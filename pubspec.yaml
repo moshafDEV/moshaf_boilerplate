@@ -21,8 +21,8 @@ executables:
   moshaf_boilerplate: generator  # Command users will execute
 
 # Optional: Add dependencies as needed
-# dependencies:
-#   args: ^2.5.0
+dependencies:
+  path: ^1.9.1
 
 # Optional: Add development dependencies for linting and code quality
 # dev_dependencies:

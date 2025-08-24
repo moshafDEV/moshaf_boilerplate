@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'dart:async';
-
+import 'dart:isolate';
+import 'package:path/path.dart' as p;
 
 void main(List<String> args) async {
+
   if (args.isEmpty) {
     _printHelp();
     exit(0);
@@ -30,6 +32,23 @@ void main(List<String> args) async {
   }
 }
 
+Future<Directory> getSourceDir(String packageName) async {
+  // Get URI to the lib/ folder of this package using dart:isolate core library
+  final libUri = await Isolate.resolvePackageUri(Uri.parse('package:$packageName/'));
+  if (libUri == null) {
+    throw StateError("Could not resolve package:$packageName/. Check the package name & global activation.");
+  }
+
+  final packageRoot = Directory.fromUri(libUri).parent; // .../package-<version>/
+  final sourceDir = Directory(p.join(packageRoot.path, 'source'));
+
+  if (!sourceDir.existsSync()) {
+    throw FileSystemException("The 'source' folder was not found in ${packageRoot.path}.\n"
+        "Make sure it is not ignored by .pubignore/.gitignore when publishing.");
+  }
+  return sourceDir;
+}
+
 void _printGeneratorVersion() {
   stdout.writeln('🚀 MOSHAF Boilerplate Generator');
   stdout.writeln('Version: 1.0.0-dev.1');
@@ -48,7 +67,7 @@ void _printHelp() {
 
 Future<void> runGenerator() async {
   stdout.writeln('\x1B[32m----------------------------------------------------------------\x1B[0m');
-  stdout.writeln('\x1B[32mWelcome to the MOSHAF Flutter Boilerplate Generator! v1.0.0\x1B[0m');
+  stdout.writeln('\x1B[32mWelcome to the MOSHAF Flutter Boilerplate Generator! v1.0.0-dev.1\x1B[0m');
   stdout.writeln('\x1B[32m----------------------------------------------------------------\x1B[0m');
   stdout.writeln('This tool will help you set up a Flutter project with:');
   stdout.writeln('- Clean Architecture structure');
@@ -114,15 +133,22 @@ Future<void> runGenerator() async {
 
   stdout.writeln('\x1B[32mInitializing the setup for your Flutter project: "$projectName". Please hold on...\x1B[0m');
   print('');
-  
+
+  const pkg = 'moshaf_boilerplate';
+  final source = await getSourceDir(pkg);
+
   // Process of creating and setting up the Flutter project
   await _runCommandWithProgress('flutter create $projectName', 'Creating Flutter project', projectName);
 
   await _runCommandWithProgress('Modifying files in folder', 'Modifying files in folder', projectName);
-  await _modifyFilesInFolder('source', 'ProjectName', projectName);
+
+  final currentDir = Directory.current;
+  await _copyAndReplaceAndDelete(source.path, currentDir.path);
+
+  await _modifyFilesInFolder(currentDir.path, 'ProjectName', projectName);
 
   await _runCommandWithProgress('Copying and replacing files', 'Copying and replacing files', projectName);
-  await _copyAndReplaceAndDelete('source', './$projectName');
+  await _copyAndReplaceAndDelete(currentDir.path, './$projectName');
 
   await _runCommandWithProgress('Cleaning up directory', 'Cleaning up directory', projectName);
   await _cleanProjectDirectory(projectName);
@@ -161,34 +187,34 @@ Future<void> _runCommandWithProgress(String command, String taskName, String pro
     // Show progress spinner for consistency
     var spinner = _getSpinner();
     var spinnerState = 0;
-    stdout.write('\x1B[33m[MOSHAF] $taskName for project: $projectName ${spinner[spinnerState]}\x1B[0m');
+    stdout.write('\x1B[33m$taskName for project: $projectName ${spinner[spinnerState]}\x1B[0m');
     var timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
       spinnerState = (spinnerState + 1) % spinner.length;
-      stdout.write('\r\x1B[33m[MOSHAF] $taskName for project: $projectName ${spinner[spinnerState]}\x1B[0m');
+      stdout.write('\r\x1B[33m$taskName for project: $projectName ${spinner[spinnerState]}\x1B[0m');
     });
     await Future.delayed(Duration(milliseconds: 600));
     timer.cancel();
-    stdout.write('\r\x1B[32m[MOSHAF] $taskName for project: $projectName ✔ Completed.\x1B[0m\n');
+    stdout.write('\r\x1B[32m$taskName for project: $projectName ✔ Completed.\x1B[0m\n');
     return;
   }
 
-  stdout.write('\x1B[33m[MOSHAF] $taskName for project: $projectName... \x1B[0m');
+  stdout.write('\x1B[33m$taskName for project: $projectName... \x1B[0m');
 
   var spinner = _getSpinner();
   var spinnerState = 0;
 
   var timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
     spinnerState = (spinnerState + 1) % spinner.length;
-    stdout.write('\r\x1B[33m[MOSHAF] $taskName for project: $projectName ${spinner[spinnerState]}\x1B[0m');
+    stdout.write('\r\x1B[33m$taskName for project: $projectName ${spinner[spinnerState]}\x1B[0m');
   });
 
   try {
     await _executeCommand(command);
     timer.cancel();
-    stdout.write('\r\x1B[32m[MOSHAF] $taskName for project: $projectName ✔ Completed.\x1B[0m\n');
+    stdout.write('\r\x1B[32m$taskName for project: $projectName ✔ Completed.\x1B[0m\n');
   } catch (e) {
     timer.cancel();
-    stdout.write('\r\x1B[31m[MOSHAF] $taskName for project: $projectName ✘ Failed: $e\x1B[0m\n');
+    stdout.write('\r\x1B[31m$taskName for project: $projectName ✘ Failed: $e\x1B[0m\n');
   }
 }
 
@@ -269,7 +295,7 @@ Future<void> _modifyFilesInFolder(String folderPath, String searchValue, String 
 
 /// Checks if [file] is an image file by its extension.
 bool _isImageFile(File file) {
-  final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff'];
+  final imageExtensions = ['.ico', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.jar'];
   final extension = '.' + file.uri.pathSegments.last.split('.').last.toLowerCase();
   return imageExtensions.contains(extension);
 }
@@ -309,8 +335,10 @@ Future<void> _copyAndReplaceAndDelete(String source, String projectName) async {
 
   try {
     await _copyFolderRecursive(sourceDir, destinationDir, 'ProjectName', projectName);
-    await sourceDir.delete(recursive: true);
-  } catch (e) {}
+    // await sourceDir.delete(recursive: true);
+  } catch (e) {
+    throw 'Error copying and replacing files: $e';
+  }
 }
 
 /// Cleans up the project directory by copying and replacing files from './[projectName]' to '.'.
