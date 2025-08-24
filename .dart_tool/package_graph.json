@@ -1,0 +1,21 @@
+{
+  "roots": [
+    "moshaf_boilerplate"
+  ],
+  "packages": [
+    {
+      "name": "moshaf_boilerplate",
+      "version": "1.0.0-dev.2",
+      "dependencies": [
+        "path"
+      ],
+      "devDependencies": []
+    },
+    {
+      "name": "path",
+      "version": "1.9.1",
+      "dependencies": []
+    }
+  ],
+  "configVersion": 1
+}
