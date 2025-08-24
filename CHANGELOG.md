@@ -1,5 +1,9 @@
 # Changelog
 
+
+## 1.0.0-dev.2
+- Enhance boilerplate generator with source directory resolution and update dependencies
+
 ## 1.0.0-dev.1
 - Initial dev release of `moshaf_boilerplate`.
 - Provides a generator for Flutter folder structure based on Clean Architecture.

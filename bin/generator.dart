@@ -32,6 +32,22 @@ void main(List<String> args) async {
   }
 }
 
+/// Reads the version from pubspec.yaml and returns it as a string.
+String getPubspecVersion() {
+  final pubspecFile = File('pubspec.yaml');
+  if (pubspecFile.existsSync()) {
+    final lines = pubspecFile.readAsLinesSync();
+    final versionLine = lines.firstWhere(
+      (line) => line.trim().startsWith('version:'),
+      orElse: () => '',
+    );
+    if (versionLine.isNotEmpty) {
+      return versionLine.split(':').last.trim();
+    }
+  }
+  return 'unknown';
+}
+
 Future<Directory> getSourceDir(String packageName) async {
   // Get URI to the lib/ folder of this package using dart:isolate core library
   final libUri = await Isolate.resolvePackageUri(Uri.parse('package:$packageName/'));
@@ -51,7 +67,7 @@ Future<Directory> getSourceDir(String packageName) async {
 
 void _printGeneratorVersion() {
   stdout.writeln('🚀 MOSHAF Boilerplate Generator');
-  stdout.writeln('Version: 1.0.0-dev.1');
+  stdout.writeln('Version: ${getPubspecVersion()}');
 }
 
 void _printHelp() {
@@ -67,7 +83,7 @@ void _printHelp() {
 
 Future<void> runGenerator() async {
   stdout.writeln('\x1B[32m----------------------------------------------------------------\x1B[0m');
-  stdout.writeln('\x1B[32mWelcome to the MOSHAF Flutter Boilerplate Generator! v1.0.0-dev.1\x1B[0m');
+  stdout.writeln('\x1B[32mWelcome to the MOSHAF Flutter Boilerplate Generator! v${getPubspecVersion()}\x1B[0m');
   stdout.writeln('\x1B[32m----------------------------------------------------------------\x1B[0m');
   stdout.writeln('This tool will help you set up a Flutter project with:');
   stdout.writeln('- Clean Architecture structure');

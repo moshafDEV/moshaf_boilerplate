@@ -1,6 +1,6 @@
 name: moshaf_boilerplate
 description: A CLI tool for generating Flutter boilerplate structures based on Clean Architecture, BLoC, dependencies, and more.
-version: 1.0.0-dev.1
+version: 1.0.0-dev.2
 
 # Repository and project links
 repository: https://github.com/moshafDEV/moshaf_boilerplate.git
