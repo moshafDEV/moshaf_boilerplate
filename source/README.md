@@ -1,6 +1,6 @@
 # ProjectName
 
-![Logo](https://moshaf.com/redesign/assets/images/logo.svg)
+![Logo](https://avatars.githubusercontent.com/u/153476629?v=4&size=120)
 
 **ProjectName App** is a Flutter-based ...
 
