@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Set Env for Dev",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "set-env.js",
+        "dev"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Set Env for Prod",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "set-env.js",
+        "prod"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    }
+  ]
+}

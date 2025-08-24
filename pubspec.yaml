@@ -1,0 +1,38 @@
+name: moshaf_boilerplate
+description: A CLI tool for generating Flutter boilerplate structures based on Clean Architecture, BLoC, dependencies, and more.
+version: 1.0.0-dev.1
+
+# Repository and project links
+repository: https://bitbucket.org/ptmoshaf/boilerplate-flutter.git
+issue_tracker: https://bitbucket.org/ptmoshaf/boilerplate-flutter.git/issues
+homepage: https://bitbucket.org/ptmoshaf/boilerplate-flutter
+
+topics:
+  - flutter
+  - boilerplate
+  - generator
+  - cli
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"   # Ensure this matches your minimum Dart SDK version
+
+# Register CLI executable
+executables:
+  moshaf_boilerplate: generator  # Command users will execute
+
+# Optional: Add dependencies as needed
+# dependencies:
+#   args: ^2.5.0
+
+# Optional: Add development dependencies for linting and code quality
+# dev_dependencies:
+#   lints: ^5.0.0
+
+flutter:
+  assets:
+    - source/
+
+# Note:
+# - Please update the repository, issue_tracker, and homepage URLs to reflect your actual project links.
+# - Uncomment and specify dependencies or dev_dependencies as required for your project.
+# - This configuration is intended for a CLI tool that assists in scaffolding Flutter projects with best practices.

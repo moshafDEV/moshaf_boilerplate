@@ -1,0 +1,77 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ProjectName Debug: Run Dev Flavor",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/main_dev.dart",
+      "args": [
+      "--flavor",
+      "dev"
+      ],
+      "preLaunchTask": "Set Env for Dev"
+    },
+    {
+      "name": "ProjectName Debug: Run Prod Flavor",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/main_prod.dart",
+      "args": [
+        "--flavor",
+        "prod"
+      ],
+      "preLaunchTask": "Set Env for Prod"
+    },
+    {
+      "name": "ProjectName Profile: Run Dev Flavor",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main_dev.dart",
+      "args": [
+        "--flavor",
+        "dev"
+      ],
+      "preLaunchTask": "Set Env for Dev"
+    },
+    {
+      "name": "ProjectName Profile: Run Prod Flavor",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main_prod.dart",
+      "args": [
+        "--flavor",
+        "prod"
+      ],
+      "preLaunchTask": "Set Env for Prod"
+    },
+    {
+      "name": "ProjectName Release: Run Dev Flavor",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main_dev.dart",
+      "args": [
+        "--flavor",
+        "dev"
+      ],
+      "preLaunchTask": "Set Env for Dev"
+    },
+    {
+      "name": "ProjectName Release: Run Prod Flavor",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main_prod.dart",
+      "args": [
+        "--flavor",
+        "prod"
+      ],
+      "preLaunchTask": "Set Env for Prod"
+    },
+  ]
+}
