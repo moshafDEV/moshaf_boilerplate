@@ -1,6 +1,6 @@
 # Flutter Boilerplate
 
-![Logo](https://avatars.githubusercontent.com/u/153476629?v=4&size=460)
+![Logo](https://avatars.githubusercontent.com/u/153476629?v=4&size=120)
 
 This repository contains a source code boilerplate designed to facilitate the initial setup of new Flutter projects. It serves as the standard coding template for projects developed by moshafDEV, ensuring consistency and adherence to best practices.
 

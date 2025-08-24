@@ -3,9 +3,9 @@ description: A CLI tool for generating Flutter boilerplate structures based on C
 version: 1.0.0-dev.1
 
 # Repository and project links
-repository: https://bitbucket.org/ptmoshaf/boilerplate-flutter.git
-issue_tracker: https://bitbucket.org/ptmoshaf/boilerplate-flutter.git/issues
-homepage: https://bitbucket.org/ptmoshaf/boilerplate-flutter
+repository: https://github.com/moshafDEV/moshaf_boilerplate.git
+issue_tracker: https://github.com/moshafDEV/moshaf_boilerplate/issues
+homepage: https://github.com/moshafDEV/moshaf_boilerplate
 
 topics:
   - flutter
