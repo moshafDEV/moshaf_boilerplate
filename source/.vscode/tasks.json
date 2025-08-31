@@ -4,9 +4,10 @@
     {
       "label": "Set Env for Dev",
       "type": "shell",
-      "command": "node",
+      "command": "dart",
       "args": [
-        "set-env.js",
+        "run",
+        "pre_launch_task.dart",
         "dev"
       ],
       "group": {
@@ -17,9 +18,10 @@
     {
       "label": "Set Env for Prod",
       "type": "shell",
-      "command": "node",
+      "command": "dart",
       "args": [
-        "set-env.js",
+        "run",
+        "pre_launch_task.dart",
         "prod"
       ],
       "group": {

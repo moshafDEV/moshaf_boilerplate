@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ProjectName/core/constants/textstyle.dart';
 import 'package:ProjectName/presentation/bloc/login/login_bloc.dart';
-import 'package:ProjectName/presentation/component/text_field_custom_widget.dart';
+import 'package:ProjectName/presentation/components/text_field_custom_widget.dart';
 
 class PasswordInputField extends StatefulWidget {
   const PasswordInputField({super.key});

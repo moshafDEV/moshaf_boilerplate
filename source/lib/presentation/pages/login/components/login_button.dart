@@ -6,8 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ProjectName/core/constants/textstyle.dart';
 import 'package:ProjectName/core/routes/app_path.dart';
 import 'package:ProjectName/presentation/bloc/login/login_bloc.dart';
-import 'package:ProjectName/presentation/component/button.dart';
-import 'package:ProjectName/presentation/component/snackbar_widget.dart';
+import 'package:ProjectName/presentation/components/button.dart';
+import 'package:ProjectName/presentation/components/snackbar_widget.dart';
 
 class LoginButton extends StatefulWidget {
   const LoginButton({super.key});

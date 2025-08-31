@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:ProjectName/core/config/di_module/init_config.dart';
 import 'package:ProjectName/core/constants/textstyle.dart';
 import 'package:ProjectName/core/utils/keyboard_util.dart';
 import 'package:ProjectName/domain/usecase/login/login.dart';
 import 'package:ProjectName/domain/usecase/login/profile.dart';
 import 'package:ProjectName/presentation/bloc/login/login_bloc.dart';
-import 'package:ProjectName/presentation/component/fade_in_up_animate.dart';
+import 'package:ProjectName/presentation/components/fade_in_up_animate.dart';
 import 'package:ProjectName/presentation/pages/login/components/email_input_field.dart';
 import 'package:ProjectName/presentation/pages/login/components/login_button.dart';
 import 'package:ProjectName/presentation/pages/login/components/password_input_field.dart';
@@ -66,10 +65,15 @@ class LoginPageContent extends StatelessWidget {
                     60.verticalSpace,
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 26),
-                      child: SvgPicture.asset(
-                        'assets/svg/logo.svg',
-                        height: 80, // Adjust as needed
-                        fit: BoxFit.contain,
+                      child: ColorFiltered(
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                        child: Image.network(
+                          'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/MIT_Logo_New.svg/330px-MIT_Logo_New.svg.png',
+                          width: 120,
+                        ),
                       ),
                     ),
                     40.verticalSpace,

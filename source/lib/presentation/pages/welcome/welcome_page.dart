@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:ProjectName/core/constants/textstyle.dart';
 import 'package:ProjectName/core/env/secure_storage_key.dart';
 import 'package:ProjectName/core/routes/app_path.dart';
 import 'package:ProjectName/core/utils/storage_data.dart';
-import 'package:ProjectName/presentation/component/button.dart';
-import 'package:ProjectName/presentation/component/fade_in_up_animate.dart';
+import 'package:ProjectName/presentation/components/button.dart';
+import 'package:ProjectName/presentation/components/fade_in_up_animate.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -75,10 +74,12 @@ class WelcomePage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SvgPicture.asset(
-          'assets/svg/logo.svg',
-          fit: BoxFit.cover,
-          width: 110, // This makes it full screen
+        ColorFiltered(
+          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          child: Image.network(
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/MIT_Logo_New.svg/330px-MIT_Logo_New.svg.png',
+            width: 90,
+          ),
         ),
       ],
     );
@@ -90,7 +91,7 @@ class WelcomePage extends StatelessWidget {
       children: [
         // Main title
         Text(
-          'Selamat Datang',
+          'Welcome',
           style: white16Bold.copyWith(
             fontSize: 36,
             height: 1.2,
@@ -101,7 +102,7 @@ class WelcomePage extends StatelessWidget {
         24.verticalSpace,
 
         // Description text
-        Text('Boilerplate moshaf', style: white16Regular),
+        Text('MOSHAF Boilerplate', style: white16Regular),
       ],
     );
   }

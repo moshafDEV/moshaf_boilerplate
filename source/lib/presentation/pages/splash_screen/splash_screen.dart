@@ -1,8 +1,6 @@
 import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:ProjectName/core/env/secure_storage_key.dart';
 import 'package:ProjectName/core/routes/app_path.dart' show Paths;
 import 'package:ProjectName/core/utils/storage_data.dart';
@@ -101,7 +99,10 @@ class _SplashScreenState extends State<SplashScreen>
                     alignment: Alignment.center,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 42),
-                      child: SvgPicture.asset('assets/svg/logo.svg'),
+                      child: Image.network(
+                        'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/MIT_Logo_New.svg/330px-MIT_Logo_New.svg.png',
+                        width: 150,
+                      ),
                     ),
                   ),
                   Positioned(

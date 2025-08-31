@@ -10,6 +10,20 @@ This repository provides a boilerplate source code to streamline the initial set
 - Modular codebase for rapid development
 - Pre-configured assets and essential directories
 - Ready-to-use templates for common features
+- Integrated support for multiple environments using [`flutter_flavor`](https://pub.dev/packages/flutter_flavor)
+- State management with [`flutter_bloc`](https://pub.dev/packages/flutter_bloc)
+- Dependency injection via [`get_it`](https://pub.dev/packages/get_it)
+- Networking powered by [`dio`](https://pub.dev/packages/dio)
+- Local storage setup with [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage)
+- Routing handled by [`go_router`](https://pub.dev/packages/go_router)
+- Linting and code quality enforced with [`flutter_lints`](https://pub.dev/packages/flutter_lints)
+- Unit and widget testing configuration
+- Customizable theme and localization support
+- Error handling and logging modules
+- Analytics integration for screen tracking
+- Example implementation for authentication (login/profile)
+- Separation of data, domain, and presentation layers
+- Configurable environment variables and DI modules
 
 ## Installation Guide
 

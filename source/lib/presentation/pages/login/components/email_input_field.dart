@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ProjectName/presentation/bloc/login/login_bloc.dart';
-import 'package:ProjectName/presentation/component/text_field_custom_widget.dart';
+import 'package:ProjectName/presentation/components/text_field_custom_widget.dart';
 
 class EmailInputField extends StatefulWidget {
   const EmailInputField({super.key});

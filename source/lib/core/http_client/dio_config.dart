@@ -3,8 +3,10 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
-import 'package:ProjectName/core/http_client/interceptors/custom_interceptor.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:ProjectName/core/config/app_config.dart';
+import 'package:ProjectName/core/http_client/interceptors/custom_interceptor.dart';
 
 void setLoggerInterceptor(Dio dio) {
   dio.interceptors.add(CustomInterceptor());
@@ -17,7 +19,12 @@ void setLoggerInterceptor(Dio dio) {
       error: true,
       compact: true,
       maxWidth: 120,
-      logPrint: (object) => log(object.toString()),
+      logPrint: (object) {
+        Flavor mode = FlavorConfig.instance.variables["mode"];
+        if (mode == Flavor.dev) {
+          log(object.toString());
+        }
+      },
     ),
   );
 }
