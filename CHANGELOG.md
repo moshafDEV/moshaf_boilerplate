@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.2
+- Improved documentation and added usage examples.
+- Updated dependencies for better compatibility.
+- Fixed minor bugs in flavor configuration.
+- Enhanced error handling during project generation.
+- Refactored code for maintainability and readability.
+
 ## 1.0.1
 - Prioritize the use of FVM for Flutter version management.
 - Tested and verified with Flutter 3.38.0, now set as the minimum supported version.

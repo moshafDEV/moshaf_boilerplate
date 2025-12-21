@@ -472,50 +472,49 @@ bool _isImageFile(File file) {
   return imageExtensions.contains(extension);
 }
 
+
+String _restoreDotSegments(String relativePath, {String dotPrefix = 'dot_'}) {
+  final parts = p.split(relativePath).map((seg) {
+    if (seg.startsWith(dotPrefix)) {
+      return '.${seg.substring(dotPrefix.length)}';
+    }
+    return seg;
+  }).toList();
+  return p.joinAll(parts);
+}
+
 /// Recursively copies [source] folder to [destination], replacing [replace] with [replaceWith] in paths.
 Future<void> _copyFolderRecursive(
   Directory source,
   Directory destination,
   String replace,
-  String replaceWith,
-) async {
+  String replaceWith, {
+  String dotPrefix = 'dot_', // template: dot_env, dot_vscode, dst
+}) async {
   try {
-    // Ensure the destination folder exists, create if it doesn't
-    if (!await destination.exists()) {
-      await destination.create(recursive: true);
+    if (!await source.exists()) {
+      throw ArgumentError('Source folder tidak ada: ${source.path}');
     }
 
-    // Get all entities, including dot (hidden) files and folders
-    var entities = source.listSync(recursive: true, followLinks: false);
-    
-    for (var entity in entities) {
-      // Determine the relative path for each entity
-      String relativePath = entity.path.replaceFirst(source.path, '');
-      
-      // Determine the target path and perform replacement in the path
-      String targetPath = '${destination.path}/$relativePath'.replaceAll(
-        replace,
-        replaceWith,
-      );
+    await destination.create(recursive: true);
 
-      // If the entity is a directory, recurse
+    // Single pass (recursive list) -> jangan recurse manual lagi
+    await for (final entity in source.list(recursive: true, followLinks: false)) {
+      final rel = p.relative(entity.path, from: source.path);
+
+      // 1) restore dot_* => .*
+      var relMapped = _restoreDotSegments(rel, dotPrefix: dotPrefix);
+
+      // 2) replace placeholder di path
+      relMapped = relMapped.replaceAll(replace, replaceWith);
+
+      final targetPath = p.join(destination.path, relMapped);
+
       if (entity is Directory) {
-        var newDestination = Directory(targetPath);
-        // Ensure the destination folder exists, create if it doesn't
-        if (!await newDestination.exists()) {
-          await newDestination.create(recursive: true);
-        }
-        // Recursively copy the contents of the folder
-        await _copyFolderRecursive(
-          entity,
-          newDestination,
-          replace,
-          replaceWith,
-        );
+        await Directory(targetPath).create(recursive: true);
       } else if (entity is File) {
-        var newFile = File(targetPath);
-        // Copy the file to the target location
-        await entity.copy(newFile.path);
+        await File(targetPath).parent.create(recursive: true);
+        await entity.copy(targetPath);
       }
     }
   } catch (e, st) {
