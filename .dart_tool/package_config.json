@@ -3,7 +3,7 @@
   "packages": [
     {
       "name": "path",
-      "rootUri": "file:///Users/umini/.pub-cache/hosted/pub.dev/path-1.9.1",
+      "rootUri": "file:///Users/administrator/.pub-cache/hosted/pub.dev/path-1.9.1",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -15,6 +15,6 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.9.1",
-  "pubCache": "file:///Users/umini/.pub-cache"
+  "generatorVersion": "3.9.2",
+  "pubCache": "file:///Users/administrator/.pub-cache"
 }

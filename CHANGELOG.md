@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1
+- Prioritize the use of FVM for Flutter version management.
+- Tested and verified with Flutter 3.38.0, now set as the minimum supported version.
+- Added Android and iOS source code to support flavor configurations.
+- Fixed execution issues with dot files.
+- Added comprehensive example project for documentation purposes.
+- Various improvements and codebase refinements.
+
 ## 1.0.0
 - Stable release of `moshaf_boilerplate` version 1.0.0.
 - Includes all features from previous dev versions.

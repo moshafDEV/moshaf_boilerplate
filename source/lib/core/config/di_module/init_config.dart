@@ -1,6 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
-import 'package:gtm/gtm.dart';
+// import 'package:gtm/gtm.dart';
 import 'package:injectable/injectable.dart';
 import 'package:ProjectName/core/env/secure_storage_key.dart';
 import 'package:ProjectName/core/services/navigation_service.dart';
@@ -9,7 +9,7 @@ import 'package:ProjectName/core/utils/storage_data.dart';
 import 'init_config.config.dart';
 
 final getIt = GetIt.instance;
-final gtm = Gtm.instance;
+// final gtm = Gtm.instance;
 
 @InjectableInit(
   initializerName: r'$initGetIt',

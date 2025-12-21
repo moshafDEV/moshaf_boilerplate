@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Set Env for Dev",
+      "type": "shell",
+      "command": "dart",
+      "args": [
+        "run",
+        "pre_launch_task.dart",
+        "dev"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Set Env for Prod",
+      "type": "shell",
+      "command": "dart",
+      "args": [
+        "run",
+        "pre_launch_task.dart",
+        "prod"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    }
+  ]
+}

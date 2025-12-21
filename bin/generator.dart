@@ -121,13 +121,11 @@ Future<void> runGenerator() async {
   // Check Flutter version
   ProcessResult result;
   try {
-    result = await Process.run('flutter', ['--version'], runInShell: true);
+    // Try with FVM first
+    result = await Process.run('fvm', ['flutter', '--version'], runInShell: true);
     if (result.exitCode != 0) {
-      // Try with FVM if flutter fails
-      result = await Process.run('fvm', [
-        'flutter',
-        '--version',
-      ], runInShell: true);
+      // Fallback to flutter if FVM fails
+      result = await Process.run('flutter', ['--version'], runInShell: true);
     }
   } catch (e) {
     stdout.writeln(
@@ -142,15 +140,20 @@ Future<void> runGenerator() async {
     var match = versionRegex.firstMatch(result.stdout);
     if (match != null) {
       flutterVersion = match.group(1) ?? '';
-      if (flutterVersion != '3.32.2') {
+      List<String> versionParts = flutterVersion.split('.');
+      int major = int.tryParse(versionParts[0]) ?? 0;
+      int minor = int.tryParse(versionParts[1]) ?? 0;
+
+      // Minimum recommended version: 3.38.0
+      if (major < 3 || (major == 3 && minor < 38)) {
         stdout.writeln(
           '\x1B[33mFlutter version detected: $flutterVersion\x1B[0m',
         );
         stdout.writeln(
-          '\x1B[31mWarning: Recommended Flutter version is 3.32.2, but detected $flutterVersion.\x1B[0m',
+          '\x1B[31mWarning: Recommended Flutter version is 3.38.0 or higher, but detected $flutterVersion.\x1B[0m',
         );
         stdout.writeln(
-          '\x1B[31mPlease use Flutter 3.32.2 for best compatibility with this boilerplate.\x1B[0m',
+          '\x1B[31mPlease use Flutter 3.38.0 or newer for best compatibility with this boilerplate.\x1B[0m',
         );
       } else {
         stdout.writeln(
@@ -243,7 +246,7 @@ Future<void> runGenerator() async {
       'flutter_bloc',
       'flutter_secure_storage',
       'get_it',
-      'gtm',
+      // 'gtm',
       'http',
       'device_info_plus',
       'package_info_plus',
@@ -288,6 +291,8 @@ Future<void> runGenerator() async {
     true,
     projectName,
   );
+
+
 
   await _selfDestruct(
     [
@@ -372,22 +377,21 @@ Future<void> _executeCommand(String command) async {
     String executable = parts[0];
     List<String> arguments = parts.skip(1).toList();
 
-    ProcessResult result = await Process.run(
-      executable,
-      arguments,
-      runInShell: true,
-    );
+    ProcessResult result;
 
-    if (result.exitCode != 0) {
-      if (executable == 'flutter') {
-        result = await Process.run('fvm', [
-          executable,
-          ...arguments,
-        ], runInShell: true);
+    // Try FVM first if the command is for flutter
+    if (executable == 'flutter' || executable == 'dart') {
+      result = await Process.run('fvm', [executable, ...arguments], runInShell: true);
+      if (result.exitCode != 0) {
+        // Fallback to flutter if FVM fails
+        result = await Process.run(executable, arguments, runInShell: true);
         if (result.exitCode != 0) {
           throw 'Error executing command: ${result.stderr}';
         }
-      } else {
+      }
+    } else {
+      result = await Process.run(executable, arguments, runInShell: true);
+      if (result.exitCode != 0) {
         throw 'Error executing command: ${result.stderr}';
       }
     }
@@ -442,8 +446,9 @@ Future<void> _modifyFilesInFolder(
     await for (var entity in dir.list(recursive: true)) {
       if (entity is File) {
         // Make sure not to modify image files or '.DS_Store' files
-        if (entity.uri.pathSegments.last == '.DS_Store' || _isImageFile(entity))
+        if (entity.uri.pathSegments.last == '.DS_Store' || _isImageFile(entity)) {
           continue;
+        }
         await _replaceTextInFile(entity, searchValue, replaceValue);
       }
     }
@@ -474,28 +479,33 @@ Future<void> _copyFolderRecursive(
   String replace,
   String replaceWith,
 ) async {
-
-  // print(source);
-  // print(destination);
-  // print(replace);
-  // print(replaceWith);
-  // return;
-
   try {
+    // Ensure the destination folder exists, create if it doesn't
     if (!await destination.exists()) {
       await destination.create(recursive: true);
     }
 
-    var entities = source.listSync();
+    // Get all entities, including dot (hidden) files and folders
+    var entities = source.listSync(recursive: true, followLinks: false);
+    
     for (var entity in entities) {
+      // Determine the relative path for each entity
       String relativePath = entity.path.replaceFirst(source.path, '');
+      
+      // Determine the target path and perform replacement in the path
       String targetPath = '${destination.path}/$relativePath'.replaceAll(
         replace,
         replaceWith,
       );
 
+      // If the entity is a directory, recurse
       if (entity is Directory) {
         var newDestination = Directory(targetPath);
+        // Ensure the destination folder exists, create if it doesn't
+        if (!await newDestination.exists()) {
+          await newDestination.create(recursive: true);
+        }
+        // Recursively copy the contents of the folder
         await _copyFolderRecursive(
           entity,
           newDestination,
@@ -504,6 +514,7 @@ Future<void> _copyFolderRecursive(
         );
       } else if (entity is File) {
         var newFile = File(targetPath);
+        // Copy the file to the target location
         await entity.copy(newFile.path);
       }
     }
@@ -513,6 +524,7 @@ Future<void> _copyFolderRecursive(
     rethrow;
   }
 }
+
 
 /// Copies [source] folder to [projectName] directory, replacing text and then deletes [source].
 Future<void> _copyAndReplaceAndDelete(String source, String projectName) async {
@@ -549,6 +561,15 @@ Future<void> _selfDestruct(List<String> projectNames) async {
       var prjTarget = Directory(projectName);
       prjTarget.delete(recursive: true);
     }
+    print('');
+    stdout.write(
+      '\r\x1B[32mFinishing up, please wait...\x1B[0m\n',
+    );
+    await _executeCommand('flutter pub run build_runner build --delete-conflicting-outputs');
+    stdout.write(
+      '\r\x1B[32m✔ Completed.\x1B[0m\n',
+    );
+
     print('');
     print('Your Flutter project is now ready and set up with best practices!');
     print('Thank you for using MOSHAF Boilerplate Generator.');
