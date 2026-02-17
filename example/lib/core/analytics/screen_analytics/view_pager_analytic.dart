@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:example_app/core/analytics/analytic.dart';
-import 'package:example_app/core/analytics/screen_analytics/screen_analytic.dart';
+import 'package:example/core/analytics/analytic.dart';
+import 'package:example/core/analytics/screen_analytics/screen_analytic.dart';
 
 class ViewPagerAnalyticObserver with ScreenAnalyticTracker {
   ViewPagerAnalyticObserver(Analytic analytic) {

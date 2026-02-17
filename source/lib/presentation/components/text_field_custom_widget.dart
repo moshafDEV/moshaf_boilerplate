@@ -43,14 +43,14 @@ class TextFieldCustomWidget extends StatelessWidget {
             children: [
               TextSpan(
                 text: labelText,
-                style: darkBlue10Medium.copyWith(fontSize: 16),
+                style: genStyle10Medium.copyWith(fontSize: 16),
               ),
               if (isRequired)
                 TextSpan(
                   text: ' *',
-                  style: darkBlue10Medium.copyWith(
+                  style: genStyle10Medium.copyWith(
                     fontSize: 16,
-                    color: kMainRed,
+                    color: kMainDanger,
                   ),
                 ),
             ],
@@ -120,28 +120,28 @@ class _TextFormFieldStatelessState extends State<_TextFormFieldStateless> {
       textInputAction: widget.textInputAction,
       decoration: InputDecoration(
         hintText: widget.hintText,
-        hintStyle: darkBlue16Regular.copyWith(
+        hintStyle: genStyle16Regular.copyWith(
           fontSize: 16,
-          color: kMainGrayDark,
+          color: kMainSecondary,
         ),
         filled: true,
-        fillColor: colorFilledForm,
+        fillColor: kMainWhite,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
             color: widget.useErrorBorder
                 ? const Color.fromARGB(255, 207, 37, 25)
-                : colorBorderForm,
+                : kMainSecondary,
             width: 1,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: colorBorderForm, width: 1),
+          borderSide: const BorderSide(color: kMainSecondary, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: kMainGreen, width: 2),
+          borderSide: const BorderSide(color: kMainPrimary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -163,7 +163,7 @@ class _TextFormFieldStatelessState extends State<_TextFormFieldStateless> {
                   _isPasswordVisible
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
-                  color: colorIconForm,
+                  color: kMainBlack,
                   size: 20,
                 ),
               )

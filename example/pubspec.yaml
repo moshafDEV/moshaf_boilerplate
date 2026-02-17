@@ -1,4 +1,4 @@
-name: example_app
+name: example
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.10.4
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -34,10 +34,10 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  envied: ^1.3.2
+  envied: ^1.3.3
   dartz: ^0.10.1
-  dio: ^5.9.0
-  equatable: ^2.0.7
+  dio: ^5.9.1
+  equatable: ^2.0.8
   flutter_bloc: ^9.1.1
   flutter_secure_storage: ^10.0.0
   get_it: ^9.2.0
@@ -46,23 +46,23 @@ dependencies:
   package_info_plus: ^9.0.0
   pretty_dio_logger: ^1.4.0
   crypto: ^3.0.7
-  timezone: ^0.10.1
-  firebase_analytics: ^12.1.0
-  firebase_crashlytics: ^5.0.6
+  timezone: ^0.11.0
+  firebase_analytics: ^12.1.2
+  firebase_crashlytics: ^5.0.7
   flutter_flavor: ^3.1.4
-  injectable: ^2.7.1+2
+  injectable: ^2.7.1+4
   flutter_dotenv: ^6.0.0
   easy_localization: ^3.0.8
-  firebase_messaging: ^16.1.0
+  firebase_messaging: ^16.1.1
   flutter_screenutil: ^5.9.3
-  chucker_flutter: ^1.9.0
+  chucker_flutter: ^1.9.1
   flutter_svg: ^2.2.3
-  awesome_extensions: ^2.0.26
+  awesome_extensions: ^2.1.0
   cached_network_image: ^3.4.1
-  json_annotation: ^4.9.0
+  json_annotation: ^4.10.0
   freezed_annotation: ^3.1.0
   flutter_inappwebview: ^6.1.5
-  pinput: ^6.0.1
+  pinput: ^6.0.2
 
 dev_dependencies:
   flutter_test:
@@ -74,24 +74,24 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-  build_runner: ^2.10.4
-  envied_generator: ^1.3.2
-  freezed: ^3.2.3
-  json_serializable: ^6.11.2
-  injectable_generator: ^2.9.1
+  build_runner: ^2.11.1
+  envied_generator: ^1.3.3
+  freezed: ^3.2.5
+  json_serializable: ^6.12.0
+  injectable_generator: ^2.12.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 flutter_native_splash:
   color: "#FFFFFF"
-  image: assets/icons/ic_splashscreen.png
+  image: assets/images/ic_splashscreen.png
   color_dark: "#FFFFFF"
-  image_dark: assets/icons/ic_splashscreen.png
+  image_dark: assets/images/ic_splashscreen.png
   android_12:
-    image: assets/icons/ic_splashscreen_andro.png
+    image: assets/images/ic_splashscreen_andro.png
     icon_background_color: "#FFFFFF"
-    image_dark: assets/icons/ic_splashscreen_andro.png
+    image_dark: assets/images/ic_splashscreen_andro.png
     icon_background_color_dark: "#FFFFFF"
   web: false
 
@@ -99,40 +99,40 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   remove_alpha_ios: true
-  image_path: "assets/icons/ic_app.png"
+  image_path: "assets/images/ic_app.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
   web:
     generate: true
-    image_path: "assets/icons/ic_app.png"
+    image_path: "assets/images/ic_app.png"
     background_color: "#ffffff"
     theme_color: "#ffffff"
   windows:
     generate: true
-    image_path: "assets/icons/ic_app.png"
+    image_path: "assets/images/ic_app.png"
     icon_size: 48 # min:48, max:256, default: 48
   macos:
     generate: true
-    image_path: "assets/icons/ic_app.png"
+    image_path: "assets/images/ic_app.png"
 
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
   assets:
-    - assets/icons/
     - assets/images/
     - assets/translations/
-    - assets/animations/
     - assets/fonts/
     - assets/svg/
     - .env
+
+    
   # fonts:
-  #   - family: BCASans
+  #   - family: TestSans
   #     fonts:
-  #       - asset: assets/fonts/BCASans/BCASans-Regular.ttf
+  #       - asset: assets/fonts/TestSans/TestSans-Regular.ttf
   #         weight: 400
-  #       - asset: assets/fonts/BCASans/BCASans-SemiBold.ttf
+  #       - asset: assets/fonts/TestSans/TestSans-SemiBold.ttf
   #         weight: 500
-  #       - asset: assets/fonts/BCASans/BCASans-Bold.ttf
+  #       - asset: assets/fonts/TestSans/TestSans-Bold.ttf
   #         weight: 600
-  #       - asset: assets/fonts/BCASans/BCASans-Extrabold.ttf
+  #       - asset: assets/fonts/TestSans/TestSans-Extrabold.ttf
   #         weight: 700

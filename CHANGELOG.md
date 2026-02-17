@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.3
+- Added support for custom project templates.
+- Improved CLI prompts for better user experience.
+- Fixed issues with flavor-specific asset generation.
+- Updated documentation for new features.
+- Enhanced compatibility with latest Flutter versions.
+
 ## 1.0.2
 - Improved documentation and added usage examples.
 - Updated dependencies for better compatibility.

@@ -96,8 +96,8 @@ class _PrimaryButtonState extends State<PrimaryButton>
 
   @override
   Widget build(BuildContext context) {
-    final defaultBackgroundColor = widget.backgroundColor ?? kMainGreen;
-    final defaultTextColor = widget.textColor ?? Colors.white;
+    final defaultBackgroundColor = widget.backgroundColor ?? kMainInfo;
+    final defaultTextColor = widget.textColor ?? kMainWhite;
     final buttonWidth = widget.width ?? double.infinity;
 
     return AnimatedBuilder(
@@ -116,7 +116,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                     ? LinearGradient(
                         colors:
                             widget.gradientColors ??
-                            [kMainGreen, kMainGreenDark],
+                            [kMainPrimary, kMainPrimary],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       )
@@ -129,7 +129,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                           color:
                               (widget.hasGradient
                                       ? (widget.gradientColors?.first ??
-                                            kMainGreen)
+                                            kMainPrimary)
                                       : defaultBackgroundColor)
                                   .withAlpha(40),
                           blurRadius: widget.elevation ?? 8,

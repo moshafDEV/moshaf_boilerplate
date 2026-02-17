@@ -1,19 +1,21 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:example_app/core/env/secure_storage_key.dart';
-import 'package:example_app/core/utils/storage_data.dart';
-import 'package:example_app/core/utils/validators.dart';
-import 'package:example_app/data/models/login/response/auth_response_model.dart';
-import 'package:example_app/data/models/profile/response/profile_reponse_model.dart';
-import 'package:example_app/domain/entities/login_param/login_param_entity.dart';
-import 'package:example_app/domain/entities/text_input_field/text_input_field_entity.dart';
-import 'package:example_app/domain/usecase/login/login.dart';
-import 'package:example_app/domain/usecase/login/profile.dart';
+import 'package:example/core/env/secure_storage_key.dart';
+import 'package:example/core/utils/storage_data.dart';
+import 'package:example/core/utils/validators.dart';
+import 'package:example/data/models/login/response/auth_response_model.dart';
+import 'package:example/data/models/profile/response/profile_reponse_model.dart';
+import 'package:example/domain/entities/login_param/login_param_entity.dart';
+import 'package:example/domain/entities/text_input_field/text_input_field_entity.dart';
+import 'package:example/domain/usecase/login/login.dart';
+import 'package:example/domain/usecase/login/profile.dart';
+import 'package:injectable/injectable.dart';
 
 part 'login_bloc.freezed.dart';
 part 'login_event.dart';
 part 'login_state.dart';
 
+@injectable
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final LoginUsecase loginUsecase;
   final ProfileUsecase profileUsecase;

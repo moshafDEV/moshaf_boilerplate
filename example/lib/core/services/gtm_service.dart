@@ -1,4 +1,4 @@
-import 'package:example_app/core/config/di_module/init_config.dart';
+import 'package:example/core/config/di_module/init_config.dart';
 
 class gtmService {
   pageView(String pageName) {

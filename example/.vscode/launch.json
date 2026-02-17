@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "example_app Debug: Run Dev Flavor",
+      "name": "example Debug: Run Dev Flavor",
       "request": "launch",
       "type": "dart",
       "flutterMode": "debug",
@@ -14,7 +14,7 @@
       "preLaunchTask": "Set Env for Dev"
     },
     {
-      "name": "example_app Debug: Run Prod Flavor",
+      "name": "example Debug: Run Prod Flavor",
       "request": "launch",
       "type": "dart",
       "flutterMode": "debug",
@@ -26,7 +26,7 @@
       "preLaunchTask": "Set Env for Prod"
     },
     {
-      "name": "example_app Profile: Run Dev Flavor",
+      "name": "example Profile: Run Dev Flavor",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile",
@@ -38,7 +38,7 @@
       "preLaunchTask": "Set Env for Dev"
     },
     {
-      "name": "example_app Profile: Run Prod Flavor",
+      "name": "example Profile: Run Prod Flavor",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile",
@@ -50,7 +50,7 @@
       "preLaunchTask": "Set Env for Prod"
     },
     {
-      "name": "example_app Release: Run Dev Flavor",
+      "name": "example Release: Run Dev Flavor",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",
@@ -62,7 +62,7 @@
       "preLaunchTask": "Set Env for Dev"
     },
     {
-      "name": "example_app Release: Run Prod Flavor",
+      "name": "example Release: Run Prod Flavor",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",

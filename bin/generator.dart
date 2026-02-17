@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:isolate';
 import 'package:path/path.dart' as p;
+import 'pre_launch_task.dart';
 
 void main(List<String> args) async {
   if (args.isEmpty) {
@@ -14,6 +15,10 @@ void main(List<String> args) async {
   switch (command) {
     case 'create':
       await runGenerator();
+      break;
+
+    case 'pre_launch_task':
+      await mainPLT(args.sublist(1));
       break;
 
     case 'version':
@@ -122,7 +127,8 @@ Future<void> runGenerator() async {
   ProcessResult result;
   try {
     // Try with FVM first
-    result = await Process.run('fvm', ['flutter', '--version'], runInShell: true);
+    result =
+        await Process.run('fvm', ['flutter', '--version'], runInShell: true);
     if (result.exitCode != 0) {
       // Fallback to flutter if FVM fails
       result = await Process.run('flutter', ['--version'], runInShell: true);
@@ -216,7 +222,8 @@ Future<void> runGenerator() async {
   final currentDir = Directory.current;
   await _copyAndReplaceAndDelete(source.path, '${currentDir.path}/source');
 
-  await _modifyFilesInFolder('${currentDir.path}/source', 'ProjectName', projectName);
+  await _modifyFilesInFolder(
+      '${currentDir.path}/source', 'ProjectName', projectName);
 
   await _runCommandWithProgress(
     'Copying and replacing files',
@@ -292,13 +299,8 @@ Future<void> runGenerator() async {
     projectName,
   );
 
-
-
   await _selfDestruct(
-    [
-      '${currentDir.path}/source',
-      projectName
-    ],
+    ['${currentDir.path}/source', projectName],
   );
 }
 
@@ -381,7 +383,8 @@ Future<void> _executeCommand(String command) async {
 
     // Try FVM first if the command is for flutter
     if (executable == 'flutter' || executable == 'dart') {
-      result = await Process.run('fvm', [executable, ...arguments], runInShell: true);
+      result = await Process.run('fvm', [executable, ...arguments],
+          runInShell: true);
       if (result.exitCode != 0) {
         // Fallback to flutter if FVM fails
         result = await Process.run(executable, arguments, runInShell: true);
@@ -446,7 +449,8 @@ Future<void> _modifyFilesInFolder(
     await for (var entity in dir.list(recursive: true)) {
       if (entity is File) {
         // Make sure not to modify image files or '.DS_Store' files
-        if (entity.uri.pathSegments.last == '.DS_Store' || _isImageFile(entity)) {
+        if (entity.uri.pathSegments.last == '.DS_Store' ||
+            _isImageFile(entity)) {
           continue;
         }
         await _replaceTextInFile(entity, searchValue, replaceValue);
@@ -471,7 +475,6 @@ bool _isImageFile(File file) {
       '.' + file.uri.pathSegments.last.split('.').last.toLowerCase();
   return imageExtensions.contains(extension);
 }
-
 
 String _restoreDotSegments(String relativePath, {String dotPrefix = 'dot_'}) {
   final parts = p.split(relativePath).map((seg) {
@@ -499,7 +502,8 @@ Future<void> _copyFolderRecursive(
     await destination.create(recursive: true);
 
     // Single pass (recursive list) -> jangan recurse manual lagi
-    await for (final entity in source.list(recursive: true, followLinks: false)) {
+    await for (final entity
+        in source.list(recursive: true, followLinks: false)) {
       final rel = p.relative(entity.path, from: source.path);
 
       // 1) restore dot_* => .*
@@ -523,7 +527,6 @@ Future<void> _copyFolderRecursive(
     rethrow;
   }
 }
-
 
 /// Copies [source] folder to [projectName] directory, replacing text and then deletes [source].
 Future<void> _copyAndReplaceAndDelete(String source, String projectName) async {
@@ -564,7 +567,8 @@ Future<void> _selfDestruct(List<String> projectNames) async {
     stdout.write(
       '\r\x1B[32mFinishing up, please wait...\x1B[0m\n',
     );
-    await _executeCommand('flutter pub run build_runner build --delete-conflicting-outputs');
+    await _executeCommand(
+        'flutter pub run build_runner build --delete-conflicting-outputs');
     stdout.write(
       '\r\x1B[32m✔ Completed.\x1B[0m\n',
     );
@@ -573,5 +577,8 @@ Future<void> _selfDestruct(List<String> projectNames) async {
     print('Your Flutter project is now ready and set up with best practices!');
     print('Thank you for using MOSHAF Boilerplate Generator.');
     print('💻 Happy coding and good luck with your project! 🚀');
-  } catch (e) {}
+  } catch (e) {
+    print('\x1B[31mError during self-destruct: $e\x1B[0m');
+    throw 'Error during self-destruct: $e';
+  }
 }

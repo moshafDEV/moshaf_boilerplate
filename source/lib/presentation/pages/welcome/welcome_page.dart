@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'package:ProjectName/core/constants/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ProjectName/core/constants/textstyle.dart';
 import 'package:ProjectName/core/env/secure_storage_key.dart';
@@ -77,7 +79,7 @@ class WelcomePage extends StatelessWidget {
         ColorFiltered(
           colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
           child: Image.network(
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/MIT_Logo_New.svg/330px-MIT_Logo_New.svg.png',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/MIT_logo_2003-2023.svg/330px-MIT_logo_2003-2023.svg.png',
             width: 90,
           ),
         ),
@@ -92,9 +94,10 @@ class WelcomePage extends StatelessWidget {
         // Main title
         Text(
           'Welcome',
-          style: white16Bold.copyWith(
+          style: genStyle16Bold.copyWith(
             fontSize: 36,
             height: 1.2,
+            color: kMainWhite,
             letterSpacing: -0.5,
           ),
         ),
@@ -102,7 +105,10 @@ class WelcomePage extends StatelessWidget {
         24.verticalSpace,
 
         // Description text
-        Text('MOSHAF Boilerplate', style: white16Regular),
+        Text(
+          'MOSHAF Boilerplate',
+          style: genStyle16Regular.copyWith(color: kMainWhite),
+        ),
       ],
     );
   }
@@ -113,7 +119,7 @@ class WelcomePage extends StatelessWidget {
       onPressed: () => _navigateToNextPage(context),
       width: double.infinity,
       height: 40,
-      textStyle: white14Bold,
+      textStyle: genStyle14Bold.copyWith(color: kMainWhite),
     );
   }
 

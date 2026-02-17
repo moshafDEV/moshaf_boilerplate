@@ -7,12 +7,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:example_app/app.dart';
-import 'package:example_app/core/config/app_config.dart';
-import 'package:example_app/core/config/di_module/init_config.dart';
-import 'package:example_app/core/env/secure_storage_key.dart';
-import 'package:example_app/core/utils/bloc_providers.dart';
-import 'package:example_app/core/utils/storage_data.dart';
+import 'package:example/app.dart';
+import 'package:example/core/config/app_config.dart';
+import 'package:example/core/config/di_module/init_config.dart';
+import 'package:example/core/env/secure_storage_key.dart';
+import 'package:example/core/utils/bloc_providers.dart';
+import 'package:example/core/utils/storage_data.dart';
 
 void mainCommon({required Flavor flavor}) async {
   runZonedGuarded<Future<void>>(

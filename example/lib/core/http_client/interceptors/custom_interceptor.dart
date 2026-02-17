@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:example_app/core/env/secure_storage_key.dart';
-import 'package:example_app/core/utils/storage_data.dart';
+import 'package:example/core/env/secure_storage_key.dart';
+import 'package:example/core/utils/storage_data.dart';
 
 class CustomInterceptor extends Interceptor {
   final Stopwatch _stopwatch = Stopwatch();

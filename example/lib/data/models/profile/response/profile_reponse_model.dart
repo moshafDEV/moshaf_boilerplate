@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:example_app/data/models/profile/response/profile_model.dart';
-import 'package:example_app/domain/entities/profile/profile_entity.dart';
+import 'package:example/data/models/profile/response/profile_model.dart';
+import 'package:example/domain/entities/profile/profile_entity.dart';
 
 part 'profile_reponse_model.g.dart';
 

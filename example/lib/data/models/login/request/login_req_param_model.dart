@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:example_app/domain/entities/login_param/login_param_entity.dart';
+import 'package:example/domain/entities/login_param/login_param_entity.dart';
 
 part 'login_req_param_model.g.dart';
 

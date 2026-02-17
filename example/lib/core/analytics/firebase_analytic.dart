@@ -1,6 +1,6 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:injectable/injectable.dart';
-import 'package:example_app/core/analytics/analytic.dart';
+import 'package:example/core/analytics/analytic.dart';
 
 @LazySingleton(as: Analytic)
 class FirebaseAnalytic implements Analytic {

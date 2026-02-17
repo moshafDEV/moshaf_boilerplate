@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:example_app/core/env/env.dart';
+import 'package:example/core/env/env.dart';
 
 import 'dio_config.dart';
 

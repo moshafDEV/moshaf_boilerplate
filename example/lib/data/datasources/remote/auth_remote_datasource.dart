@@ -1,12 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
-import 'package:example_app/core/constants/api_path_constant.dart';
-import 'package:example_app/core/error/failure.dart';
-import 'package:example_app/core/http_client/main_client.dart';
-import 'package:example_app/data/models/login/request/login_req_param_model.dart';
-import 'package:example_app/data/models/login/response/auth_response_model.dart';
-import 'package:example_app/data/models/login/response/token_model.dart';
+import 'package:example/core/constants/api_path_constant.dart';
+import 'package:example/core/error/failure.dart';
+import 'package:example/core/http_client/main_client.dart';
+import 'package:example/data/models/login/request/login_req_param_model.dart';
+import 'package:example/data/models/login/response/auth_response_model.dart';
+import 'package:example/data/models/login/response/token_model.dart';
 
 abstract class AuthRemoteDatasource {
   Future<Either<Failure, TokenData>> login(LoginReqParamModel loginParam);

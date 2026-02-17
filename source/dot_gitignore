@@ -109,3 +109,8 @@ bitbucket-pipelines.yml
 
 **/env.g.dart
 **/init_config.config.dart
+
+# Dart codegen outputs
+**/*.g.dart
+**/*.freezed.dart
+**/*.gr.dart

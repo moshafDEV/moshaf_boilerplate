@@ -51,13 +51,13 @@ dev_dependencies:
 
 flutter_native_splash:
   color: "#FFFFFF"
-  image: assets/icons/ic_splashscreen.png
+  image: assets/images/ic_splashscreen.png
   color_dark: "#FFFFFF"
-  image_dark: assets/icons/ic_splashscreen.png
+  image_dark: assets/images/ic_splashscreen.png
   android_12:
-    image: assets/icons/ic_splashscreen_andro.png
+    image: assets/images/ic_splashscreen_andro.png
     icon_background_color: "#FFFFFF"
-    image_dark: assets/icons/ic_splashscreen_andro.png
+    image_dark: assets/images/ic_splashscreen_andro.png
     icon_background_color_dark: "#FFFFFF"
   web: false
 
@@ -65,40 +65,40 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   remove_alpha_ios: true
-  image_path: "assets/icons/ic_app.png"
+  image_path: "assets/images/ic_app.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
   web:
     generate: true
-    image_path: "assets/icons/ic_app.png"
+    image_path: "assets/images/ic_app.png"
     background_color: "#ffffff"
     theme_color: "#ffffff"
   windows:
     generate: true
-    image_path: "assets/icons/ic_app.png"
+    image_path: "assets/images/ic_app.png"
     icon_size: 48 # min:48, max:256, default: 48
   macos:
     generate: true
-    image_path: "assets/icons/ic_app.png"
+    image_path: "assets/images/ic_app.png"
 
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
   assets:
-    - assets/icons/
     - assets/images/
     - assets/translations/
-    - assets/animations/
     - assets/fonts/
     - assets/svg/
     - .env
+
+    
   # fonts:
-  #   - family: BCASans
+  #   - family: TestSans
   #     fonts:
-  #       - asset: assets/fonts/BCASans/BCASans-Regular.ttf
+  #       - asset: assets/fonts/TestSans/TestSans-Regular.ttf
   #         weight: 400
-  #       - asset: assets/fonts/BCASans/BCASans-SemiBold.ttf
+  #       - asset: assets/fonts/TestSans/TestSans-SemiBold.ttf
   #         weight: 500
-  #       - asset: assets/fonts/BCASans/BCASans-Bold.ttf
+  #       - asset: assets/fonts/TestSans/TestSans-Bold.ttf
   #         weight: 600
-  #       - asset: assets/fonts/BCASans/BCASans-Extrabold.ttf
+  #       - asset: assets/fonts/TestSans/TestSans-Extrabold.ttf
   #         weight: 700

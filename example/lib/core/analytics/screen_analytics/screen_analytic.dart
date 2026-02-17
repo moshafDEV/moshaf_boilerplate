@@ -1,5 +1,5 @@
-import 'package:example_app/core/analytics/analytic.dart';
-import 'package:example_app/core/analytics/screen_analytics/screen_analytic_listener.dart';
+import 'package:example/core/analytics/analytic.dart';
+import 'package:example/core/analytics/screen_analytics/screen_analytic_listener.dart';
 
 mixin ScreenAnalyticTracker {
   late Analytic analytic;

@@ -1,8 +1,8 @@
-# example_app
+# example
 
 ![Logo](https://avatars.githubusercontent.com/u/153476629?v=4&size=120)
 
-**example_app App** is a Flutter-based ...
+**example App** is a Flutter-based ...
 
 ### Developer Notes
 

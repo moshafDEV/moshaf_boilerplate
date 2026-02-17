@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:example_app/core/config/di_module/init_config.dart';
-import 'package:example_app/core/constants/textstyle.dart';
-import 'package:example_app/core/utils/keyboard_util.dart';
-import 'package:example_app/domain/usecase/login/login.dart';
-import 'package:example_app/domain/usecase/login/profile.dart';
-import 'package:example_app/presentation/bloc/login/login_bloc.dart';
-import 'package:example_app/presentation/components/fade_in_up_animate.dart';
-import 'package:example_app/presentation/pages/login/components/email_input_field.dart';
-import 'package:example_app/presentation/pages/login/components/login_button.dart';
-import 'package:example_app/presentation/pages/login/components/password_input_field.dart';
+import 'package:example/core/config/di_module/init_config.dart';
+import 'package:example/core/constants/textstyle.dart';
+import 'package:example/core/utils/keyboard_util.dart';
+import 'package:example/domain/usecase/login/login.dart';
+import 'package:example/domain/usecase/login/profile.dart';
+import 'package:example/presentation/bloc/login/login_bloc.dart';
+import 'package:example/presentation/components/fade_in_up_animate.dart';
+import 'package:example/presentation/pages/login/components/email_input_field.dart';
+import 'package:example/presentation/pages/login/components/login_button.dart';
+import 'package:example/presentation/pages/login/components/password_input_field.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -71,7 +71,7 @@ class LoginPageContent extends StatelessWidget {
                           BlendMode.srcIn,
                         ),
                         child: Image.network(
-                          'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/MIT_Logo_New.svg/330px-MIT_Logo_New.svg.png',
+                          'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/MIT_logo_2003-2023.svg/330px-MIT_logo_2003-2023.svg.png',
                           width: 120,
                         ),
                       ),
@@ -96,13 +96,13 @@ class LoginPageContent extends StatelessWidget {
 
                                 Text(
                                   'Selamat datang',
-                                  style: black12Bold.copyWith(fontSize: 20),
+                                  style: genStyle12Bold.copyWith(fontSize: 20),
                                 ),
                                 8.verticalSpace,
 
                                 Text(
                                   'Nikmati akses layanan dalam satu genggaman!',
-                                  style: black12Regular.copyWith(fontSize: 16),
+                                  style: genStyle12Regular.copyWith(fontSize: 16),
                                 ),
 
                                 24.verticalSpace,

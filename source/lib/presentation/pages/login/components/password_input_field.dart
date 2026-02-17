@@ -65,7 +65,7 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-        child: Text('Lupa Password', style: blue14Medium),
+        child: Text('Lupa Password', style: genStyle14Medium),
       ),
     );
   }

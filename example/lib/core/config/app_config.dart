@@ -1,4 +1,4 @@
-import 'package:example_app/core/env/env.dart';
+import 'package:example/core/env/env.dart';
 
 enum Flavor {
   dev(0),

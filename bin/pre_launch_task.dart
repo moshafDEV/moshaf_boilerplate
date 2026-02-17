@@ -127,7 +127,54 @@ Future<bool> promptYesNoAutoYes(String label, {int seconds = 5}) async {
   return true;
 }
 
-void main(List<String> arguments) async {
+Future<String?> _getDartVersion() async {
+  try {
+    final result = await Process.run('dart', ['--version']);
+    final output = result.stderr.toString() + result.stdout.toString();
+    final match = RegExp(r'(\d+)\.(\d+)\.(\d+)').firstMatch(output);
+    if (match != null) {
+      return '${match.group(1)}.${match.group(2)}.${match.group(3)}';
+    }
+  } catch (_) {}
+  return null;
+}
+
+bool _versionLessThan(String v1, String v2) {
+  final a = v1.split('.').map(int.parse).toList();
+  final b = v2.split('.').map(int.parse).toList();
+  for (var i = 0; i < 3; i++) {
+    if (a[i] < b[i]) return true;
+    if (a[i] > b[i]) return false;
+  }
+  return false;
+}
+
+Future<String?> _getMinDartVersionFromPubspec() async {
+  final pubspec = File('pubspec.yaml');
+  if (!pubspec.existsSync()) return null;
+  final lines = await pubspec.readAsLines();
+  final sdkLine = lines.firstWhere(
+    (l) => l.trim().startsWith('sdk:'),
+    orElse: () => '',
+  );
+  final match = RegExp(r'sdk:\s*">=([0-9.]+)"').firstMatch(sdkLine);
+  return match?.group(1);
+}
+
+Future<void> mainPLT(List<String> arguments) async {
+  // Check Dart SDK version
+  final minVersion = await _getMinDartVersionFromPubspec();
+  final currentVersion = await _getDartVersion();
+  if (minVersion != null && currentVersion != null) {
+    if (_versionLessThan(currentVersion, minVersion)) {
+      logError(
+        'Current Dart SDK version ($currentVersion) is lower than the minimum required ($minVersion). '
+        'Please switch to the correct SDK (e.g., using fvm).',
+      );
+      exit(1);
+    }
+  }
+
   if (arguments.isEmpty) {
     logError('No flavor argument provided.');
     exit(1);
@@ -197,3 +244,5 @@ void main(List<String> arguments) async {
     exit(1);
   }
 }
+
+void main(List<String> arguments) async => await mainPLT(arguments);

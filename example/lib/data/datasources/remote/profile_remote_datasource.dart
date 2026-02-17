@@ -1,10 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
-import 'package:example_app/core/constants/api_path_constant.dart';
-import 'package:example_app/core/error/failure.dart';
-import 'package:example_app/core/http_client/main_client.dart';
-import 'package:example_app/data/models/profile/response/profile_reponse_model.dart';
+import 'package:example/core/constants/api_path_constant.dart';
+import 'package:example/core/error/failure.dart';
+import 'package:example/core/http_client/main_client.dart';
+import 'package:example/data/models/profile/response/profile_reponse_model.dart';
 
 abstract class ProfileRemoteDatasource {
   Future<Either<Failure, ProfileResponseModel>> myProfile();

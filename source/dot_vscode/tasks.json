@@ -4,10 +4,9 @@
     {
       "label": "Set Env for Dev",
       "type": "shell",
-      "command": "dart",
+      "command": "moshaf_boilerplate",
       "args": [
-        "run",
-        "pre_launch_task.dart",
+        "pre_launch_task",
         "dev"
       ],
       "group": {
@@ -18,10 +17,9 @@
     {
       "label": "Set Env for Prod",
       "type": "shell",
-      "command": "dart",
+      "command": "moshaf_boilerplate",
       "args": [
-        "run",
-        "pre_launch_task.dart",
+        "pre_launch_task",
         "prod"
       ],
       "group": {

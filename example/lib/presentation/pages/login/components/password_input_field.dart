@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:example_app/core/constants/textstyle.dart';
-import 'package:example_app/presentation/bloc/login/login_bloc.dart';
-import 'package:example_app/presentation/components/text_field_custom_widget.dart';
+import 'package:example/core/constants/textstyle.dart';
+import 'package:example/presentation/bloc/login/login_bloc.dart';
+import 'package:example/presentation/components/text_field_custom_widget.dart';
 
 class PasswordInputField extends StatefulWidget {
   const PasswordInputField({super.key});
@@ -65,7 +65,7 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-        child: Text('Lupa Password', style: blue14Medium),
+        child: Text('Lupa Password', style: genStyle14Medium),
       ),
     );
   }

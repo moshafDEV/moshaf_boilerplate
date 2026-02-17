@@ -2,9 +2,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 // import 'package:gtm/gtm.dart';
 import 'package:injectable/injectable.dart';
-import 'package:example_app/core/env/secure_storage_key.dart';
-import 'package:example_app/core/services/navigation_service.dart';
-import 'package:example_app/core/utils/storage_data.dart';
+import 'package:example/core/env/secure_storage_key.dart';
+import 'package:example/core/services/navigation_service.dart';
+import 'package:example/core/utils/storage_data.dart';
 
 import 'init_config.config.dart';
 

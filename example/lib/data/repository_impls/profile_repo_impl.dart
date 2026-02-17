@@ -1,10 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-import 'package:example_app/core/error/failure.dart';
-import 'package:example_app/data/datasources/remote/profile_remote_datasource.dart';
-import 'package:example_app/data/models/profile/response/profile_reponse_model.dart';
-import 'package:example_app/domain/entities/profile/profile_entity.dart';
-import 'package:example_app/domain/repositories/profile_repository.dart';
+import 'package:example/core/error/failure.dart';
+import 'package:example/data/datasources/remote/profile_remote_datasource.dart';
+import 'package:example/data/models/profile/response/profile_reponse_model.dart';
+import 'package:example/domain/entities/profile/profile_entity.dart';
+import 'package:example/domain/repositories/profile_repository.dart';
 
 @Injectable(as: ProfileRepository)
 class ProfileRemoteDatasourceImpl implements ProfileRepository {

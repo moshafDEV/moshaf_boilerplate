@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:example_app/domain/entities/auth/auth_response_entity.dart';
+import 'package:example/domain/entities/auth/auth_response_entity.dart';
 
 part 'token_model.g.dart';
 

@@ -1,9 +1,10 @@
 import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:example_app/core/env/secure_storage_key.dart';
-import 'package:example_app/core/routes/app_path.dart' show Paths;
-import 'package:example_app/core/utils/storage_data.dart';
+import 'package:example/core/constants/colors.dart';
+import 'package:example/core/env/secure_storage_key.dart';
+import 'package:example/core/routes/app_path.dart' show Paths;
+import 'package:example/core/utils/storage_data.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -87,7 +88,7 @@ class _SplashScreenState extends State<SplashScreen>
       body: Container(
         width: screenSize.width,
         height: screenSize.height,
-        color: const Color.fromARGB(255, 169, 216, 255),
+        color: kMainSecondary.withAlpha(20),
         child: AnimatedBuilder(
           animation: _fadeAnimation,
           builder: (context, child) {
@@ -100,7 +101,7 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 42),
                       child: Image.network(
-                        'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/MIT_Logo_New.svg/330px-MIT_Logo_New.svg.png',
+                        'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/MIT_logo_2003-2023.svg/330px-MIT_logo_2003-2023.svg.png',
                         width: 150,
                       ),
                     ),
@@ -132,7 +133,7 @@ class _SplashScreenState extends State<SplashScreen>
               builder: (context, child) {
                 return LinearProgressIndicator(
                   value: _loadingAnimation.value,
-                  backgroundColor: const Color(0xFFECF0F1),
+                  backgroundColor: kMainSecondary,
                   valueColor: const AlwaysStoppedAnimation<Color>(
                     Color(0xFF4A90E2),
                   ),

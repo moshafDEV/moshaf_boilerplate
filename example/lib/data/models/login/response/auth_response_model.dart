@@ -1,5 +1,5 @@
-import 'package:example_app/data/models/login/response/token_model.dart';
-import 'package:example_app/domain/entities/auth/auth_response_entity.dart';
+import 'package:example/data/models/login/response/token_model.dart';
+import 'package:example/domain/entities/auth/auth_response_entity.dart';
 
 class AuthResponseModel {
   final int? code;

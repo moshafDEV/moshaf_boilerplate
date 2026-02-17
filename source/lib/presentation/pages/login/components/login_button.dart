@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ProjectName/core/constants/textstyle.dart';
+import 'package:ProjectName/core/constants/colors.dart';
 import 'package:ProjectName/core/routes/app_path.dart';
 import 'package:ProjectName/presentation/bloc/login/login_bloc.dart';
 import 'package:ProjectName/presentation/components/button.dart';
@@ -52,7 +53,7 @@ class _LoginButtonState extends State<LoginButton> {
                 },
                 width: double.infinity,
                 height: 45,
-                textStyle: white16Bold,
+                textStyle: genStyle16Bold.copyWith(color: kMainWhite),
               ),
 
               24.verticalSpace,
@@ -70,10 +71,10 @@ class _LoginButtonState extends State<LoginButton> {
       child: RichText(
         text: TextSpan(
           children: [
-            TextSpan(text: 'Belum punya akun? ', style: black14Regular),
+            TextSpan(text: 'Belum punya akun? ', style: genStyle14Regular),
             TextSpan(
               text: 'Daftar di sini.',
-              style: blue14Medium,
+              style: genStyle14Medium,
               recognizer: TapGestureRecognizer()..onTap = _handleRegister,
             ),
           ],

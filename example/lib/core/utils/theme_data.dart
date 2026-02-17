@@ -30,19 +30,19 @@ final themeData = ThemeData(
   inputDecorationTheme: const InputDecorationTheme(
     hintStyle: TextStyle(fontSize: 12),
     focusedErrorBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: colorRed),
+      borderSide: BorderSide(color: kMainDanger),
       borderRadius: BorderRadius.all(Radius.circular(8)),
     ),
     errorBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: colorRed),
+      borderSide: BorderSide(color: kMainDanger),
       borderRadius: BorderRadius.all(Radius.circular(8)),
     ),
     enabledBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: colorNeutralGrey),
+      borderSide: BorderSide(color: kMainSecondary),
       borderRadius: BorderRadius.all(Radius.circular(8)),
     ),
     focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: colorBlue),
+      borderSide: BorderSide(color: kMainInfo),
       borderRadius: BorderRadius.all(Radius.circular(8)),
     ),
   ),
@@ -52,9 +52,9 @@ final themeData = ThemeData(
     scrolledUnderElevation: 0,
     surfaceTintColor: Colors.white,
     centerTitle: true,
-    titleTextStyle: black14Medium.copyWith(
+    titleTextStyle: genStyle14Medium.copyWith(
       fontWeight: FontWeight.w500,
-      color: colorNeutralBlack,
+      color: kMainBlack,
       fontSize: 14,
     ),
     systemOverlayStyle: const SystemUiOverlayStyle(
@@ -67,13 +67,13 @@ final themeData = ThemeData(
     surfaceTintColor: Colors.white,
   ),
   expansionTileTheme: const ExpansionTileThemeData(
-    iconColor: colorGrey,
-    textColor: colorGrey,
-    collapsedIconColor: colorGrey,
+    iconColor: kMainSecondary,
+    textColor: kMainSecondary,
+    collapsedIconColor: kMainSecondary,
     tilePadding: EdgeInsets.zero,
   ),
   chipTheme: ChipThemeData(
-    backgroundColor: colorRedBadgeDiscount,
+    backgroundColor: kMainDanger,
     labelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
     secondaryLabelStyle: TextStyle(
       fontSize: 14.sp,
@@ -84,8 +84,8 @@ final themeData = ThemeData(
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: colorBlue,
-      foregroundColor: colorWhite,
+      backgroundColor: kMainInfo,
+      foregroundColor: kMainDanger,
       textStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
     ),
@@ -100,9 +100,9 @@ final themeData = ThemeData(
     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     fillColor: WidgetStateProperty.resolveWith((states) {
       if (states.contains(WidgetState.selected)) {
-        return colorBlue;
+        return kMainInfo;
       }
-      return colorWhite;
+      return kMainDanger;
     }),
   ),
   iconButtonTheme: IconButtonThemeData(

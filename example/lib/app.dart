@@ -1,11 +1,11 @@
 import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:example_app/core/config/di_module/init_config.dart';
-import 'package:example_app/core/routes/app_path.dart';
-import 'package:example_app/core/routes/app_routes.dart';
-import 'package:example_app/core/services/navigation_service.dart';
-import 'package:example_app/core/utils/theme_data.dart';
+import 'package:example/core/config/di_module/init_config.dart';
+import 'package:example/core/routes/app_path.dart';
+import 'package:example/core/routes/app_routes.dart';
+import 'package:example/core/services/navigation_service.dart';
+import 'package:example/core/utils/theme_data.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 
 class App extends StatelessWidget {
@@ -19,7 +19,7 @@ class App extends StatelessWidget {
     return FlavorBanner(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'example_app',
+        title: 'example',
         navigatorKey: getIt<NavigationService>().navigatorKey,
         routes: appRoutes,
         navigatorObservers: [ChuckerFlutter.navigatorObserver, routeObserver],

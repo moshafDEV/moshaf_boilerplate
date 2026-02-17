@@ -71,7 +71,7 @@ class LoginPageContent extends StatelessWidget {
                           BlendMode.srcIn,
                         ),
                         child: Image.network(
-                          'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/MIT_Logo_New.svg/330px-MIT_Logo_New.svg.png',
+                          'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/MIT_logo_2003-2023.svg/330px-MIT_logo_2003-2023.svg.png',
                           width: 120,
                         ),
                       ),
@@ -96,13 +96,13 @@ class LoginPageContent extends StatelessWidget {
 
                                 Text(
                                   'Selamat datang',
-                                  style: black12Bold.copyWith(fontSize: 20),
+                                  style: genStyle12Bold.copyWith(fontSize: 20),
                                 ),
                                 8.verticalSpace,
 
                                 Text(
                                   'Nikmati akses layanan dalam satu genggaman!',
-                                  style: black12Regular.copyWith(fontSize: 16),
+                                  style: genStyle12Regular.copyWith(fontSize: 16),
                                 ),
 
                                 24.verticalSpace,

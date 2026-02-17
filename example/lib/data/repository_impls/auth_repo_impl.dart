@@ -1,13 +1,13 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-import 'package:example_app/core/error/failure.dart';
-import 'package:example_app/data/datasources/remote/auth_remote_datasource.dart';
-import 'package:example_app/data/models/login/request/login_req_param_model.dart';
-import 'package:example_app/data/models/login/response/auth_response_model.dart';
-import 'package:example_app/data/models/login/response/token_model.dart';
-import 'package:example_app/domain/entities/auth/auth_response_entity.dart';
-import 'package:example_app/domain/entities/login_param/login_param_entity.dart';
-import 'package:example_app/domain/repositories/auth_repository.dart';
+import 'package:example/core/error/failure.dart';
+import 'package:example/data/datasources/remote/auth_remote_datasource.dart';
+import 'package:example/data/models/login/request/login_req_param_model.dart';
+import 'package:example/data/models/login/response/auth_response_model.dart';
+import 'package:example/data/models/login/response/token_model.dart';
+import 'package:example/domain/entities/auth/auth_response_entity.dart';
+import 'package:example/domain/entities/login_param/login_param_entity.dart';
+import 'package:example/domain/repositories/auth_repository.dart';
 
 @Injectable(as: AuthRepository)
 class AuthRemoteDatasourceImpl implements AuthRepository {

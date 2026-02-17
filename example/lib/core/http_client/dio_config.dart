@@ -5,8 +5,8 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import 'package:example_app/core/config/app_config.dart';
-import 'package:example_app/core/http_client/interceptors/custom_interceptor.dart';
+import 'package:example/core/config/app_config.dart';
+import 'package:example/core/http_client/interceptors/custom_interceptor.dart';
 
 void setLoggerInterceptor(Dio dio) {
   dio.interceptors.add(CustomInterceptor());

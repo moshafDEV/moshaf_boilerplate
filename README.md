@@ -76,6 +76,145 @@ Once installation is complete, follow these steps to initialize your Flutter pro
 > **Note:**  
 > After generating your project, it is highly recommended to review and customize your `.gitignore` file to ensure that unnecessary files and directories are excluded from version control. This helps maintain a clean repository and prevents accidental commits of sensitive or build-related files.
 
+## ⚙️ Setup Android and iOS Project
+
+After generating the project using this boilerplate, complete the following additional steps to ensure the application runs properly on both Android and iOS.
+
+<details>
+<summary><strong>📱 Android Setup</strong></summary>
+
+### 1. Configure Product Flavors
+
+Product flavors for **dev** and **prod** have already been prepared.  
+You only need to adjust and use them according to your project requirements.
+
+```gradle
+flavorDimensions("flavor")
+productFlavors {
+    create("dev") {
+        dimension = "flavor"
+        namespace = "com.example.example"
+        applicationId = "com.example.example"
+    }
+    // create("prod") {
+    //     dimension = "flavor"
+    //     namespace = "com.moshaf.example"
+    //     applicationId = "com.moshaf.example"
+    // }
+}
+```
+
+- Update the `namespace` and `applicationId` as needed.
+- Uncomment and configure the `prod` flavor when ready for production.
+
+---
+
+### 3. Flavor-Based Configuration
+
+Flavor-specific configurations have also been prepared.
+
+You can place different configuration files such as:
+
+- `google-services.json`
+- `AndroidManifest.xml`
+- Other environment-specific resources
+
+Inside the following directories:
+
+```
+android/app/src/dev
+android/app/src/prod
+```
+
+This allows you to:
+- Use different Firebase / Google Services configurations
+- Separate AndroidManifest settings for dev and prod
+- Manage environment-specific resources cleanly
+
+</details>
+
+<details>
+<summary><strong>🍎 iOS Setup</strong></summary>
+
+### 1. Add `FLAVOR` Parameter
+
+1. Open the project in Xcode.
+2. Select **Runner** from the project navigator.
+3. Go to the **Build Settings** tab.
+4. Scroll to **User-Defined Settings**.
+5. Add a new key named:
+
+```
+FLAVOR
+```
+
+6. Set the value according to your desired flavor (e.g., `dev`, `prod`).
+
+Make sure your build configurations are properly mapped to each flavor if you are using multiple environments.
+
+---
+
+### 2. Configure `Info.plist` and Google Service per Flavor
+
+You can configure environment-specific settings directly in Xcode via **Build Settings**.
+
+#### Info.plist Configuration
+
+1. Open **Runner** in Xcode.
+2. Go to the **Build Settings** tab.
+3. Search for:
+
+```
+Packaging > Info.plist File
+```
+
+4. Set different `Info.plist` paths for each build configuration (e.g., Dev and Prod).
+
+Example:
+
+```
+ios/config/dev/Info.plist
+ios/config/prod/Info.plist
+```
+
+This allows you to:
+- Customize bundle name
+- Configure URL schemes
+- Set environment-specific keys
+
+---
+
+#### GoogleService-Info.plist Configuration
+
+To use different Firebase configurations per flavor:
+
+1. Add multiple `GoogleService-Info.plist` files to your project (e.g., dev and prod versions).
+2. In Xcode, go to:
+
+```
+Build Settings > Packaging > Product Bundle Identifier
+```
+
+Make sure each flavor uses a different **Bundle Identifier** that matches the Firebase project.
+
+3. Then configure:
+
+```
+Build Phases > Copy Bundle Resources
+```
+
+Ensure the correct `GoogleService-Info.plist` is included for each build configuration.
+
+You can also manage this using separate build configurations and target memberships.
+
+This setup allows you to:
+- Use different Firebase projects (dev & prod)
+- Separate environment configurations cleanly
+- Avoid manual file swapping before build
+
+</details>
+
+---
 
 ## Directory Structure Overview
 
@@ -146,13 +285,13 @@ Once installation is complete, follow these steps to initialize your Flutter pro
 
 For best compatibility and performance, use the following versions:
 
-- **Flutter:** 3.32.2  
+- **Flutter: < 3.41.0**
   Check your version:
   ```bash
   flutter --version
   ```
 
-- **Dart:**  
+- **Dart: < 3.11.0**  
   Check your version:
   ```bash
   dart --version

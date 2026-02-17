@@ -3,14 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BlocProviders {
   static get getproviders => [
+    // Add your BlocProviders here for Global access, for example:
     // BlocProvider(create: (_) => locator<LoginBloc>()),
   ];
-
-  static void resetAllBlocs(BuildContext context) {
-    // context
-    //     .read<ActivitySavedContentListBloc>()
-    //     .add(const ActivitySavedContentListEvent.reset());
-  }
 }
 
 Widget getBlocWrapper(Widget child) {
@@ -19,9 +14,6 @@ Widget getBlocWrapper(Widget child) {
   if (providers.isEmpty) {
     return child;
   } else {
-    return MultiBlocProvider(
-      providers: providers,
-      child: child,
-    );
+    return MultiBlocProvider(providers: providers, child: child);
   }
 }

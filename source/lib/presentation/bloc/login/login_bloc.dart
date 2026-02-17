@@ -9,11 +9,13 @@ import 'package:ProjectName/domain/entities/login_param/login_param_entity.dart'
 import 'package:ProjectName/domain/entities/text_input_field/text_input_field_entity.dart';
 import 'package:ProjectName/domain/usecase/login/login.dart';
 import 'package:ProjectName/domain/usecase/login/profile.dart';
+import 'package:injectable/injectable.dart';
 
 part 'login_bloc.freezed.dart';
 part 'login_event.dart';
 part 'login_state.dart';
 
+@injectable
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final LoginUsecase loginUsecase;
   final ProfileUsecase profileUsecase;
