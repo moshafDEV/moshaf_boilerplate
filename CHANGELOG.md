@@ -1,9 +1,6 @@
 # Changelog
 
-## [1.0.4] - 2023-02-22
-- Update README.md with clearer instructions and additional details.
-
-## 1.0.4
+## 2.0.0
 - Fixed bugs in iOS project configuration.
 - Improved documentation and usage guides.
 - Added support for Flutter 3.41.1 and latest versions.
