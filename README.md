@@ -76,12 +76,12 @@ Once installation is complete, follow these steps to initialize your Flutter pro
 > **Note:**  
 > After generating your project, it is highly recommended to review and customize your `.gitignore` file to ensure that unnecessary files and directories are excluded from version control. This helps maintain a clean repository and prevents accidental commits of sensitive or build-related files.
 
-[## ⚙️ Initial Setup Android and iOS Project](#init-setup)
+## Initial Setup Android and iOS Project
 
 After generating the project using this boilerplate, complete the following additional steps to ensure the application runs properly on both Android and iOS.
 
 <details>
-<summary><strong>📱 Android Setup</strong></summary>
+<summary><strong>Android Setup</strong></summary>
 
 ### 1. Configure Product Flavors
 
@@ -134,7 +134,7 @@ This allows you to:
 </details>
 
 <details>
-<summary><strong>🍎 iOS Setup</strong></summary>
+<summary><strong>iOS Setup</strong></summary>
 
 ### 1. Add configurations project
 
@@ -143,7 +143,7 @@ This allows you to:
 3. Click the **"+"** button to add a new configuration and duplicate from each existing configuration.
 4. Add the configurations as shown in the capture below:
 
-![iOS Configuration Setup](https://github.com/moshafDEV/moshaf_boilerplate/blob/main/assets/readme/img_add_configuration.png)
+![iOS Configuration Setup](https://raw.githubusercontent.com/moshafDEV/moshaf_boilerplate/refs/heads/main/assets/readme/img_add_configuration.png)
 
 
 ### 2. Add `FLAVOR` Parameter
@@ -164,9 +164,9 @@ Make sure your build configurations are properly mapped to each flavor if you ar
 
 **Example**
 
-![iOS Add User Defined Setting](https://github.com/moshafDEV/moshaf_boilerplate/blob/main/assets/readme/img_add_user_defined_setting.png)
+![iOS Add User Defined Setting](https://raw.githubusercontent.com/moshafDEV/moshaf_boilerplate/refs/heads/main/assets/readme/img_add_user_defined_setting.png)
 
-![iOS Add Flavor Parameter](https://github.com/moshafDEV/moshaf_boilerplate/blob/main/assets/readme/img_add_flavor_parameter.png)
+![iOS Add Flavor Parameter](https://raw.githubusercontent.com/moshafDEV/moshaf_boilerplate/refs/heads/main/assets/readme/img_add_flavor_parameter.png)
 
 ---
 

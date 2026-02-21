@@ -26,7 +26,7 @@ Maintaining consistent code style by applying the standard Dart formatting rules
 
 After completing all the configurations above, you are ready to run the application on an emulator or physical device.
 
-[Go to Initial Setup](https://pub.dev/packages/moshaf_boilerplate#init-setup)
+[Go to Initial Setup](https://pub.dev/packages/moshaf_boilerplate#initial-setup-android-and-ios-project)
 
 **Building APK:**
 

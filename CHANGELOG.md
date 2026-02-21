@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.4] - 2023-02-22
+- Update README.md with clearer instructions and additional details.
+
 ## 1.0.4
 - Fixed bugs in iOS project configuration.
 - Improved documentation and usage guides.
