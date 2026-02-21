@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.4
+- Fixed bugs in iOS project configuration.
+- Improved documentation and usage guides.
+- Added support for Flutter 3.41.1 and latest versions.
+- Enhanced source code for zone-guarded implementations.
+- Improved error handling and logging mechanisms.
+- Updated dependencies to latest stable versions.
+
 ## 1.0.3
 - Added support for custom project templates.
 - Improved CLI prompts for better user experience.

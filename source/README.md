@@ -22,6 +22,12 @@ Maintaining consistent code style by applying the standard Dart formatting rules
     dart format .
    ```
 
+### ⚠️ Ensure These Steps Are Completed
+
+After completing all the configurations above, you are ready to run the application on an emulator or physical device.
+
+[Go to Initial Setup](https://pub.dev/packages/moshaf_boilerplate#init-setup)
+
 **Building APK:**
 
 1. Set the environment variables for the desired flavor (dev or prod):
