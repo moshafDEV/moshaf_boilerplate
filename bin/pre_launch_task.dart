@@ -224,13 +224,13 @@ Future<void> mainPLT(List<String> arguments) async {
     return;
   }
 
-  // Execution order: dart → fvm flutter → flutter
+  // Execution order: fvm flutter → dart → flutter
   try {
-    final okDart = await _tryDart();
-    if (okDart) return;
-
     final okFvm = await _tryFvmFlutter();
     if (okFvm) return;
+
+    final okDart = await _tryDart();
+    if (okDart) return;
 
     final okFlutter = await _tryFlutter();
     if (okFlutter) return;

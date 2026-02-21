@@ -224,6 +224,12 @@ Future<void> runGenerator() async {
 
   await _modifyFilesInFolder(
       '${currentDir.path}/source', 'ProjectName', projectName);
+   
+  // Handle pubspec.yaml - preserve destination's SDK version
+  final pubspecFile = File('${currentDir.path}/$projectName/pubspec.yaml');
+  if (pubspecFile.existsSync()) {
+    await _preservePubspecSdkVersion(pubspecFile);
+  }
 
   await _runCommandWithProgress(
     'Copying and replacing files',
@@ -237,6 +243,7 @@ Future<void> runGenerator() async {
     'Cleaning up directory',
     projectName,
   );
+
   await _cleanProjectDirectory(projectName);
 
   await _runCommandWithProgress(
@@ -262,11 +269,11 @@ Future<void> runGenerator() async {
       'timezone',
       'firebase_analytics',
       'firebase_crashlytics',
+      'firebase_messaging',
       'flutter_flavor',
       'injectable',
       'flutter_dotenv',
       'easy_localization',
-      'firebase_messaging',
       'flutter_screenutil',
       'chucker_flutter',
       'flutter_svg',
@@ -275,7 +282,7 @@ Future<void> runGenerator() async {
       'json_annotation',
       'freezed_annotation',
       'flutter_inappwebview',
-      'pinput',
+      // 'pinput',
     ],
     false,
     projectName,
@@ -428,6 +435,7 @@ Future<void> _replaceTextInFile(
 ) async {
   try {
     String content = await file.readAsString();
+    
     if (content.contains(searchValue)) {
       content = content.replaceAll(searchValue, replaceValue);
       await file.writeAsString(content);
@@ -476,6 +484,104 @@ bool _isImageFile(File file) {
   return imageExtensions.contains(extension);
 }
 
+/// Preserves the SDK version constraint in the destination pubspec.yaml file.
+Future<void> _preservePubspecSdkVersion(File destPubspec) async {
+  try {
+    if (!await destPubspec.exists()) {
+      return;
+    }
+    
+    // Read SDK version from destination (Flutter generated pubspec.yaml)
+    final destLines = await destPubspec.readAsLines();
+    String? sdkLine;
+    String? cupertinoIconsVersion;
+    String? flutterLintsVersion;
+    
+    for (final line in destLines) {
+      if (line.trim().startsWith('sdk:') && !line.contains('flutter')) {
+        sdkLine = line;
+      }
+      if (line.trim().startsWith('cupertino_icons:')) {
+        cupertinoIconsVersion = line.trim();
+      }
+      if (line.trim().startsWith('flutter_lints:')) {
+        flutterLintsVersion = line.trim();
+      }
+    }
+    
+    if (sdkLine == null) return;
+    
+    // Apply to ../source/pubspec.yaml
+    final sourceDir = Directory.current;
+    final sourcePubspec = File('${sourceDir.path}/source/pubspec.yaml');
+    
+    if (!await sourcePubspec.exists()) {
+      return;
+    }
+    
+    final sourceLines = await sourcePubspec.readAsLines();
+    final updatedLines = <String>[];
+    bool inEnvironment = false;
+    bool inDependencies = false;
+    bool inDevDependencies = false;
+    
+    for (var i = 0; i < sourceLines.length; i++) {
+      final line = sourceLines[i];
+      
+      if (line.trim().startsWith('environment:')) {
+        inEnvironment = true;
+        inDependencies = false;
+        inDevDependencies = false;
+        updatedLines.add(line);
+        continue;
+      }
+      
+      if (line.trim().startsWith('dependencies:')) {
+        inDependencies = true;
+        inEnvironment = false;
+        inDevDependencies = false;
+        updatedLines.add(line);
+        continue;
+      }
+      
+      if (line.trim().startsWith('dev_dependencies:')) {
+        inDevDependencies = true;
+        inEnvironment = false;
+        inDependencies = false;
+        updatedLines.add(line);
+        continue;
+      }
+      
+      if (inEnvironment && line.trim().startsWith('sdk:') && !line.contains('flutter')) {
+        updatedLines.add(sdkLine);
+        continue;
+      }
+      
+      if (inDependencies && line.trim().startsWith('cupertino_icons:') && cupertinoIconsVersion != null) {
+        updatedLines.add('  $cupertinoIconsVersion');
+        continue;
+      }
+      
+      if (inDevDependencies && line.trim().startsWith('flutter_lints:') && flutterLintsVersion != null) {
+        updatedLines.add('  $flutterLintsVersion');
+        continue;
+      }
+      
+      if ((inEnvironment || inDependencies || inDevDependencies) && line.isNotEmpty && !line.startsWith(' ') && !line.startsWith('\t')) {
+        inEnvironment = false;
+        inDependencies = false;
+        inDevDependencies = false;
+      }
+      
+      updatedLines.add(line);
+    }
+    
+    await sourcePubspec.writeAsString(updatedLines.join('\n'));
+  } catch (e) {
+    print('\x1B[31mError preserving SDK version in pubspec.yaml: $e\x1B[0m');
+  }
+}
+
 String _restoreDotSegments(String relativePath, {String dotPrefix = 'dot_'}) {
   final parts = p.split(relativePath).map((seg) {
     if (seg.startsWith(dotPrefix)) {
@@ -496,14 +602,14 @@ Future<void> _copyFolderRecursive(
 }) async {
   try {
     if (!await source.exists()) {
-      throw ArgumentError('Source folder tidak ada: ${source.path}');
+      throw ArgumentError('"Source" folder is not found: ${source.path}');
     }
 
     await destination.create(recursive: true);
 
     // Single pass (recursive list) -> jangan recurse manual lagi
     await for (final entity
-        in source.list(recursive: true, followLinks: false)) {
+      in source.list(recursive: true, followLinks: false)) {
       final rel = p.relative(entity.path, from: source.path);
 
       // 1) restore dot_* => .*
@@ -515,7 +621,7 @@ Future<void> _copyFolderRecursive(
       final targetPath = p.join(destination.path, relMapped);
 
       if (entity is Directory) {
-        await Directory(targetPath).create(recursive: true);
+      await Directory(targetPath).create(recursive: true);
       } else if (entity is File) {
         await File(targetPath).parent.create(recursive: true);
         await entity.copy(targetPath);

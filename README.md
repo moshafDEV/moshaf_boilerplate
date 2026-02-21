@@ -76,7 +76,7 @@ Once installation is complete, follow these steps to initialize your Flutter pro
 > **Note:**  
 > After generating your project, it is highly recommended to review and customize your `.gitignore` file to ensure that unnecessary files and directories are excluded from version control. This helps maintain a clean repository and prevents accidental commits of sensitive or build-related files.
 
-## ⚙️ Setup Android and iOS Project
+## ⚙️ Initial Setup Android and iOS Project
 
 After generating the project using this boilerplate, complete the following additional steps to ensure the application runs properly on both Android and iOS.
 
@@ -136,7 +136,17 @@ This allows you to:
 <details>
 <summary><strong>🍎 iOS Setup</strong></summary>
 
-### 1. Add `FLAVOR` Parameter
+### 1. Add configurations project
+
+1. Open the project in Xcode.
+2. Select **Runner** from the sidebar and select **Project Runner** from the navigator.
+3. Click the **"+"** button to add a new configuration and duplicate from each existing configuration.
+4. Add the configurations as shown in the capture below:
+
+![iOS Configuration Setup](/assets/readme/img_add_configuration.png)
+
+
+### 2. Add `FLAVOR` Parameter
 
 1. Open the project in Xcode.
 2. Select **Runner** from the project navigator.
@@ -152,9 +162,15 @@ FLAVOR
 
 Make sure your build configurations are properly mapped to each flavor if you are using multiple environments.
 
+**Example**
+
+![iOS Add User Definaed Setting](/assets/readme/img_add_user_defined_setting.png)
+
+![iOS Add Flavor Parameter](/assets/readme/img_add_flavor_parameter.png)
+
 ---
 
-### 2. Configure `Info.plist` and Google Service per Flavor
+### 3. Configure `Info.plist` and Google Service per Flavor
 
 You can configure environment-specific settings directly in Xcode via **Build Settings**.
 
@@ -222,9 +238,7 @@ This setup allows you to:
 
 ```
 ├── assets
-│   ├── animations
 │   ├── fonts
-│   ├── icons
 │   ├── images
 │   ├── svg
 │   └── translations
@@ -285,13 +299,13 @@ This setup allows you to:
 
 For best compatibility and performance, use the following versions:
 
-- **Flutter: < 3.41.0**
+- **Flutter: >= 3.32.0**
   Check your version:
   ```bash
   flutter --version
   ```
 
-- **Dart: < 3.11.0**  
+- **Dart: >= 3.8.0**  
   Check your version:
   ```bash
   dart --version

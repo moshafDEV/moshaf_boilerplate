@@ -14,7 +14,7 @@ topics:
   - cli
 
 environment:
-  sdk: ">=3.3.0 <3.11.0"   # Ensure this matches your minimum Dart SDK version
+  sdk: ">=3.3.0"   # Ensure this matches your minimum Dart SDK version
 
 # Register CLI executable
 executables:
