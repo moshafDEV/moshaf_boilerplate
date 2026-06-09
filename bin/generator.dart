@@ -92,13 +92,27 @@ void _printGeneratorVersion() async {
 }
 
 void _printHelp() {
-  stdout.writeln('Usage: moshaf_boilerplate <command>\n');
+  stdout.writeln('Usage: moshaf_boilerplate <command> [arguments]\n');
   stdout.writeln('Commands:');
-  stdout.writeln('  create      Generate boilerplate (requires Flutter)');
-  stdout.writeln('  version     Show the boilerplate generator version');
-  stdout.writeln('  help        Show this help message\n');
+  stdout.writeln('  create                     Generate Flutter boilerplate (requires Flutter)');
+  stdout.writeln('  pre_launch_task <flavor>   Prepare environment before running the app');
+  stdout.writeln('  version                    Show the boilerplate generator version');
+  stdout.writeln('  help                       Show this help message\n');
+  stdout.writeln('pre_launch_task:');
+  stdout.writeln('  Copies the correct .env and GoogleService-Info.plist for the given flavor,');
+  stdout.writeln('  then optionally runs build_runner (auto-yes after 5 s).\n');
+  stdout.writeln('  Flavors:');
+  stdout.writeln('    dev    Copies .env.dev  → .env  and GoogleService-Info-dev.plist');
+  stdout.writeln('    prod   Copies .env.prod → .env  and GoogleService-Info-prod.plist\n');
+  stdout.writeln('  Execution strategy (first success wins):');
+  stdout.writeln('    fvm flutter pub run build_runner build');
+  stdout.writeln('    dart run build_runner build');
+  stdout.writeln('    flutter pub run build_runner build\n');
+  stdout.writeln('  VSCode: configured automatically via .vscode/tasks.json in generated projects.\n');
   stdout.writeln('Examples:');
   stdout.writeln('  moshaf_boilerplate create');
+  stdout.writeln('  moshaf_boilerplate pre_launch_task dev');
+  stdout.writeln('  moshaf_boilerplate pre_launch_task prod');
   stdout.writeln('  moshaf_boilerplate version');
 }
 
@@ -212,6 +226,8 @@ Future<void> runGenerator() async {
     'Creating Flutter project',
     projectName,
   );
+
+  await _injectFlavorConfig('./$projectName', projectName);
 
   await _runCommandWithProgress(
     'Modifying files in folder',
@@ -425,6 +441,60 @@ Future<void> _installDependencies(
       '\x1B[31m✘ Failed to install ${isDev ? '--dev ' : ''} dependencies: $e\x1B[0m',
     );
   }
+}
+
+/// Injects flavorDimensions + productFlavors into the Flutter-generated build.gradle.kts
+/// right after the buildTypes block, instead of replacing the whole file.
+Future<void> _injectFlavorConfig(String projectPath, String projectName) async {
+  final file = File('$projectPath/android/app/build.gradle.kts');
+  if (!file.existsSync()) {
+    stdout.writeln('\x1B[33mWarning: build.gradle.kts not found, skipping flavor injection.\x1B[0m');
+    return;
+  }
+
+  final content = await file.readAsString();
+
+  final buildTypesIndex = content.indexOf('buildTypes {');
+  if (buildTypesIndex == -1) {
+    stdout.writeln('\x1B[33mWarning: buildTypes block not found, skipping flavor injection.\x1B[0m');
+    return;
+  }
+
+  int braceDepth = 0;
+  int endIndex = -1;
+  for (int i = buildTypesIndex; i < content.length; i++) {
+    final ch = content[i];
+    if (ch == '{') braceDepth++;
+    else if (ch == '}') {
+      braceDepth--;
+      if (braceDepth == 0) {
+        endIndex = i;
+        break;
+      }
+    }
+  }
+
+  if (endIndex == -1) {
+    stdout.writeln('\x1B[33mWarning: Could not find end of buildTypes block.\x1B[0m');
+    return;
+  }
+
+  final flavorBlock = '\n\n    flavorDimensions("flavor")\n'
+      '    productFlavors {\n'
+      '        create("dev") {\n'
+      '            dimension = "flavor"\n'
+      '            namespace = "com.example.$projectName"\n'
+      '            applicationId = "com.example.$projectName"\n'
+      '        }\n'
+      '        // create("prod") {\n'
+      '            // dimension = "flavor"\n'
+      '            // namespace = "com.moshaf.$projectName"\n'
+      '            // applicationId = "com.moshaf.$projectName"\n'
+      '        // }\n'
+      '    }';
+
+  final newContent = content.substring(0, endIndex + 1) + flavorBlock + content.substring(endIndex + 1);
+  await file.writeAsString(newContent);
 }
 
 /// Replaces all occurrences of [searchValue] with [replaceValue] in [file].

@@ -6,8 +6,13 @@
 
 ### Developer Notes
 
-Ensure that Node.js is installed on your system and execute the following commands:
+**FVM Configuration:**
 
+If you're using Flutter Version Manager (fvm), ensure you have set the correct Flutter version for this project. Run the following command in the project root:
+
+```bash
+fvm use $version
+```
 
 **Prettier:**
 
@@ -16,7 +21,7 @@ Maintaining consistent code style by applying the standard Dart formatting rules
    ```bash
     dart format .
    ```
-   
+
 ### ⚠️ Ensure These Steps Are Completed
 
 After completing all the configurations above, you are ready to run the application on an emulator or physical device.
@@ -28,24 +33,21 @@ After completing all the configurations above, you are ready to run the applicat
 1. Set the environment variables for the desired flavor (dev or prod):
 
    ```bash
-    node set-env.js [dev/prod] (root directory)
+    moshaf_boilerplate pre_launch_task [dev/prod]  (root directory)
    ```
 
 2. Build the APK for the selected flavor:
    
    ```bash
-   flutter build apk --split-per-abi --flavor [dev/prod] --target=lib/main_[dev/prod].dart
+   flutter build apk --split-per-abi --flavor [dev/prod]
    ```
-
-
-
 
 **Building IPA (iOS):**
 
 1. Set the environment variables for the desired flavor (dev or prod):
 
    ```bash
-   node set-env.js [dev/prod] (root directory)
+   moshaf_boilerplate pre_launch_task [dev/prod]  (root directory)
    ```
 
 2. Install the necessary CocoaPods dependencies:

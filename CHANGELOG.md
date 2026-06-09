@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.0
+- Replaced static `build.gradle.kts` template with dynamic flavor injection via `_injectFlavorConfig()`, which inserts `flavorDimensions` and `productFlavors` after the generated `buildTypes` block at project creation time.
+- Added `pre_launch_task` command to CLI help with full documentation: flavor options (`dev`/`prod`), env/plist copy behavior, build_runner execution strategy (fvm → dart → flutter), and VSCode tasks.json note.
+- Updated example README: replaced `node set-env.js` with `moshaf_boilerplate pre_launch_task`, added FVM configuration section, removed `--target` flag from build commands.
+- Added `cupertino.dart` import to `theme_data.dart`.
+
 ## 2.0.0
 - Fixed bugs in iOS project configuration.
 - Improved documentation and usage guides.
