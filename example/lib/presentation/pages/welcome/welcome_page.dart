@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:example/core/constants/assets.gen.dart';
 import 'package:example/core/constants/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:example/core/constants/textstyle.dart';
-import 'package:example/core/env/secure_storage_key.dart';
 import 'package:example/core/routes/app_path.dart';
-import 'package:example/core/utils/storage_data.dart';
 import 'package:example/presentation/components/button.dart';
 import 'package:example/presentation/components/fade_in_up_animate.dart';
 
@@ -30,9 +30,9 @@ class WelcomePage extends StatelessWidget {
       body: Container(
         width: 1.sw,
         height: 1.sh,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/img_landing.jpg'),
+            image: AssetImage(Assets.images.imgLanding),
             fit: BoxFit.cover,
           ),
         ),
@@ -123,12 +123,9 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  void _navigateToNextPage(BuildContext context) async {
-    final accessToken = await SecureStorageUtils.getStorage(bearerToken);
-    if (accessToken.isNotEmpty) {
-      Navigator.of(context).pushReplacementNamed(Paths.home);
-      return;
-    }
-    Navigator.of(context).pushReplacementNamed(Paths.login);
+  void _navigateToNextPage(BuildContext context) {
+    // go_router's `redirect` (app_router.dart) promotes an already-
+    // authenticated user straight to Paths.home instead.
+    context.go(Paths.login);
   }
 }

@@ -1,10 +1,6 @@
-import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:ProjectName/core/config/di_module/init_config.dart';
-import 'package:ProjectName/core/routes/app_path.dart';
-import 'package:ProjectName/core/routes/app_routes.dart';
-import 'package:ProjectName/core/services/navigation_service.dart';
+import 'package:ProjectName/core/routes/app_router.dart';
 import 'package:ProjectName/core/utils/theme_data.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 
@@ -13,21 +9,15 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final RouteObserver<ModalRoute<void>> routeObserver =
-        RouteObserver<ModalRoute<void>>();
-
     return FlavorBanner(
-      child: MaterialApp(
+      child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         title: 'ProjectName',
-        navigatorKey: getIt<NavigationService>().navigatorKey,
-        routes: appRoutes,
-        navigatorObservers: [ChuckerFlutter.navigatorObserver, routeObserver],
+        routerConfig: appRouter,
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         theme: themeData,
-        initialRoute: Paths.splash,
         builder: (context, child) {
           var mediaQuery = MediaQuery.of(context);
           double textScaleFactor;

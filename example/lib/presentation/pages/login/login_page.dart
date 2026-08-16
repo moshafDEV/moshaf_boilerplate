@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:example/core/config/di_module/init_config.dart';
+import 'package:example/core/constants/assets.gen.dart';
 import 'package:example/core/constants/textstyle.dart';
 import 'package:example/core/utils/keyboard_util.dart';
 import 'package:example/domain/usecase/login/login.dart';
@@ -48,9 +49,9 @@ class LoginPageContent extends StatelessWidget {
         body: Container(
           width: double.infinity,
           height: double.infinity,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/images/img_landing.jpg'),
+              image: AssetImage(Assets.images.imgLanding),
               fit: BoxFit.fitWidth,
               alignment: Alignment.topCenter, // Set image position to top
             ),

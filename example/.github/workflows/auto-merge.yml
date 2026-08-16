@@ -1,0 +1,32 @@
+# Arms GitHub's native auto-merge on every PR the moment it's opened, so no
+# human has to click "Enable auto-merge" manually. This does NOT bypass
+# branch protection — GitHub still withholds the actual merge until every
+# required status check passes AND every required review is satisfied
+# (including CodeRabbit's, if branch protection is configured to count it —
+# see ci/docs/AUTO_MERGE_SETUP.md, which this file cannot configure for you).
+#
+# If CodeRabbit ever submits "Request changes" (request_changes_workflow in
+# .coderabbit.yaml), GitHub blocks the merge outright regardless of this
+# workflow, until the PR is updated and CodeRabbit's review is satisfied.
+
+name: Arm auto-merge
+
+on:
+  pull_request_target:
+    types: [opened, reopened, ready_for_review]
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  enable-auto-merge:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable auto-merge (squash)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr merge --auto --squash "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}"

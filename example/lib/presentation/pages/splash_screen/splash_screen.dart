@@ -1,10 +1,11 @@
+import 'dart:async';
+
 import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:example/core/constants/colors.dart';
-import 'package:example/core/env/secure_storage_key.dart';
 import 'package:example/core/routes/app_path.dart' show Paths;
-import 'package:example/core/utils/storage_data.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -46,25 +47,23 @@ class _SplashScreenState extends State<SplashScreen>
     _animationController.forward();
   }
 
-  void _navigateToHome() {
-    Future.delayed(const Duration(seconds: 2), () async {
-      if (mounted) {
-        final accessToken = await SecureStorageUtils.getStorage(bearerToken);
-        if (accessToken.isNotEmpty) {
-          Navigator.of(context).pushReplacementNamed(Paths.home);
-          return;
-        }
+  Timer? _navigationTimer;
 
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          Paths.welcome,
-          (route) => false, // Clear navigation stack
-        );
-      }
+  void _navigateToHome() {
+    _navigationTimer = Timer(const Duration(seconds: 2), () {
+      if (!mounted) return;
+
+      // Always proceeds to the normal cold-start entry point — go_router's
+      // `redirect` (app_router.dart) is the single source of truth for the
+      // auth check, and fast-forwards an already-authenticated user
+      // straight to Paths.home instead.
+      context.go(Paths.welcome);
     });
   }
 
   @override
   void dispose() {
+    _navigationTimer?.cancel();
     _animationController.dispose();
     super.dispose();
   }

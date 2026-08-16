@@ -49,36 +49,12 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
-flutter_native_splash:
-  color: "#FFFFFF"
-  image: assets/images/ic_splashscreen.png
-  color_dark: "#FFFFFF"
-  image_dark: assets/images/ic_splashscreen.png
-  android_12:
-    image: assets/images/ic_splashscreen_andro.png
-    icon_background_color: "#FFFFFF"
-    image_dark: assets/images/ic_splashscreen_andro.png
-    icon_background_color_dark: "#FFFFFF"
-  web: false
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  remove_alpha_ios: true
-  image_path: "assets/images/ic_app.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
-  web:
-    generate: true
-    image_path: "assets/images/ic_app.png"
-    background_color: "#ffffff"
-    theme_color: "#ffffff"
-  windows:
-    generate: true
-    image_path: "assets/images/ic_app.png"
-    icon_size: 48 # min:48, max:256, default: 48
-  macos:
-    generate: true
-    image_path: "assets/images/ic_app.png"
+# flutter_native_splash / flutter_launcher_icons config moved out to their
+# own files (flutter_native_splash.yaml / flutter_launcher_icons.yaml) —
+# both packages auto-detect those default filenames, no --path/-f flag
+# needed. Run manually after dropping in your own app icon/splash images:
+#   dart run flutter_native_splash:create
+#   dart run flutter_launcher_icons
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -90,15 +66,14 @@ flutter:
     - assets/svg/
     - .env
 
-    
-  # fonts:
-  #   - family: TestSans
-  #     fonts:
-  #       - asset: assets/fonts/TestSans/TestSans-Regular.ttf
-  #         weight: 400
-  #       - asset: assets/fonts/TestSans/TestSans-SemiBold.ttf
-  #         weight: 500
-  #       - asset: assets/fonts/TestSans/TestSans-Bold.ttf
-  #         weight: 600
-  #       - asset: assets/fonts/TestSans/TestSans-Extrabold.ttf
-  #         weight: 700
+  fonts:
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/manrope/Manrope-Light.ttf
+          weight: 300
+        - asset: assets/fonts/manrope/Manrope-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/manrope/Manrope-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/manrope/Manrope-Bold.ttf
+          weight: 600

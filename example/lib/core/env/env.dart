@@ -9,4 +9,9 @@ abstract class Env {
 
   @EnviedField(varName: 'API_URL', obfuscate: true)
   static String apiUrl = _Env.apiUrl;
+
+  // Not obfuscated: a feature flag, not a secret. Gates Firebase
+  // initialization — see AppConfig.initialize() and AppModule.analytic.
+  @EnviedField(varName: 'ENABLE_FIREBASE', defaultValue: false)
+  static bool enableFirebase = _Env.enableFirebase;
 }

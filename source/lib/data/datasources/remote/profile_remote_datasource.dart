@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:ProjectName/core/constants/api_path_constant.dart';
+import 'package:ProjectName/core/error/exception.dart';
 import 'package:ProjectName/core/error/failure.dart';
 import 'package:ProjectName/core/http_client/main_client.dart';
 import 'package:ProjectName/data/models/profile/response/profile_reponse_model.dart';
@@ -25,7 +26,8 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
     } on DioException catch (e) {
       return left(
         ServerFailure(
-          e.response?.data['message'] ?? 'Something went wrong',
+          extractErrorMessage(e.response?.data,
+              fallback: e.response?.statusMessage ?? 'Something went wrong'),
           e.response?.statusCode,
         ),
       );

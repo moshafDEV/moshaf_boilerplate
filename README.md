@@ -12,18 +12,20 @@ This repository provides a boilerplate source code to streamline the initial set
 - Ready-to-use templates for common features
 - Integrated support for multiple environments using [`flutter_flavor`](https://pub.dev/packages/flutter_flavor)
 - State management with [`flutter_bloc`](https://pub.dev/packages/flutter_bloc)
-- Dependency injection via [`get_it`](https://pub.dev/packages/get_it)
+- Dependency injection via [`get_it`](https://pub.dev/packages/get_it) + [`injectable`](https://pub.dev/packages/injectable)
 - Networking powered by [`dio`](https://pub.dev/packages/dio)
 - Local storage setup with [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage)
-- Routing handled by [`go_router`](https://pub.dev/packages/go_router)
+- Declarative navigation via [`go_router`](https://pub.dev/packages/go_router) — a single `redirect` gates the auth flow (splash/welcome/login/home), with a reporting `errorBuilder` for unmatched routes
+- Type-safe asset access — `moshaf_boilerplate assets` scans `assets/` and generates `Assets.images.xxx`/`Assets.svg.xxx` constants, no `flutter_gen` dependency needed
 - Linting and code quality enforced with [`flutter_lints`](https://pub.dev/packages/flutter_lints)
 - Unit and widget testing configuration
 - Customizable theme and localization support
-- Error handling and logging modules
+- Error handling and logging modules, wired into both crash reporting and routing
 - Analytics integration for screen tracking
 - Example implementation for authentication (login/profile)
 - Separation of data, domain, and presentation layers
 - Configurable environment variables and DI modules
+- Ready-to-adapt Jenkins CI pipeline (`Jenkinsfile` + `ci/`) for Android + iOS staging/production builds
 
 ## Installation Guide
 
@@ -63,172 +65,99 @@ Follow these steps to install `moshaf_boilerplate` globally using Dart Pub:
 
 Once installation is complete, follow these steps to initialize your Flutter project using `moshaf_boilerplate`:
 
-1. **Open CLI in Your Project Directory**  
-   Navigate to the folder where you want to create your new Flutter project.
+1. **Open CLI in Your Workspace Directory**  
+   Navigate to the folder where you keep your projects (e.g. `~/dev`) — not a folder named after the project itself.
 
 2. **Run the Boilerplate Creation Command**  
    Execute the following command:
    ```bash
    moshaf_boilerplate create
    ```
-   This will scaffold your project with the recommended structure and templates.
+   You'll be prompted for a project name, then a new folder with that name is created right there with the full Clean Architecture structure and templates inside it — nothing outside that new folder is touched.
 
 > **Note:**  
 > After generating your project, it is highly recommended to review and customize your `.gitignore` file to ensure that unnecessary files and directories are excluded from version control. This helps maintain a clean repository and prevents accidental commits of sensitive or build-related files.
 
-## Initial Setup Android and iOS Project
+## Running on macOS
 
-After generating the project using this boilerplate, complete the following additional steps to ensure the application runs properly on both Android and iOS.
+macOS builds need one manual, per-machine step that no CLI generator can do
+for you: `flutter_secure_storage` uses Keychain, which under App Sandbox
+requires a real signing identity. After generating your project:
 
-<details>
-<summary><strong>Android Setup</strong></summary>
+1. Open `macos/Runner.xcworkspace` in Xcode.
+2. Select **Runner** → **Signing & Capabilities**.
+3. Pick your Team (a personal Apple ID works for local development).
 
-### 1. Configure Product Flavors
+Without this, `flutter run -d macos` fails to build with `"Runner" has
+entitlements that require signing with a development certificate.` Android
+and iOS don't need this step.
 
-Product flavors for **dev** and **prod** have already been prepared.  
-You only need to adjust and use them according to your project requirements.
+## Flavors (Android & iOS)
 
-```gradle
-flavorDimensions("flavor")
-productFlavors {
-    create("dev") {
-        dimension = "flavor"
-        namespace = "com.example.example"
-        applicationId = "com.example.example"
-    }
-    // create("prod") {
-    //     dimension = "flavor"
-    //     namespace = "com.moshaf.example"
-    //     applicationId = "com.moshaf.example"
-    // }
-}
+`dev` and `prod` flavors — application id/bundle id, display name, app icon,
+launch screen — are set up automatically at generation time by
+[`flutter_flavorizr`](https://pub.dev/packages/flutter_flavorizr), driven by
+`flavorizr.yaml` at the project root. No manual Xcode configuration-duplication
+or Gradle editing is required; `flutter run --flavor dev -t lib/main_dev.dart`
+(or `prod`) works right after generation.
+
+### Changing a flavor, or adding a new one
+
+Edit `flavorizr.yaml`, then re-run:
+```bash
+dart run flutter_flavorizr -f
 ```
+This only touches native Android/iOS flavor config (application id, bundle
+id, app name, icons, launch screen) — it never touches `lib/`, so your own
+Dart code (including `main_dev.dart`/`main_prod.dart` and this boilerplate's
+`flutter_flavor`-based `FlavorConfig`) is untouched.
 
-- Update the `namespace` and `applicationId` as needed.
-- Uncomment and configure the `prod` flavor when ready for production.
+### Adding your Firebase config per flavor
 
----
+Firebase config files are secrets and can't be templated, so add them
+yourself, then point `flavorizr.yaml` at them:
 
-### 3. Flavor-Based Configuration
+- **Android**: place `google-services.json` in `android/app/src/dev/` (and
+  `.../prod/`), then uncomment the matching `firebase.config` line under that
+  flavor in `flavorizr.yaml`.
+- **iOS**: place `GoogleService-Info.plist` wherever you like in the repo
+  (e.g. `ios/config/dev/GoogleService-Info.plist`), then uncomment and point
+  the matching `firebase.config` line to it.
 
-Flavor-specific configurations have also been prepared.
+Re-run `dart run flutter_flavorizr -f` afterwards to wire them in.
 
-You can place different configuration files such as:
+## App Icon & Splash Screen
 
-- `google-services.json`
-- `AndroidManifest.xml`
-- Other environment-specific resources
-
-Inside the following directories:
-
+Config for [`flutter_launcher_icons`](https://pub.dev/packages/flutter_launcher_icons) and
+[`flutter_native_splash`](https://pub.dev/packages/flutter_native_splash) ships as
+`flutter_launcher_icons.yaml`/`flutter_native_splash.yaml` at the project root (both
+auto-detected by their default filename, no extra flag needed). They point at placeholder
+image paths — drop in your own icon/splash images at those paths, then run:
+```bash
+dart run flutter_launcher_icons
+dart run flutter_native_splash:create
 ```
-android/app/src/dev
-android/app/src/prod
-```
+Neither runs automatically at generation time, since there's no real app icon to generate
+from yet.
 
-This allows you to:
-- Use different Firebase / Google Services configurations
-- Separate AndroidManifest settings for dev and prod
-- Manage environment-specific resources cleanly
+## Type-Safe Assets
 
-</details>
+`moshaf_boilerplate assets` scans `assets/` and (re)writes
+`lib/core/constants/assets.gen.dart` — one generated class per top-level folder
+(`Assets.images.imgLanding`, `Assets.svg.iconSearch`, ...), plain `String` constants, no
+`flutter_gen`/`build_runner` dependency. Runs once automatically at generation time; re-run
+it yourself any time you add or remove files under `assets/` (also available as a VS Code
+task, "Regenerate Assets").
 
-<details>
-<summary><strong>iOS Setup</strong></summary>
+## Continuous Integration (Jenkins)
 
-### 1. Add configurations project
-
-1. Open the project in Xcode.
-2. Select **Runner** from the sidebar and select **Project Runner** from the navigator.
-3. Click the **"+"** button to add a new configuration and duplicate from each existing configuration.
-4. Add the configurations as shown in the capture below:
-
-![iOS Configuration Setup](https://raw.githubusercontent.com/moshafDEV/moshaf_boilerplate/refs/heads/main/assets/readme/img_add_configuration.png)
-
-
-### 2. Add `FLAVOR` Parameter
-
-1. Open the project in Xcode.
-2. Select **Runner** from the project navigator.
-3. Go to the **Build Settings** tab.
-4. Scroll to **User-Defined Settings**.
-5. Add a new key named:
-
-```
-FLAVOR
-```
-
-6. Set the value according to your desired flavor (e.g., `dev`, `prod`).
-
-Make sure your build configurations are properly mapped to each flavor if you are using multiple environments.
-
-**Example**
-
-![iOS Add User Defined Setting](https://raw.githubusercontent.com/moshafDEV/moshaf_boilerplate/refs/heads/main/assets/readme/img_add_user_defined_setting.png)
-
-![iOS Add Flavor Parameter](https://raw.githubusercontent.com/moshafDEV/moshaf_boilerplate/refs/heads/main/assets/readme/img_add_flavor_parameter.png)
-
----
-
-### 3. Configure `Info.plist` and Google Service per Flavor
-
-You can configure environment-specific settings directly in Xcode via **Build Settings**.
-
-#### Info.plist Configuration
-
-1. Open **Runner** in Xcode.
-2. Go to the **Build Settings** tab.
-3. Search for:
-
-```
-Packaging > Info.plist File
-```
-
-4. Set different `Info.plist` paths for each build configuration (e.g., Dev and Prod).
-
-Example:
-
-```
-ios/config/dev/Info.plist
-ios/config/prod/Info.plist
-```
-
-This allows you to:
-- Customize bundle name
-- Configure URL schemes
-- Set environment-specific keys
-
----
-
-#### GoogleService-Info.plist Configuration
-
-To use different Firebase configurations per flavor:
-
-1. Add multiple `GoogleService-Info.plist` files to your project (e.g., dev and prod versions).
-2. In Xcode, go to:
-
-```
-Build Settings > Packaging > Product Bundle Identifier
-```
-
-Make sure each flavor uses a different **Bundle Identifier** that matches the Firebase project.
-
-3. Then configure:
-
-```
-Build Phases > Copy Bundle Resources
-```
-
-Ensure the correct `GoogleService-Info.plist` is included for each build configuration.
-
-You can also manage this using separate build configurations and target memberships.
-
-This setup allows you to:
-- Use different Firebase projects (dev & prod)
-- Separate environment configurations cleanly
-- Avoid manual file swapping before build
-
-</details>
+A ready-to-adapt Jenkins pipeline ships as `Jenkinsfile` + `ci/` — builds, signs, and ships
+Android and iOS for `staging`/`production` branches, with optional TestFlight/Play
+Store/OTA distribution. Every project-specific value (credential IDs, agent labels, bundle
+IDs) lives in one file, `ci/config.groovy`; `Jenkinsfile` and `ci/scripts/*.sh` stay
+untouched. Start with `ci/docs/CREDENTIALS_GUIDE.md`, then `ci/docs/RUN-PIPELINE.md` to test
+locally before wiring it into Jenkins. Not using Jenkins? Delete `Jenkinsfile` and `ci/` —
+nothing else in the project depends on them.
 
 ---
 
@@ -237,6 +166,11 @@ This setup allows you to:
 > **Note:** The following diagram illustrates the recommended folder structure, demonstrating clear separation of concerns in accordance with Clean Architecture.
 
 ```
+├── ci                            # Jenkins pipeline scripts/docs (optional, deletable)
+├── Jenkinsfile
+├── flavorizr.yaml
+├── flutter_launcher_icons.yaml
+├── flutter_native_splash.yaml
 ├── assets
 │   ├── fonts
 │   ├── images
@@ -252,12 +186,12 @@ This setup allows you to:
 │   │   ├── config
 │   │   │   ├── di_module
 │   │   │   └── loggers
-│   │   ├── constants
+│   │   ├── constants                # colors.dart, textstyle.dart, generated assets.gen.dart
 │   │   ├── env
 │   │   ├── error
 │   │   ├── http_client
 │   │   │   ├── interceptors
-│   │   ├── routes
+│   │   ├── routes                   # app_router.dart (GoRouter), app_routes.dart, app_path.dart
 │   │   ├── services
 │   │   └── utils
 │   ├── data
@@ -274,6 +208,7 @@ This setup allows you to:
 │   ├── domain
 │   │   ├── entities
 │   │   │   ├── auth
+│   │   │   ├── general_data_list
 │   │   │   ├── login_param
 │   │   │   ├── profile
 │   │   │   └── text_input_field
@@ -283,12 +218,14 @@ This setup allows you to:
 │   └── presentation
 │       ├── bloc
 │       │   └── login
-│       ├── component
+│       ├── components                # shared widgets: chip, dialog, avatar, switch, ...
 │       └── pages
+│           ├── forgot_password
 │           ├── home
 │           │   ├── components
 │           ├── login
 │           │   ├── components
+│           ├── register
 │           ├── splash_screen
 │           │   ├── components
 │           └── welcome
@@ -299,13 +236,13 @@ This setup allows you to:
 
 For best compatibility and performance, use the following versions:
 
-- **Flutter: >= 3.32.0**
+- **Flutter: >= 3.38.0**
   Check your version:
   ```bash
   flutter --version
   ```
 
-- **Dart: >= 3.8.0**  
+- **Dart: >= 3.9.0**
   Check your version:
   ```bash
   dart --version

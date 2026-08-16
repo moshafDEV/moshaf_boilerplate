@@ -4,21 +4,25 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:ProjectName/core/config/app_config.dart';
+import 'package:ProjectName/core/utils/error_reporter.dart';
 import 'package:ProjectName/main.dart';
 
 void main() {
   runZonedGuarded<Future<void>>(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
+      ErrorReporter.install();
       FlavorConfig(variables: {"mode": Flavor.prod});
-      mainCommon(flavor: Flavor.prod);
+      await mainCommon(flavor: Flavor.prod);
     },
-    (error, stack) => log(
-      'Error in mainCommon: $error',
-      name: 'MainCommon',
-      error: error,
-      stackTrace: stack,
-    ),
-    // CrashlyticsLogger.recordError(error, stack, fatal: true), // need firebase
+    (error, stack) {
+      log(
+        'Error in mainCommon: $error',
+        name: 'MainCommon',
+        error: error,
+        stackTrace: stack,
+      );
+      ErrorReporter.recordZoneError(error, stack);
+    },
   );
 }

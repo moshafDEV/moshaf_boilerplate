@@ -1,0 +1,571 @@
+// All project-specific values live in ci/config.groovy — that's the only
+// file to touch when reusing this setup for a different Flutter project.
+// Stage bodies stay thin wrappers around ci/scripts/*.sh so the shell logic
+// is reviewable/testable on its own.
+
+def CFG = [:]
+
+def installAndroidSigning() {
+    withCredentials([
+        file(credentialsId: env.CRED_ANDROID_KEYSTORE, variable: 'KEYSTORE_FILE'),
+        file(credentialsId: env.CRED_ANDROID_KEY_PROPERTIES, variable: 'KEY_PROPERTIES_FILE')
+    ]) {
+        sh 'bash ci/scripts/install-android-signing.sh'
+    }
+}
+
+// environment is 'STAGING' or 'PRODUCTION' — picks which cert/profile pair
+// (and which installed provisioning-profile filename) to use, since staging
+// ships Ad Hoc and production ships App Store/TestFlight.
+def installIosSigning(String environment) {
+    def bindings = [
+        file(credentialsId: env.getProperty("CRED_IOS_CERT_${environment}"), variable: 'CERT_FILE'),
+        string(credentialsId: env.getProperty("CRED_IOS_CERT_PASSWORD_${environment}"), variable: 'CERT_PASSWORD'),
+        file(credentialsId: env.getProperty("CRED_IOS_PROFILE_${environment}"), variable: 'PROFILE_FILE'),
+        string(credentialsId: env.CRED_IOS_KEYCHAIN_PASSWORD, variable: 'KEYCHAIN_PASSWORD')
+    ]
+    // Optional: apps with extension targets (Notification Service Extension,
+    // Share Extension, etc.) need a profile per extra target — bundled into
+    // one .zip credential rather than adding a binding per extension. Empty
+    // by default, so projects without extensions are unaffected.
+    def extraProfilesCredId = env.getProperty("CRED_IOS_EXTRA_PROFILES_${environment}")
+    def hasExtraProfiles = extraProfilesCredId != null && extraProfilesCredId.trim() != ''
+    if (hasExtraProfiles) {
+        bindings << file(credentialsId: extraProfilesCredId, variable: 'EXTRA_PROFILES_ZIP')
+    }
+
+    withCredentials(bindings) {
+        withEnv([
+            "IOS_PROVISIONING_PROFILE_FILENAME=${env.getProperty("IOS_PROVISIONING_PROFILE_FILENAME_${environment}")}",
+            "HAS_EXTRA_PROFILES=${hasExtraProfiles}"
+        ]) {
+            sh 'bash ci/scripts/install-ios-signing.sh'
+        }
+    }
+}
+
+// Switch provisioning profile only (cert stays), used in 'both' mode to change
+// from Ad Hoc to App Store mid-build. suffix is '' for main profile or
+// '_TESTFLIGHT' for the TestFlight variant of staging.
+def switchIosProfile(String environment, String suffix) {
+    def profileCredId = env.getProperty("CRED_IOS_PROFILE_${environment}${suffix}")
+    def extraProfilesCredId = env.getProperty("CRED_IOS_EXTRA_PROFILES_${environment}${suffix}")
+    def hasExtraProfiles = extraProfilesCredId != null && extraProfilesCredId.trim() != ''
+
+    def bindings = [file(credentialsId: profileCredId, variable: 'PROFILE_FILE')]
+    if (hasExtraProfiles) {
+        bindings << file(credentialsId: extraProfilesCredId, variable: 'EXTRA_PROFILES_ZIP')
+    }
+
+    withCredentials(bindings) {
+        withEnv([
+            "IOS_PROVISIONING_PROFILE_FILENAME=${env.getProperty("IOS_PROVISIONING_PROFILE_FILENAME_${environment}${suffix}")}",
+            "HAS_EXTRA_PROFILES=${hasExtraProfiles}"
+        ]) {
+            sh 'bash ci/scripts/install-ios-profile.sh'
+        }
+    }
+}
+
+def buildFlutterAndroid(String envFile, String flavor, String entrypoint, String buildType) {
+    sh "bash ci/scripts/build-flutter-android.sh '${envFile}' '${flavor}' '${entrypoint}' '${buildType}'"
+}
+
+// ANDROID_BUILD_MODE == 'native' skips Docker (for when Android shares a Mac
+// agent with iOS — see config comment); otherwise runs body inside
+// FLUTTER_DOCKER_IMAGE, same as before. Every Android stage step goes
+// through this instead of calling docker.image().inside() directly, so the
+// mode switch only has to be handled in one place.
+def runMaybeInDocker(Closure body) {
+    if (env.ANDROID_BUILD_MODE == 'native') {
+        body()
+    } else {
+        docker.image(env.FLUTTER_DOCKER_IMAGE).inside(env.FLUTTER_DOCKER_ARGS, body)
+    }
+}
+
+def buildFlutterIos(String envFile, String flavor, String entrypoint, String exportOptionsPlist) {
+    sh "bash ci/scripts/build-flutter-ios.sh '${envFile}' '${flavor}' '${entrypoint}' '${exportOptionsPlist}'"
+}
+
+// version/build are explicit params, not always env.APP_VERSION/env.APP_BUILD
+// — iOS's real CFBundleVersion doesn't necessarily match pubspec.yaml (see
+// readIosBuildNumber()), so each call site passes whichever value is
+// actually true for the platform being reported.
+def reportBuildflightStart(String bundleId, String platform, String version, String build) {
+    withCredentials([string(credentialsId: env.CRED_BUILDFLIGHT_API_KEY, variable: 'BUILD_API_TOKEN')]) {
+        sh "bash ci/scripts/buildflight-start.sh '${bundleId}' '${platform}' '${version}' '${build}'"
+    }
+}
+
+// project.pbxproj can hardcode its own FLUTTER_BUILD_NUMBER per configuration
+// (Release-dev for staging, Release-prod for production). flavor determines which.
+def readIosBuildNumber(String flavor) {
+    def configName = flavor == 'prod' ? 'Release-prod' : 'Release-dev'
+    def script = """
+        python3 << 'PYTHON'
+import re
+with open('ios/Runner.xcodeproj/project.pbxproj', 'r') as f:
+    content = f.read()
+# Find the config section for Release-dev or Release-prod
+pattern = r'${configName}[^}]*FLUTTER_BUILD_NUMBER = ([0-9]+)'
+match = re.search(pattern, content, re.DOTALL)
+if match:
+    print(match.group(1))
+PYTHON
+    """
+    return sh(script: script, returnStdout: true).trim()
+}
+
+// Auto-derives a distinct filename for production buildflight uploads from
+// the same BUILDFLIGHT_APK_FILENAME/_IPA_FILENAME staging already uses,
+// instead of needing a separate _PRODUCTION config key just for this.
+def productionFilename(String filename) {
+    def dot = filename.lastIndexOf('.')
+    return dot == -1 ? "${filename}-production" : "${filename[0..<dot]}-production${filename[dot..-1]}"
+}
+
+def uploadToBuildflight(String searchDir, String extension, String platform, String filename) {
+    withCredentials([string(credentialsId: env.CRED_BUILDFLIGHT_API_KEY, variable: 'BUILD_API_TOKEN')]) {
+        sh "bash ci/scripts/buildflight-upload.sh '${searchDir}' '${extension}' '${platform}' '${filename}'"
+    }
+}
+
+def reportBuildflightFailure(String bundleId, String platform) {
+    withCredentials([string(credentialsId: env.CRED_BUILDFLIGHT_API_KEY, variable: 'BUILD_API_TOKEN')]) {
+        sh "bash ci/scripts/buildflight-fail.sh '${bundleId}' '${platform}'"
+    }
+}
+
+// Local-only build timeline for an optional menu bar / status-monitoring
+// app — it polls ~/jenkins-agent/current-build.json on this same Mac, no
+// Jenkins API token needed. init() resets the file with the full stage list for this
+// branch's flow (also self-heals any stale 'running' left by a run that
+// crashed before reaching its own cleanup); update()/finish() are called at
+// each transition.
+def initBuildTimeline(List stageNames) {
+    sh "bash ci/scripts/report-stage-status.sh init '${env.JOB_NAME}' '${env.BUILD_NUMBER}' '${env.BUILD_URL}' ${stageNames.collect { "'${it}'" }.join(' ')}"
+}
+
+def reportStageStatus(String stageName, String status) {
+    sh "bash ci/scripts/report-stage-status.sh update '${stageName}' '${status}'"
+}
+
+def finishBuildTimeline(String status) {
+    sh "bash ci/scripts/report-stage-status.sh finish '${status}'"
+}
+
+def uploadToTestFlight(String searchDir) {
+    withCredentials([
+        file(credentialsId: env.CRED_APPSTORE_API_KEY, variable: 'APPSTORE_API_KEY_FILE'),
+        string(credentialsId: env.CRED_APPSTORE_API_KEY_ID, variable: 'APPSTORE_API_KEY_ID'),
+        string(credentialsId: env.CRED_APPSTORE_API_ISSUER_ID, variable: 'APPSTORE_API_ISSUER_ID')
+    ]) {
+        sh "bash ci/scripts/upload-testflight.sh '${searchDir}'"
+    }
+}
+
+// altool upload alone doesn't make a build available to anyone — beta-group
+// assignment (internal: instant; external: also submits Beta App Review) is a
+// separate step. All the credential-bound work is done HERE, on the Mac agent:
+// compile-testflight-submit.sh mints the ASC JWT, resolves the app id, and
+// bakes every parameter into one self-contained script. That whole text is then
+// handed to the async 'submit-testflight-groups-ios' job, which only executes
+// it — no credentials, keys, git, or copyArtifacts downstream. Returns
+// immediately (wait: false); the wait-for-Apple-processing happens over there.
+// No-op unless TESTFLIGHT_AUTO_SUBMIT_<environment> is 'true'. environment is
+// 'STAGING' or 'PRODUCTION'.
+def deferTestFlightSubmission(String environment, String bundleId, String buildNumber) {
+    if (env.getProperty("TESTFLIGHT_AUTO_SUBMIT_${environment}") != 'true') {
+        echo "TESTFLIGHT_AUTO_SUBMIT_${environment} is not 'true' — skipping beta-group submission."
+        return
+    }
+    def internalGroupId = env.getProperty("TESTFLIGHT_INTERNAL_GROUP_ID_${environment}") ?: ''
+    def externalGroupId = env.getProperty("TESTFLIGHT_EXTERNAL_GROUP_ID_${environment}") ?: ''
+    def submitScript
+    withCredentials([
+        file(credentialsId: env.CRED_APPSTORE_API_KEY, variable: 'APPSTORE_API_KEY_FILE'),
+        string(credentialsId: env.CRED_APPSTORE_API_KEY_ID, variable: 'APPSTORE_API_KEY_ID'),
+        string(credentialsId: env.CRED_APPSTORE_API_ISSUER_ID, variable: 'APPSTORE_API_ISSUER_ID')
+    ]) {
+        submitScript = sh(
+            script: "bash ci/scripts/compile-testflight-submit.sh '${bundleId}' '${buildNumber}' '${internalGroupId}' '${externalGroupId}'",
+            returnStdout: true
+        )
+    }
+    build(
+        job: 'example/submit-testflight-groups-ios',
+        parameters: [
+            text(name: 'SUBMIT_SCRIPT', value: submitScript),
+            string(name: 'UPSTREAM_BUILD_NUMBER', value: "${env.BUILD_NUMBER}")
+        ],
+        wait: false,
+        propagate: false
+    )
+    echo "✅ TestFlight submission compiled on this agent and queued in 'submit-testflight-groups-ios'."
+}
+
+// Uploads the just-built .aab to a Play Console testing track via the Play
+// Developer Publishing API — plain curl (see upload-playstore.sh), no
+// Gradle Play Publisher plugin, so nothing in android/ needs to change.
+def uploadToPlayStore(String packageName, String track) {
+    withCredentials([file(credentialsId: env.CRED_PLAYSTORE_SERVICE_ACCOUNT, variable: 'PLAYSTORE_SERVICE_ACCOUNT_FILE')]) {
+        def aabFile = sh(script: "find build/app/outputs/bundle -name '*.aab' | head -1", returnStdout: true).trim()
+        // Credential file path goes through env + single-quoted sh instead of
+        // Groovy GString interpolation, so Jenkins' log masking actually
+        // recognizes it as a secret (see the "insecure interpolation" warning
+        // this used to throw).
+        withEnv(["AAB_FILE=${aabFile}", "PACKAGE_NAME=${packageName}", "TRACK=${track}"]) {
+            sh 'bash ci/scripts/upload-playstore.sh "$PLAYSTORE_SERVICE_ACCOUNT_FILE" "$PACKAGE_NAME" "$AAB_FILE" "$TRACK"'
+        }
+    }
+}
+
+// Populates the workspace with source. Default: unstash what Prepare
+// already checked out on the controller — no extra network fetch either
+// way, just a transfer through the controller instead of hitting the
+// remote again. When
+// PRESERVE_WORKSPACE_NATIVE is 'true' (native mode, same Mac for both
+// Android and iOS), it instead runs checkout scm directly on THIS agent:
+// Jenkins' own checkout step only does a full clone when the workspace has
+// no .git yet — since that .git is never wiped between runs anymore (see
+// cleanBuildArtifacts()), every run after the very first is just an
+// incremental fetch, on the same physical Mac, no stash/unstash needed.
+// .git persists across runs under PRESERVE_WORKSPACE_NATIVE (see
+// cleanBuildArtifacts()), so anything left dirty by a previous run or by
+// Xcode touching tracked files (xcuserdata, schemes) would otherwise block
+// or silently carry into the next checkout.
+def forceDiscardModify() {
+    sh 'git reset --hard HEAD'
+}
+
+def syncSource() {
+    if (env.PRESERVE_WORKSPACE_NATIVE == 'true' && env.SAME_AGENT == 'true') {
+        try {
+            forceDiscardModify()
+        } catch (Exception e) {
+            echo "forceDiscardModify warning: ${e.message}, continuing..."
+        }
+        checkout scm
+    } else {
+        unstash 'source'
+    }
+}
+
+
+
+// The single cleanup call at the end of every stage that has one. Normally
+// a full cleanWs(). But that would defeat PRESERVE_WORKSPACE_NATIVE's whole
+// point — wiping .git along with everything else — so when that flag is on
+// (and this is the shared native agent), only delete build output instead.
+def cleanBuildArtifacts() {
+    if (env.PRESERVE_WORKSPACE_NATIVE == 'true' && env.SAME_AGENT == 'true') {
+        sh 'rm -rf build'
+    } else {
+        cleanWs()
+    }
+}
+
+pipeline {
+    agent none
+
+    options {
+        timestamps()
+        skipDefaultCheckout()
+    }
+
+    stages {
+        // The one thing that CAN'T come from config: a workspace has to exist
+        // before ci/config.groovy can be read at all, so this first agent is a
+        // fixed literal (Jenkins' own built-in node — always present). Every
+        // stage after this reads its settings from env.*, populated below.
+        stage('Prepare') {
+            agent { label 'built-in' }
+            steps {
+                script {
+                    try {
+                        forceDiscardModify()
+                    } catch (Exception e) {
+                        echo "forceDiscardModify warning: ${e.message}, continuing..."
+                    }
+
+                    checkout scm
+
+                    CFG = load('ci/config.groovy')
+                    CFG.each { k, v -> env.setProperty(k, v.toString()) }
+
+                    env.APP_VERSION = sh(script: "grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d+ -f1", returnStdout: true).trim()
+                    env.APP_BUILD = sh(script: "grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d+ -f2", returnStdout: true).trim()
+
+                    // Android/iOS stages below reuse this checkout instead of
+                    // re-cloning from the remote every time: same agent (both
+                    // labels equal) just keeps working in this workspace;
+                    // different agents unstash this instead — still no
+                    // network fetch, just a transfer through the controller.
+                    env.SAME_AGENT = (env.LINUX_AGENT_LABEL == env.IOS_AGENT_LABEL).toString()
+                    stash name: 'source', excludes: '.git/**'
+                }
+            }
+        }
+
+        // Gate for both flows: nothing builds until the whole test suite is
+        // green. Runs on LINUX_AGENT_LABEL (same node the Android stage
+        // right after uses too) and is the FIRST stage to touch the
+        // workspace after Prepare, so it owns syncSource()/initBuildTimeline()
+        // — the build stages that follow just keep using what's already here.
+        stage('Run Unit Tests') {
+            when { anyOf { branch 'staging'; branch 'production' } }
+            agent { label "${env.LINUX_AGENT_LABEL}" }
+            steps {
+                script {
+                    syncSource()
+                    def isProd = env.BRANCH_NAME == 'production'
+                    initBuildTimeline(isProd
+                        ? ['Run Unit Tests', 'Build Android App Bundle (Production)', 'Build iOS IPA (Production)']
+                        : ['Run Unit Tests', 'Build Android APK (Staging)', 'Build iOS IPA (Staging)'])
+                    reportStageStatus('Run Unit Tests', 'running')
+                    runMaybeInDocker {
+                        sh "bash ci/scripts/run-flutter-tests.sh '${isProd ? env.ANDROID_ENV_FILE_PRODUCTION : env.ANDROID_ENV_FILE_STAGING}'"
+                    }
+                }
+            }
+            post {
+                success {
+                    reportStageStatus('Run Unit Tests', 'success')
+                }
+                failure {
+                    reportStageStatus('Run Unit Tests', 'failure')
+                    finishBuildTimeline('FAILURE')
+                    cleanBuildArtifacts()
+                }
+            }
+        }
+
+        // Buildflight upload folded into this stage rather than a separate
+        // one — same reasoning as the iOS stage below: the next stage on
+        // this same node would otherwise need the exact same workspace state,
+        // so there's nothing gained by splitting it, only a stage to keep in
+        // sync.
+        stage('Build Android APK (Staging)') {
+            when { branch 'staging' }
+            agent { label "${env.LINUX_AGENT_LABEL}" }
+            steps {
+                script {
+                    // Same LINUX_AGENT_LABEL as Run Unit Tests above — same
+                    // node, same workspace, already synced there.
+                    reportStageStatus('Build Android APK (Staging)', 'running')
+                    runMaybeInDocker {
+                        sh 'bash ci/scripts/patch-gradle-ci.sh'
+                        installAndroidSigning()
+                        reportBuildflightStart(env.ANDROID_BUNDLE_ID_STAGING, 'android', env.APP_VERSION, env.APP_BUILD)
+                        buildFlutterAndroid(env.ANDROID_ENV_FILE_STAGING, env.ANDROID_FLAVOR_STAGING, env.ANDROID_ENTRYPOINT_STAGING, 'apk')
+                        uploadToBuildflight('build/app/outputs/flutter-apk', 'apk', 'android', env.BUILDFLIGHT_APK_FILENAME)
+                    }
+                }
+            }
+            post {
+                success {
+                    reportStageStatus('Build Android APK (Staging)', 'success')
+                    archiveArtifacts artifacts: 'build/app/outputs/flutter-apk/*.apk', fingerprint: true
+                }
+                failure {
+                    reportStageStatus('Build Android APK (Staging)', 'failure')
+                    // post{} runs outside the steps{} docker.inside() scope —
+                    // in docker mode, curl needs to be back inside the
+                    // Flutter image, hence runMaybeInDocker again here too.
+                    script { runMaybeInDocker { reportBuildflightFailure(env.ANDROID_BUNDLE_ID_STAGING, 'android') } }
+                    finishBuildTimeline('FAILURE')
+                    // On success the APK stays in the workspace for the iOS
+                    // stage right after — only clean up here if we're not
+                    // getting there.
+                    cleanBuildArtifacts()
+                }
+            }
+        }
+
+        // --- iOS: runs on the Mac agent (label from config) — same physical
+        // node as the Linux stage above when LINUX_AGENT_LABEL ==
+        // IOS_AGENT_LABEL (SAME_AGENT), so it just keeps using that
+        // workspace; otherwise it syncs the source Prepare already checked
+        // out, rather than re-cloning from the remote. Ad Hoc distribution
+        // (Apple accounts in play are standard Apple Developer Program, not
+        // Enterprise) unless IOS_STAGING_DISTRIBUTION says otherwise.
+        //
+        // buildflight upload folded into this stage — in 'both' mode, a
+        // second build overwrites build/ios/ipa/ with the TestFlight variant
+        // (`flutter build ipa` always writes there regardless of export
+        // options), so the Ad Hoc build must be uploaded to buildflight
+        // before that second build runs, not in a later stage.
+        stage('Build iOS IPA (Staging)') {
+            when { branch 'staging' }
+            agent { label "${env.IOS_AGENT_LABEL}" }
+            steps {
+                script {
+                    syncSource()
+                    reportStageStatus('Build iOS IPA (Staging)', 'running')
+                    installIosSigning('STAGING')
+                    def iosBuild = readIosBuildNumber('dev')
+
+                    def distribution = env.IOS_STAGING_DISTRIBUTION ?: 'adhoc'
+                    def wantsAdhoc = distribution == 'adhoc' || distribution == 'both'
+                    def wantsTestFlight = distribution == 'testflight' || distribution == 'both'
+
+                    if (wantsAdhoc) {
+                        reportBuildflightStart(env.IOS_BUNDLE_ID_STAGING, 'ios', env.APP_VERSION, iosBuild)
+                        buildFlutterIos(env.IOS_ENV_FILE_STAGING, env.IOS_FLAVOR_STAGING, env.IOS_ENTRYPOINT_STAGING, env.IOS_EXPORT_OPTIONS_STAGING)
+                        uploadToBuildflight('build/ios/ipa', 'ipa', 'ios', env.BUILDFLIGHT_IPA_FILENAME)
+                    }
+
+                    if (wantsTestFlight) {
+                        if (wantsAdhoc) {
+                            // 'both' mode: switch to App Store profile before second build
+                            switchIosProfile('STAGING', '_TESTFLIGHT')
+                        }
+                        buildFlutterIos(env.IOS_ENV_FILE_STAGING, env.IOS_FLAVOR_STAGING, env.IOS_ENTRYPOINT_STAGING, env.IOS_EXPORT_OPTIONS_STAGING_TESTFLIGHT)
+                        uploadToTestFlight('build/ios/ipa')
+                        deferTestFlightSubmission('STAGING', env.IOS_BUNDLE_ID_STAGING, iosBuild)
+                        echo "✅ Build uploaded to TestFlight."
+                    }
+                }
+            }
+            post {
+                success {
+                    reportStageStatus('Build iOS IPA (Staging)', 'success')
+                    // Whichever variant built LAST is what's here — 'both'
+                    // mode already uploaded the Ad Hoc one to buildflight
+                    // before overwriting it with the TestFlight build.
+                    archiveArtifacts artifacts: 'build/ios/ipa/*.ipa', fingerprint: true
+                }
+                failure {
+                    reportStageStatus('Build iOS IPA (Staging)', 'failure')
+                    script {
+                        // No buildflight "start" call was made in 'testflight'
+                        // mode, so there's nothing to report "fail" against.
+                        if ((env.IOS_STAGING_DISTRIBUTION ?: 'adhoc') != 'testflight') {
+                            reportBuildflightFailure(env.IOS_BUNDLE_ID_STAGING, 'ios')
+                        }
+                    }
+                }
+                cleanup {
+                    // Throwaway keychain from this build only — must go regardless of
+                    // outcome, else it piles up (and its identity) across every run.
+                    sh 'bash ci/scripts/cleanup-ios-keychain.sh'
+                    finishBuildTimeline(currentBuild.currentResult)
+                    cleanBuildArtifacts()
+                }
+            }
+        }
+
+        // ANDROID_PRODUCTION_DISTRIBUTION: 'store' (default) builds an .aab
+        // for Play Store, optionally uploaded to its Internal testing track.
+        // 'buildflight' is for apps that never go through Play Store at all
+        // (Enterprise-style internal distribution) — builds a plain .apk and
+        // ships it the exact same way staging already does.
+        stage('Build Android App Bundle (Production)') {
+            when { branch 'production' }
+            agent { label "${env.LINUX_AGENT_LABEL}" }
+            steps {
+                script {
+                    // Same LINUX_AGENT_LABEL as Run Unit Tests above — same
+                    // node, same workspace, already synced there.
+                    reportStageStatus('Build Android App Bundle (Production)', 'running')
+                    def androidDistribution = env.ANDROID_PRODUCTION_DISTRIBUTION ?: 'store'
+                    def buildType = androidDistribution == 'buildflight' ? 'apk' : 'appbundle'
+                    runMaybeInDocker {
+                        sh 'bash ci/scripts/patch-gradle-ci.sh'
+                        installAndroidSigning()
+                        if (androidDistribution == 'buildflight') {
+                            reportBuildflightStart(env.ANDROID_BUNDLE_ID_PRODUCTION, 'android', env.APP_VERSION, env.APP_BUILD)
+                        }
+                        buildFlutterAndroid(env.ANDROID_ENV_FILE_PRODUCTION, env.ANDROID_FLAVOR_PRODUCTION, env.ANDROID_ENTRYPOINT_PRODUCTION, buildType)
+                        if (androidDistribution == 'buildflight') {
+                            uploadToBuildflight('build/app/outputs/flutter-apk', 'apk', 'android', productionFilename(env.BUILDFLIGHT_APK_FILENAME))
+                        } else if (env.ANDROID_INTERNAL_TESTING_ENABLED == 'true') {
+                            uploadToPlayStore(env.ANDROID_BUNDLE_ID_PRODUCTION, 'internal')
+                        }
+                    }
+                }
+            }
+            post {
+                success {
+                    reportStageStatus('Build Android App Bundle (Production)', 'success')
+                    // Declarative post blocks only accept steps directly —
+                    // any if/else needs to be inside script{}.
+                    script {
+                        if ((env.ANDROID_PRODUCTION_DISTRIBUTION ?: 'store') == 'buildflight') {
+                            archiveArtifacts artifacts: 'build/app/outputs/flutter-apk/*.apk', fingerprint: true
+                        } else {
+                            // A flavoured build writes to bundle/prodRelease/, not bundle/release/.
+                            archiveArtifacts artifacts: 'build/app/outputs/bundle/**/*.aab', fingerprint: true
+                        }
+                    }
+                }
+                failure {
+                    reportStageStatus('Build Android App Bundle (Production)', 'failure')
+                    script {
+                        if ((env.ANDROID_PRODUCTION_DISTRIBUTION ?: 'store') == 'buildflight') {
+                            runMaybeInDocker { reportBuildflightFailure(env.ANDROID_BUNDLE_ID_PRODUCTION, 'android') }
+                        }
+                    }
+                    finishBuildTimeline('FAILURE')
+                    cleanBuildArtifacts()
+                }
+                // No cleanup on success — the iOS production stage right
+                // after still needs this workspace (or syncs from it) too.
+            }
+        }
+
+        // IOS_PRODUCTION_DISTRIBUTION: 'store' (default) optionally uploads
+        // to TestFlight (IOS_PRODUCTION_TESTFLIGHT_ENABLED). 'buildflight' is
+        // for Enterprise/In-House builds that never go through App Store
+        // Connect at all — ships the .ipa the exact same way staging's Ad
+        // Hoc build already does, and skips TestFlight entirely (it doesn't
+        // apply to In-House distribution regardless of that other flag).
+        stage('Build iOS IPA (Production)') {
+            when { branch 'production' }
+            agent { label "${env.IOS_AGENT_LABEL}" }
+            steps {
+                script {
+                    syncSource()
+                    reportStageStatus('Build iOS IPA (Production)', 'running')
+                    installIosSigning('PRODUCTION')
+                    def iosBuild = readIosBuildNumber('prod')
+                    def iosDistribution = env.IOS_PRODUCTION_DISTRIBUTION ?: 'store'
+
+                    if (iosDistribution == 'buildflight') {
+                        reportBuildflightStart(env.IOS_BUNDLE_ID_PRODUCTION, 'ios', env.APP_VERSION, iosBuild)
+                    }
+                    buildFlutterIos(env.IOS_ENV_FILE_PRODUCTION, env.IOS_FLAVOR_PRODUCTION, env.IOS_ENTRYPOINT_PRODUCTION, env.IOS_EXPORT_OPTIONS_PRODUCTION)
+                    if (iosDistribution == 'buildflight') {
+                        uploadToBuildflight('build/ios/ipa', 'ipa', 'ios', productionFilename(env.BUILDFLIGHT_IPA_FILENAME))
+                    } else if (env.IOS_PRODUCTION_TESTFLIGHT_ENABLED == 'true') {
+                        uploadToTestFlight('build/ios/ipa')
+                        deferTestFlightSubmission('PRODUCTION', env.IOS_BUNDLE_ID_PRODUCTION, iosBuild)
+                        echo "✅ Build uploaded to TestFlight."
+                    }
+                }
+            }
+            post {
+                success {
+                    reportStageStatus('Build iOS IPA (Production)', 'success')
+                    // Uploaded to buildflight/TestFlight above (whichever
+                    // applies) — this just keeps a copy on Jenkins too.
+                    archiveArtifacts artifacts: 'build/ios/ipa/*.ipa', fingerprint: true
+                }
+                failure {
+                    reportStageStatus('Build iOS IPA (Production)', 'failure')
+                    script {
+                        if ((env.IOS_PRODUCTION_DISTRIBUTION ?: 'store') == 'buildflight') {
+                            reportBuildflightFailure(env.IOS_BUNDLE_ID_PRODUCTION, 'ios')
+                        }
+                    }
+                }
+                cleanup {
+                    sh 'bash ci/scripts/cleanup-ios-keychain.sh'
+                    finishBuildTimeline(currentBuild.currentResult)
+                    cleanBuildArtifacts()
+                }
+            }
+        }
+    }
+}

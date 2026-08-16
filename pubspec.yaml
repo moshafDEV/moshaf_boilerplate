@@ -1,6 +1,6 @@
 name: moshaf_boilerplate
 description: A CLI tool for generating Flutter boilerplate structures based on Clean Architecture, BLoC, dependencies, and more.
-version: 2.1.0
+version: 3.0.0
 
 # Repository and project links
 repository: https://github.com/moshafDEV/moshaf_boilerplate.git
@@ -14,7 +14,7 @@ topics:
   - cli
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"   # Ensure this matches your minimum Dart SDK version
+  sdk: ">=3.9.0 <4.0.0"   # Floor set by dart_xcodeproj/xml — keep in sync if either is bumped
 
 # Register CLI executable
 executables:
@@ -22,7 +22,9 @@ executables:
 
 # Optional: Add dependencies as needed
 dependencies:
+  dart_xcodeproj: ^0.1.1
   path: ^1.9.1
+  xml: ^6.6.1
 
 # Optional: Add development dependencies for linting and code quality
 # dev_dependencies:

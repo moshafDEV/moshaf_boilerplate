@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ProjectName/core/constants/textstyle.dart';
+import 'package:ProjectName/core/routes/app_path.dart';
 import 'package:ProjectName/presentation/bloc/login/login_bloc.dart';
 import 'package:ProjectName/presentation/components/text_field_custom_widget.dart';
 
@@ -72,6 +74,6 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
 
   void _handleForgotPassword() {
     HapticFeedback.lightImpact();
-    Navigator.of(context).pushNamed('/forgot-password');
+    context.push(Paths.forgotPassword);
   }
 }

@@ -16,17 +16,14 @@ class CustomInterceptor extends Interceptor {
     final accessToken = await SecureStorageUtils.getStorage(bearerToken);
     if (accessToken.isNotEmpty) {
       options.headers['Authorization'] = "bearer $accessToken";
-      debugPrint('Access token $accessToken');
     } else {
       options.headers.remove('Authorization');
-      debugPrint('Authorization header removed');
     }
 
     // Add language code to the request headers if available
     final langCode = await SecureStorageUtils.getStorage(localeLangId);
     if (langCode.isNotEmpty) {
       options.headers['X-Localization'] = langCode;
-      debugPrint('Language code $langCode');
     } else {
       options.headers.remove('X-Localization');
     }
@@ -42,7 +39,6 @@ class CustomInterceptor extends Interceptor {
     debugPrint(
       'Request to ${response.realUri} completed in ${_stopwatch.elapsedMilliseconds}ms',
     );
-    if (response.statusCode! >= 200 && response.statusCode! < 300) {}
     // if response is 401 or 403, we can navigate to login page
     if (response.statusCode == 401 || response.statusCode == 403) {
       // prefs.clear();
@@ -77,32 +73,31 @@ class CustomInterceptor extends Interceptor {
       return super.onError(err, handler);
     }
 
-    if (err.error.toString().contains('CERTIFICATE_VERIFY_FAILED')) {
-      final customError = DioException(
-        requestOptions: err.requestOptions,
-        response: err.response,
-        type: err.type,
-        error: err.error,
-        message:
-            'SSL certificate verification failed. Please check your connection.',
-      );
-      return super.onError(customError, handler);
-    }
-
-    if (err.type == DioExceptionType.connectionError ||
-        err.type == DioExceptionType.unknown) {
-      final customError = DioException(
-        requestOptions: err.requestOptions,
-        response: err.response,
-        type: err.type,
-        error: err.error,
-        message:
-            'No internet connection detected. Please check your network and try again.',
-      );
-
-      return super.onError(customError, handler);
-    } else {
-      return super.onError(err, handler);
+    // try/finally so super.onError always fires, even if rewriting the message below throws.
+    var outgoing = err;
+    try {
+      if (err.error.toString().contains('CERTIFICATE_VERIFY_FAILED')) {
+        outgoing = DioException(
+          requestOptions: err.requestOptions,
+          response: err.response,
+          type: err.type,
+          error: err.error,
+          message:
+              'SSL certificate verification failed. Please check your connection.',
+        );
+      } else if (err.type == DioExceptionType.connectionError ||
+          err.type == DioExceptionType.unknown) {
+        outgoing = DioException(
+          requestOptions: err.requestOptions,
+          response: err.response,
+          type: err.type,
+          error: err.error,
+          message:
+              'No internet connection detected. Please check your network and try again.',
+        );
+      }
+    } finally {
+      super.onError(outgoing, handler);
     }
   }
 }

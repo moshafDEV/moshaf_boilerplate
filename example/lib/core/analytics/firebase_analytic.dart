@@ -1,8 +1,9 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:injectable/injectable.dart';
 import 'package:example/core/analytics/analytic.dart';
 
-@LazySingleton(as: Analytic)
+// Registered conditionally via AppModule.analytic (not @LazySingleton here)
+// — only NoOpAnalytic is used when ENABLE_FIREBASE is false, so this class
+// is never constructed without Firebase having been initialized first.
 class FirebaseAnalytic implements Analytic {
   final FirebaseAnalytics fAnalytic = FirebaseAnalytics.instance;
 

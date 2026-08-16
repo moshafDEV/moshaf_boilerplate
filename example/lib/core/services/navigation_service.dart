@@ -1,42 +1,19 @@
-import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
+import 'package:example/core/routes/app_router.dart';
 
+/// Thin go_router wrapper — lets code without a BuildContext (blocs,
+/// usecases) still trigger navigation, via DI instead of reaching for
+/// `context.go`/`context.push` directly.
+@lazySingleton
 class NavigationService {
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  void goTo(String location) => appRouter.go(location);
 
-  Future<dynamic> navigateTo(String routeName, {Object? arguments}) {
-    return navigatorKey.currentState!.pushNamed(
-      routeName,
-      arguments: arguments,
-    );
-  }
+  Future<T?> push<T extends Object?>(String location) =>
+      appRouter.push<T>(location);
 
-  Future<dynamic> navigatePushReplacementTo(String routeName, {Object? arguments}) {
-    return navigatorKey.currentState!.pushNamed(
-      routeName,
-      arguments: arguments,
-    );
-  }
+  void replace(String location) => appRouter.replace(location);
 
-  goBack() {
-    return navigatorKey.currentState!.pop();
-  }
+  void pop<T extends Object?>([T? result]) => appRouter.pop(result);
 
-  Future<dynamic> replaceTo(String routeName, {Object? arguments}) {
-    return navigatorKey.currentState!.pushReplacementNamed(
-      routeName,
-      arguments: arguments,
-    );
-  }
-
-  clearAndNavigateTo(String routeName, {Object? arguments}) {
-    return navigatorKey.currentState!.pushNamedAndRemoveUntil(routeName,
-        arguments: arguments, (Route<dynamic> route) => false);
-  }
-
-  Future<dynamic> navigateToWithResult(String routeName, {Object? arguments}) {
-    return navigatorKey.currentState!.pushNamed(
-      routeName,
-      arguments: arguments,
-    );
-  }
+  bool canPop() => appRouter.canPop();
 }

@@ -1,0 +1,58 @@
+app:
+  android:
+    flavorDimensions: "flavor-type"
+
+flavors:
+  dev:
+    app:
+      name: "example Dev"
+    android:
+      applicationId: "com.example.example.dev"
+      # Drop your dev google-services.json in android/app/src/dev/ and
+      # uncomment the line below to have flavorizr wire it in for you on
+      # the next `dart run flutter_flavorizr -f`.
+      # firebase:
+      #   config: "android/app/src/dev/google-services.json"
+    ios:
+      bundleId: "com.example.example.dev"
+      # Drop your dev GoogleService-Info.plist somewhere in the repo and
+      # point to it here, then re-run flavorizr the same way as above.
+      # firebase:
+      #   config: "ios/config/dev/GoogleService-Info.plist"
+
+  prod:
+    app:
+      name: "example"
+    android:
+      applicationId: "com.example.example"
+      # firebase:
+      #   config: "android/app/src/prod/google-services.json"
+    ios:
+      bundleId: "com.example.example"
+      # firebase:
+      #   config: "ios/config/prod/GoogleService-Info.plist"
+
+# Deliberately excludes every `flutter:*`/`google:*`/`huawei:*`/`ide:*`
+# processor: those would overwrite this project's own lib/main.dart,
+# main_dev.dart/main_prod.dart, and flutter_flavor-based FlavorConfig with
+# flavorizr's own (different) Dart-side flavor pattern. This list only
+# touches native Android/iOS flavor config — verified end-to-end (both
+# flavors, both platforms) before shipping it as the default.
+#
+# Adding a new flavor, changing a bundle id, or wiring in a real Firebase
+# config file above? Re-run: dart run flutter_flavorizr -f
+instructions:
+  - 'assets:download'
+  - 'assets:extract'
+  - 'android:androidManifest'
+  - 'android:flavorizrGradle'
+  - 'android:buildGradle'
+  - 'ios:podfile'
+  - 'ios:xcconfig'
+  - 'ios:buildTargets'
+  - 'ios:schema'
+  - 'ios:dummyAssets'
+  - 'ios:icons'
+  - 'ios:plist'
+  - 'ios:launchScreen'
+  - 'assets:clean'

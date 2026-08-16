@@ -8,3 +8,6 @@ analyzer:
     - "**/*.freezed.dart"
     # ignore warnings in files boilerplate.
     - _boilerplate_sourcecode/**
+    # build/ can end up holding full copies of pub packages (incl. their own
+    # example apps) via SPM resolution — never part of this project's code.
+    - build/**

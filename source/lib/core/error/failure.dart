@@ -14,7 +14,7 @@ abstract class Failure extends Equatable {
 }
 
 class ServerFailure extends Failure {
-  const ServerFailure(String message, dynamic code) : super(message, 500);
+  const ServerFailure(String message, dynamic code) : super(message, code);
 }
 
 class ConnectionFailure extends Failure {
@@ -30,5 +30,5 @@ class FormatException extends Failure {
 }
 
 class NotFoundException extends Failure {
-  const NotFoundException(String message, dynamic code) : super(message, 400);
+  const NotFoundException(String message, dynamic code) : super(message, code);
 }

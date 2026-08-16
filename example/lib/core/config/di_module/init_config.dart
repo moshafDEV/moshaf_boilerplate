@@ -3,7 +3,6 @@ import 'package:get_it/get_it.dart';
 // import 'package:gtm/gtm.dart';
 import 'package:injectable/injectable.dart';
 import 'package:example/core/env/secure_storage_key.dart';
-import 'package:example/core/services/navigation_service.dart';
 import 'package:example/core/utils/storage_data.dart';
 
 import 'init_config.config.dart';
@@ -24,8 +23,6 @@ Future<void> initConfig() async {
   await initSecureStorage();
 
   await SecureStorageUtils.setStorage(localeLangId, 'id');
-
-  getIt.registerLazySingleton<NavigationService>(() => NavigationService());
 }
 
 Future<void> configureDependencies() async => await $initGetIt(getIt);

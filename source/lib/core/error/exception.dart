@@ -13,6 +13,15 @@ class DatabaseException implements Exception {
   DatabaseException(this.message);
 }
 
+/// Extracts a message from a Dio error body, which isn't guaranteed to be a Map (could be String/HTML/null).
+String extractErrorMessage(dynamic responseData,
+    {String fallback = 'Something went wrong'}) {
+  if (responseData is Map && responseData['message'] != null) {
+    return responseData['message'].toString();
+  }
+  return fallback;
+}
+
 class ErrorHandling {
   static Either<Failure, T> handleException<T>(exception) {
     if (exception is ServerException) {
@@ -25,32 +34,29 @@ class ErrorHandling {
       return const Left(ServerFailure('Format Exception', 500));
     } else if (exception is DioException) {
       // Handling DioException with fallback and proper key checks
-      
+
       String errorMessage = 'Unknown Dio Exception';
       if (exception.response?.data != null) {
         var responseData = exception.response?.data;
-        
+
         // Check if the message key exists
         if (responseData is Map<String, dynamic>) {
-          errorMessage = responseData['message'] ?? 
-                         responseData['errorCode']?.toString() ?? 
-                         responseData['details']?.join(', ') ?? 
-                         'Unknown Dio Exception';
+          errorMessage = responseData['message'] ??
+              responseData['errorCode']?.toString() ??
+              responseData['details']?.join(', ') ??
+              'Unknown Dio Exception';
         }
       } else {
         errorMessage = exception.message ?? 'Unknown Dio Exception';
       }
       if (exception.response?.statusCode == 400) {
         return Left(NotFoundException(
-            errorMessage,
-            exception.response?.statusCode ?? 400
-        ));
+            errorMessage, exception.response?.statusCode ?? 400));
       } else if (exception.response?.statusCode == 401) {
-        var responseData = exception.response?.data;
         return Left(ServerFailure(
-            errorMessage = responseData['message'] ?? 'Unknown Dio Exception',
-            exception.response?.statusCode ?? 401
-        ));
+            extractErrorMessage(exception.response?.data,
+                fallback: 'Unknown Dio Exception'),
+            exception.response?.statusCode ?? 401));
       } else {
         return Left(
           ServerFailure(
@@ -64,4 +70,3 @@ class ErrorHandling {
     }
   }
 }
-

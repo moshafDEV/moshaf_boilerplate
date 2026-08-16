@@ -4,6 +4,10 @@ APP_NAME="ProjectName"
 #api variable
 API_URL="https://sample.com/api"
 
+#feature flags
+#set to true once google-services.json/GoogleService-Info.plist are in place (see README > Flavors)
+ENABLE_FIREBASE=false
+
 #for deeplink
 # BASE_URL_DEEPLINK="https://sample.com"
 

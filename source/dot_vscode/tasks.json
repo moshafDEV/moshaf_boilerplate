@@ -26,6 +26,15 @@
         "kind": "build",
         "isDefault": false
       }
+    },
+    {
+      "label": "Regenerate Assets",
+      "type": "shell",
+      "command": "moshaf_boilerplate",
+      "args": [
+        "assets"
+      ],
+      "group": "build"
     }
   ]
 }

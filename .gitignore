@@ -1,2 +1,11 @@
 
 .dart_tool/
+.DS_Store
+
+# Personal dev notes — not for publishing, see DEV_NOTES.md.
+DEV_NOTES.md
+
+# Scratch space for testing `create` / `pre_launch_task` against a local
+# `dart pub global activate --source path .` checkout (see DEV_NOTES.md).
+# Never run those commands at the repo root — see the warning there for why.
+test/

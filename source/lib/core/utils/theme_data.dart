@@ -74,7 +74,7 @@ final themeData = ThemeData(
     tilePadding: EdgeInsets.zero,
   ),
   chipTheme: ChipThemeData(
-    backgroundColor: kMainDanger,
+    backgroundColor: kMainGreySoft,
     labelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
     secondaryLabelStyle: TextStyle(
       fontSize: 14.sp,
@@ -86,7 +86,7 @@ final themeData = ThemeData(
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: kMainInfo,
-      foregroundColor: kMainDanger,
+      foregroundColor: kMainWhite,
       textStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
     ),
@@ -103,11 +103,11 @@ final themeData = ThemeData(
       if (states.contains(WidgetState.selected)) {
         return kMainInfo;
       }
-      return kMainDanger;
+      return Colors.transparent;
     }),
   ),
   iconButtonTheme: IconButtonThemeData(
     style: ButtonStyle(padding: WidgetStateProperty.all(EdgeInsets.zero)),
   ),
-  fontFamily: 'Poppins',
+  fontFamily: 'Manrope',
 );

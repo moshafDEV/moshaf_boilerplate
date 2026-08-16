@@ -1,0 +1,14 @@
+# Config for the `flutter_native_splash` package.
+# Regenerate native splash screens with: dart run flutter_native_splash:create
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/images/ic_splashscreen.png
+  color_dark: "#FFFFFF"
+  image_dark: assets/images/ic_splashscreen.png
+  android_12:
+    image: assets/images/ic_splashscreen_andro.png
+    icon_background_color: "#FFFFFF"
+    image_dark: assets/images/ic_splashscreen_andro.png
+    icon_background_color_dark: "#FFFFFF"
+  web: false
