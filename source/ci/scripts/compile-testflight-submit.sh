@@ -22,12 +22,16 @@ API_BASE="https://api.appstoreconnect.apple.com/v1"
 
 TOKEN="$(python3 "$SCRIPT_DIR/generate-asc-jwt.py" "$APPSTORE_API_KEY_FILE" "$APPSTORE_API_KEY_ID" "$APPSTORE_API_ISSUER_ID")"
 
+# Match the bundle id EXACTLY. filter[bundleId] returns every app whose bundle
+# id starts with the value, so a prefix bundle (e.g. com.x.familia) also matches
+# its own suffixes (com.x.familia.staging). Taking data[0] blindly can pick the
+# wrong app; pick the one whose bundleId equals BUNDLE_ID.
 APP_ID="$(curl --fail-with-body --show-error --silent --globoff \
     --header "Authorization: Bearer $TOKEN" \
     "$API_BASE/apps?filter[bundleId]=$BUNDLE_ID" \
-    | python3 -c "import json,sys; d=json.load(sys.stdin)['data']; print(d[0]['id'] if d else '')")"
+    | ASC_BUNDLE_ID="$BUNDLE_ID" python3 -c "import json,os,sys; d=json.load(sys.stdin)['data']; b=os.environ['ASC_BUNDLE_ID']; m=[a['id'] for a in d if a.get('attributes',{}).get('bundleId')==b]; print(m[0] if m else '')")"
 if [ -z "$APP_ID" ]; then
-    echo "ERROR: no App Store Connect app found for bundle id $BUNDLE_ID (the app record must exist there first)" >&2
+    echo "ERROR: no App Store Connect app found with exact bundle id $BUNDLE_ID (the app record must exist there first)" >&2
     exit 1
 fi
 
