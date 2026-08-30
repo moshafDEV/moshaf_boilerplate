@@ -19,6 +19,10 @@ class ProfileRemoteDatasourceImpl implements ProfileRepository {
       return left((apiResult as Left).value);
     }
     final ProfileResponseModel response = (apiResult as Right).value;
-    return right(response.toDomain());
+    try {
+      return right(response.toDomain());
+    } catch (e) {
+      return left(ServerFailure('Failed to parse profile response', e.toString()));
+    }
   }
 }

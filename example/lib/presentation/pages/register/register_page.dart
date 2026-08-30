@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:example/core/constants/colors.dart';
 import 'package:example/core/constants/textstyle.dart';
 
-/// Placeholder — the "Daftar di sini" link on the login page needs a real
+/// Placeholder — the "Sign up here." link on the login page needs a real
 /// destination, but no register flow (usecase/bloc/API) exists yet in this
 /// boilerplate. Replace this with your own registration form.
 class RegisterPage extends StatelessWidget {

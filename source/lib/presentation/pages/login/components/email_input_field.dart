@@ -27,7 +27,7 @@ class _EmailInputFieldState extends State<EmailInputField> {
             fieldController: textFieldController,
             isRequired: true,
             labelText: 'Email',
-            hintText: 'Masukan alamat email anda',
+            hintText: 'Enter your email address',
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             invalidMessage: state.email.invalidMessage,

@@ -7,7 +7,8 @@ import 'package:example/core/env/env.dart';
 
 enum Flavor {
   dev(0),
-  prod(1);
+  staging(1),
+  prod(2);
 
   const Flavor(this.level);
   final int level;
@@ -57,5 +58,6 @@ class AppConfig {
   static AppConfig get instance => AppConfig();
 
   static bool get isDev => instance.flavor == Flavor.dev;
+  static bool get isStaging => instance.flavor == Flavor.staging;
   static bool get isProd => instance.flavor == Flavor.prod;
 }

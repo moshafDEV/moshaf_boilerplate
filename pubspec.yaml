@@ -23,6 +23,7 @@ executables:
 # Optional: Add dependencies as needed
 dependencies:
   dart_xcodeproj: ^0.1.1
+  image: ^4.9.0
   path: ^1.9.1
   xml: ^6.6.1
 

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ProjectName/core/config/di_module/init_config.dart';
 import 'package:ProjectName/core/constants/assets.gen.dart';
 import 'package:ProjectName/core/constants/textstyle.dart';
+import 'package:ProjectName/core/routes/app_path.dart';
 import 'package:ProjectName/core/utils/keyboard_util.dart';
 import 'package:ProjectName/domain/usecase/login/login.dart';
 import 'package:ProjectName/domain/usecase/login/profile.dart';
@@ -66,14 +68,20 @@ class LoginPageContent extends StatelessWidget {
                     60.verticalSpace,
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 26),
-                      child: ColorFiltered(
-                        colorFilter: const ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.srcIn,
-                        ),
-                        child: Image.network(
-                          'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/MIT_logo_2003-2023.svg/330px-MIT_logo_2003-2023.svg.png',
-                          width: 120,
+                      // Tapping the logo opens About — the entry point into
+                      // the developer-mode unlock flow (see about_page.dart),
+                      // deliberately not a visible button.
+                      child: GestureDetector(
+                        onTap: () => context.push(Paths.about),
+                        child: ColorFiltered(
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                          child: Image.network(
+                            'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/MIT_logo_2003-2023.svg/330px-MIT_logo_2003-2023.svg.png',
+                            width: 120,
+                          ),
                         ),
                       ),
                     ),
@@ -96,13 +104,13 @@ class LoginPageContent extends StatelessWidget {
                                 8.verticalSpace,
 
                                 Text(
-                                  'Selamat datang',
+                                  'Welcome back',
                                   style: genStyle12Bold.copyWith(fontSize: 20),
                                 ),
                                 8.verticalSpace,
 
                                 Text(
-                                  'Nikmati akses layanan dalam satu genggaman!',
+                                  'Enjoy access to our services, all in one place!',
                                   style: genStyle12Regular.copyWith(fontSize: 16),
                                 ),
 

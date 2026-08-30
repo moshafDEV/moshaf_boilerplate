@@ -35,3 +35,18 @@ if ! fvm flutter build ipa --release --flavor "$FLAVOR" -t "$ENTRYPOINT" --expor
     rm -f ios/Podfile.lock
     fvm flutter build ipa --release --flavor "$FLAVOR" -t "$ENTRYPOINT" --export-options-plist="$EXPORT_OPTIONS_PLIST"
 fi
+
+# `flutter build ipa` never uploads dSYMs to Crashlytics on its own — there is
+# no Run Script build phase for it in the Xcode project either, which is why
+# Crashlytics has been reporting "Missing (required)" dSYMs for every shipped
+# version. Upload them here, right after the archive that produced them.
+UPLOAD_SYMBOLS="ios/Pods/FirebaseCrashlytics/upload-symbols"
+DSYM_DIR="build/ios/archive/Runner.xcarchive/dSYMs"
+if [ -x "$UPLOAD_SYMBOLS" ] && [ -d "$DSYM_DIR" ]; then
+    echo "Uploading dSYMs to Crashlytics..."
+    if ! "$UPLOAD_SYMBOLS" -gsp "$GOOGLE_SERVICE_INFO" -p ios "$DSYM_DIR"; then
+        echo "Warning: Crashlytics dSYM upload failed — continuing, this must not block the IPA build/submission." >&2
+    fi
+else
+    echo "Warning: skipping Crashlytics dSYM upload (upload-symbols or $DSYM_DIR not found)." >&2
+fi

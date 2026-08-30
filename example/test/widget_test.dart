@@ -1,29 +1,18 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+// `flutter create` ships its own default counter-app test here, referencing
+// a `MyApp` class that doesn't exist in this template — this file exists
+// purely to override that with something that actually passes out of the
+// box. Pumping the real `App()` needs full DI/routing/localization
+// bootstrap (see main.dart's mainCommon) to work at all, which is more than
+// a starter sanity test is worth — see forgot_password_link_test.dart or
+// developer_overlay_test.dart for real examples of testing this project's
+// own widgets.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:example/app.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const App());
+  testWidgets('test harness is wired up', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: Text('OK'))));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('OK'), findsOneWidget);
   });
 }

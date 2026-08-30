@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:ProjectName/core/constants/textstyle.dart';
-import 'package:ProjectName/core/routes/app_path.dart';
 import 'package:ProjectName/presentation/bloc/login/login_bloc.dart';
 import 'package:ProjectName/presentation/components/text_field_custom_widget.dart';
+import 'package:ProjectName/presentation/pages/login/components/forgot_password_link.dart';
 
 class PasswordInputField extends StatefulWidget {
   const PasswordInputField({super.key});
@@ -36,7 +33,7 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
                 isRequired: true,
                 isPassword: true,
                 labelText: 'Password',
-                hintText: 'Masukan password anda',
+                hintText: 'Enter your password',
                 keyboardType: TextInputType.visiblePassword,
                 textInputAction: TextInputAction.done,
                 invalidMessage: state.password.invalidMessage,
@@ -49,31 +46,11 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
 
               8.verticalSpace,
 
-              _buildForgotPasswordLink(),
+              const ForgotPasswordLink(),
             ],
           );
         },
       ),
     );
-  }
-
-  Widget _buildForgotPasswordLink() {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: TextButton(
-        onPressed: _handleForgotPassword,
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        child: Text('Lupa Password', style: genStyle14Medium),
-      ),
-    );
-  }
-
-  void _handleForgotPassword() {
-    HapticFeedback.lightImpact();
-    context.push(Paths.forgotPassword);
   }
 }

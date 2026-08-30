@@ -8,4 +8,8 @@ DEV_NOTES.md
 # Scratch space for testing `create` / `pre_launch_task` against a local
 # `dart pub global activate --source path .` checkout (see DEV_NOTES.md).
 # Never run those commands at the repo root — see the warning there for why.
-test/
+# Anchored to the repo root only — a bare `test/` also matches source/test/
+# and example/test/, which are real, tracked, and must ship in the package
+# (dart pub publish flags a tracked-but-gitignored file as a potential
+# publish-time exclusion, which would silently drop those test suites).
+/test/

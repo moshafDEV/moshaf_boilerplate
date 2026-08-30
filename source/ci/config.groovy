@@ -135,9 +135,9 @@ return [
     // App identity — keep these in sync with flavorizr.yaml's applicationId
     // /bundleId for the matching flavor (dev ↔ *_STAGING, prod ↔ *_PRODUCTION).
     // ================================================================
-    ANDROID_BUNDLE_ID_STAGING   : 'com.example.ProjectName.dev',
+    ANDROID_BUNDLE_ID_STAGING   : 'com.example.ProjectName.staging',
     ANDROID_BUNDLE_ID_PRODUCTION: 'com.example.ProjectName',
-    IOS_BUNDLE_ID_STAGING       : 'com.example.ProjectName.dev',
+    IOS_BUNDLE_ID_STAGING       : 'com.example.ProjectName.staging',
     IOS_BUNDLE_ID_PRODUCTION    : 'com.example.ProjectName',
 
     // ================================================================

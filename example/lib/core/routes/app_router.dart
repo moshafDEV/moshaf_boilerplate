@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:example/core/env/secure_storage_key.dart';
@@ -20,14 +19,21 @@ const publicRoutes = {
   Paths.forgotPassword,
 };
 
+/// Routes exempt from the auth gate entirely — reachable whether signed in
+/// or out, and never redirected away either direction. Splash needs this so
+/// its 2s animation always plays; About needs it so the developer-mode
+/// unlock gesture works even when there's no real login to test against.
+const alwaysAllowedRoutes = {
+  Paths.splash,
+  Paths.about,
+};
+
 /// Pure auth-gate decision, split out from [_redirect] so it's unit-testable
 /// without mocking flutter_secure_storage's platform channel — the storage
 /// read is the only part that needs a real Flutter test/app environment.
-/// Splash is always let through (`null`) so its 2s animation plays
-/// uninterrupted; every other location is checked against [isAuthed].
 @visibleForTesting
 String? redirectDecision({required bool isAuthed, required String location}) {
-  if (location == Paths.splash) return null;
+  if (alwaysAllowedRoutes.contains(location)) return null;
 
   final isPublicRoute = publicRoutes.contains(location);
   if (!isAuthed && !isPublicRoute) return Paths.welcome;
@@ -52,10 +58,7 @@ final GoRouter appRouter = GoRouter(
   initialLocation: Paths.splash,
   routes: appRoutes,
   redirect: _redirect,
-  observers: [
-    ChuckerFlutter.navigatorObserver,
-    navigatorStackGuard,
-  ],
+  observers: [navigatorStackGuard],
   errorBuilder: (context, state) {
     ErrorReporter.recordHandled(
       state.error ?? Exception('Unknown route'),

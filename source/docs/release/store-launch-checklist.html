@@ -1,0 +1,1912 @@
+<!doctype html>
+<html lang="id"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Store Launch Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans+Condensed:wght@600;700&amp;family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap">
+<style>
+:root{
+  --ground:#F1F4F8; --surface:#FFFFFF; --surface-2:#F6F8FB; --sunken:#EAEFF5;
+  --line:#DBE2EB; --line-2:#C3CDDA;
+  --ink:#0E141C; --ink-2:#3B4857; --muted:#6A798B;
+  --accent:#2748C8; --accent-2:#1B33A0; --accent-soft:#E6EAFB;
+  --ok:#146B47; --ok-soft:#E0F0E8; --warn:#8A5712; --warn-soft:#FAEEDB; --crit:#A22318; --crit-soft:#FAE5E3;
+  --shadow:0 1px 2px rgba(14,20,28,.05), 0 8px 24px -16px rgba(14,20,28,.25);
+  --r:10px;
+  --sans:"IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cond:"IBM Plex Sans Condensed", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#090D13; --surface:#111823; --surface-2:#0D131C; --sunken:#0A0F16;
+    --line:#1E2937; --line-2:#2C3A4B;
+    --ink:#E7EDF4; --ink-2:#B4C2D1; --muted:#7E92A6;
+    --accent:#8AA2FF; --accent-2:#B3C2FF; --accent-soft:#18203A;
+    --ok:#5FD39D; --ok-soft:#0F2820; --warn:#E7B569; --warn-soft:#2A2013; --crit:#FF9086; --crit-soft:#2C1512;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#090D13; --surface:#111823; --surface-2:#0D131C; --sunken:#0A0F16;
+  --line:#1E2937; --line-2:#2C3A4B;
+  --ink:#E7EDF4; --ink-2:#B4C2D1; --muted:#7E92A6;
+  --accent:#8AA2FF; --accent-2:#B3C2FF; --accent-soft:#18203A;
+  --ok:#5FD39D; --ok-soft:#0F2820; --warn:#E7B569; --warn-soft:#2A2013; --crit:#FF9086; --crit-soft:#2C1512;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--sans); font-size:15px; line-height:1.55;
+  font-feature-settings:"cv05" 1;
+}
+h1,h2,h3,h4{margin:0; text-wrap:balance; font-weight:600}
+p{margin:0}
+a{color:var(--accent); text-underline-offset:2px}
+code{font-family:var(--mono); font-size:.86em; background:var(--sunken); border:1px solid var(--line); border-radius:5px; padding:.06em .35em}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:30; background:color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter:saturate(1.4) blur(10px); border-bottom:1px solid var(--line);
+}
+.topbar-in{max-width:1200px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.brand{display:flex; align-items:baseline; gap:10px; margin-right:auto; min-width:0}
+.brand .mark{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent); border:1px solid var(--accent); border-radius:4px; padding:2px 6px; white-space:nowrap;
+}
+.brand h1{font-family:var(--cond); font-size:19px; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.brand .slash{color:var(--line-2); font-size:17px; user-select:none}
+.app-input{
+  font:inherit; font-size:14px; font-weight:600; color:var(--ink); background:transparent;
+  border:1px dashed var(--line-2); border-radius:7px; padding:3px 9px; min-width:130px; max-width:230px;
+  transition:border-color .15s, background .15s;
+}
+.app-input::placeholder{color:var(--muted); font-weight:400}
+.app-input:hover{border-color:var(--accent)}
+.app-input:focus{border-style:solid; border-color:var(--accent); background:var(--surface)}
+.controls{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.seg{display:inline-flex; background:var(--sunken); border:1px solid var(--line); border-radius:8px; padding:2px}
+.seg button{
+  font:inherit; font-size:12.5px; font-weight:500; color:var(--muted); background:none; border:0;
+  padding:5px 11px; border-radius:6px; cursor:pointer; white-space:nowrap;
+}
+.seg button[aria-pressed="true"]{background:var(--surface); color:var(--ink); box-shadow:var(--shadow)}
+.seg button[hidden]{display:none}
+#viewSeg button[data-view="audit"]::after,
+#viewSeg button[data-view="ref"]::after{
+  content:""; display:inline-block; width:5px; height:5px; border-radius:50%;
+  background:var(--accent); margin-left:6px; vertical-align:middle; opacity:.75;
+}
+.gen-chip{
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--accent); border:1px solid var(--accent); border-radius:4px; padding:1px 6px; flex:none;
+}
+.gen-hint{
+  margin-top:14px; padding-top:14px; border-top:1px solid var(--line);
+  font-size:12.5px; color:var(--muted); max-width:66ch;
+}
+.gen-hint code{font-size:11px}
+.gen-hint:empty{display:none}
+.seg button:hover{color:var(--ink)}
+.btn{
+  font:inherit; font-size:12.5px; font-weight:500; color:var(--ink-2); background:var(--surface);
+  border:1px solid var(--line); border-radius:8px; padding:6px 11px; cursor:pointer; white-space:nowrap;
+}
+.btn:hover{border-color:var(--line-2); color:var(--ink)}
+.lang{font-family:var(--mono); font-size:11.5px; letter-spacing:.06em}
+
+/* ---------- shell ---------- */
+.shell{max-width:1200px; margin:0 auto; padding:26px 20px 90px; display:grid; grid-template-columns:246px minmax(0,1fr); gap:34px; align-items:start}
+@media (max-width:940px){ .shell{grid-template-columns:1fr; gap:20px; padding-top:18px} }
+
+/* ---------- sidebar ---------- */
+.side{position:sticky; top:74px; display:flex; flex-direction:column; gap:16px}
+@media (max-width:940px){ .side{position:static} }
+.gauge{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:16px; box-shadow:var(--shadow)}
+.gauge-top{display:flex; align-items:center; gap:13px}
+.ring{width:56px; height:56px; flex:none; transform:rotate(-90deg)}
+.ring circle{fill:none; stroke-width:7}
+.ring .bg{stroke:var(--sunken)}
+.ring .fg{stroke:var(--accent); stroke-linecap:round; transition:stroke-dasharray .45s cubic-bezier(.2,.7,.2,1)}
+.gauge-num{font-family:var(--cond); font-size:26px; line-height:1; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+.gauge-lbl{font-size:12px; color:var(--muted); margin-top:3px}
+.gauge-sub{margin-top:12px; padding-top:12px; border-top:1px solid var(--line); display:flex; gap:14px; font-size:12px; color:var(--muted)}
+.gauge-sub b{font-family:var(--mono); font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums}
+
+.nav{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:6px; box-shadow:var(--shadow)}
+.nav a{
+  display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:7px;
+  color:var(--ink-2); text-decoration:none; font-size:13px;
+}
+.nav a:hover{background:var(--sunken); color:var(--ink)}
+.nav .n{font-family:var(--mono); font-size:10.5px; color:var(--muted); width:16px; flex:none}
+.nav .t{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.nav .c{font-family:var(--mono); font-size:10.5px; color:var(--muted); font-variant-numeric:tabular-nums}
+.nav a.done .c{color:var(--ok)}
+.side-note{font-size:11.5px; color:var(--muted); line-height:1.5; padding:0 4px}
+
+/* ---------- sections ---------- */
+.stack{display:flex; flex-direction:column; gap:22px}
+.intro{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:20px 22px; box-shadow:var(--shadow)}
+.intro-kicker{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent); margin-bottom:7px;
+}
+.intro-kicker:empty{display:none}
+.intro h2{font-family:var(--cond); font-size:23px; letter-spacing:-.01em; margin-bottom:6px}
+.intro p{color:var(--ink-2); max-width:66ch; font-size:14.5px}
+.intro .legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:14px; padding-top:14px; border-top:1px solid var(--line); font-size:12px; color:var(--muted)}
+.intro .legend span{display:inline-flex; align-items:center; gap:6px}
+
+.sec{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden; scroll-margin-top:78px}
+.sec-head{display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--line); background:var(--surface-2)}
+.sec-n{font-family:var(--mono); font-size:11px; color:var(--accent); border:1px solid var(--accent); border-radius:4px; padding:1px 6px; flex:none}
+.sec-head h3{font-family:var(--cond); font-size:17.5px; letter-spacing:-.005em; flex:1; min-width:0}
+.bar{width:92px; height:5px; border-radius:3px; background:var(--sunken); overflow:hidden; flex:none}
+.bar i{display:block; height:100%; background:var(--accent); border-radius:3px; transition:width .35s ease}
+.sec-count{font-family:var(--mono); font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; flex:none}
+
+.item{display:grid; grid-template-columns:auto minmax(0,1fr); gap:12px; padding:14px 18px; border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item.is-done{background:var(--surface-2)}
+.item.is-done .it-title{color:var(--muted); text-decoration:line-through; text-decoration-color:var(--line-2)}
+.item.hide{display:none}
+.chk{position:relative; width:19px; height:19px; margin-top:2px}
+.chk input{position:absolute; inset:0; opacity:0; margin:0; cursor:pointer; width:100%; height:100%}
+.chk .box{
+  display:block; width:19px; height:19px; border:1.5px solid var(--line-2); border-radius:5px;
+  background:var(--surface); transition:.15s;
+}
+.chk input:checked + .box{background:var(--accent); border-color:var(--accent)}
+.chk input:checked + .box::after{
+  content:""; position:absolute; left:6px; top:2.5px; width:5px; height:10px;
+  border:solid var(--surface); border-width:0 2px 2px 0; transform:rotate(42deg);
+}
+:root[data-theme="dark"] .chk input:checked + .box::after,
+:root:not([data-theme="light"]) .chk input:checked + .box::after{border-color:#0B1017}
+.chk input:focus-visible + .box{outline:2px solid var(--accent); outline-offset:2px}
+.it-head{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap}
+.it-title{font-size:14.5px; font-weight:600; letter-spacing:-.005em}
+.it-desc{color:var(--ink-2); font-size:13.5px; margin-top:4px; max-width:74ch}
+.tag{
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase;
+  padding:2px 6px; border-radius:4px; white-space:nowrap; flex:none;
+}
+.tag-must{background:var(--crit-soft); color:var(--crit)}
+.tag-rec{background:var(--warn-soft); color:var(--warn)}
+.tag-only{background:var(--accent-soft); color:var(--accent-2)}
+
+/* ---------- per-item platform tabs ---------- */
+.it-note{
+  margin-top:7px; font-size:12.5px; line-height:1.5; color:var(--ink-2);
+  border-left:2px solid var(--line-2); padding:1px 0 1px 10px; max-width:74ch;
+}
+.it-note b{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; margin-right:5px}
+.it-note.ok{border-color:var(--ok)} .it-note.ok b{color:var(--ok)}
+.it-note.todo{border-color:var(--warn)} .it-note.todo b{color:var(--warn)}
+.it-note.blk{border-color:var(--crit)} .it-note.blk b{color:var(--crit)}
+.jump{
+  font:inherit; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em;
+  color:var(--accent); background:var(--accent-soft); border:1px solid transparent;
+  border-radius:5px; padding:2px 7px; cursor:pointer; white-space:nowrap;
+}
+.jump:hover{border-color:var(--accent)}
+.find .jump{margin-top:6px; display:inline-block}
+.jump-row{display:flex; gap:5px; flex-wrap:wrap; margin-top:6px}
+.is-target{box-shadow:inset 3px 0 0 var(--accent); background:var(--accent-soft) !important}
+.tabs{margin-top:10px; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--surface-2)}
+.tabs-bar{display:flex; gap:0; border-bottom:1px solid var(--line); background:var(--sunken)}
+.tabs-bar button{
+  font:inherit; font-size:12px; font-weight:500; font-family:var(--mono); letter-spacing:.04em;
+  color:var(--muted); background:none; border:0; border-bottom:2px solid transparent;
+  padding:7px 13px; cursor:pointer;
+}
+.tabs-bar button[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent); background:var(--surface-2)}
+.tabs-bar button:hover{color:var(--ink)}
+.tabs-panel{padding:11px 14px; font-size:13.5px; color:var(--ink-2)}
+.tabs-panel ul{margin:0; padding-left:17px; display:flex; flex-direction:column; gap:4px}
+.tabs-panel li::marker{color:var(--muted)}
+.tabs-panel p + p, .tabs-panel p + ul, .tabs-panel ul + p{margin-top:7px}
+.tabs-panel .kv{display:grid; grid-template-columns:auto 1fr; gap:3px 12px; font-size:13px}
+.tabs-panel .kv dt{font-family:var(--mono); font-size:11.5px; color:var(--muted); padding-top:2px}
+.tabs-panel .kv dd{margin:0}
+pre{
+  margin:8px 0 0; padding:10px 12px; background:var(--sunken); border:1px solid var(--line);
+  border-radius:7px; overflow-x:auto; font-family:var(--mono); font-size:11.5px; line-height:1.6; color:var(--ink-2);
+}
+.note{margin-top:8px; font-size:12.5px; color:var(--muted); border-left:2px solid var(--line-2); padding-left:10px}
+
+.modal{
+  position:fixed; inset:0; z-index:60; display:none; align-items:center; justify-content:center;
+  padding:24px; background:color-mix(in srgb, var(--ink) 45%, transparent);
+}
+.modal[open]{display:flex}
+.modal-box{
+  background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow);
+  width:min(660px, 100%); max-height:80vh; display:flex; flex-direction:column; gap:12px; padding:20px;
+}
+.modal-box h3{font-family:var(--cond); font-size:18px}
+.modal-box p{font-size:13.5px; color:var(--ink-2); max-width:66ch}
+.modal-box textarea{
+  font-family:var(--mono); font-size:11.5px; line-height:1.6; color:var(--ink);
+  background:var(--sunken); border:1px solid var(--line); border-radius:8px; padding:11px 12px;
+  min-height:190px; resize:vertical; width:100%;
+}
+.modal-actions{display:flex; gap:8px; justify-content:flex-end; align-items:center}
+.modal-actions .ok{color:var(--ok); font-size:12.5px; margin-right:auto}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+:root[data-theme="dark"] .btn.primary,
+:root:not([data-theme="light"]) .btn.primary{color:#0B1017}
+.print-head{display:none}
+.plat-lbl{
+  display:block; font-family:var(--mono); font-size:10px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:4px;
+}
+/* audit + reference views */
+.acard{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden; scroll-margin-top:78px}
+.acard > .sec-head h3{font-family:var(--cond)}
+.acard-body{padding:14px 18px; font-size:13.5px; color:var(--ink-2)}
+.acard-body p + p, .acard-body p + ul, .acard-body p + ol, .acard-body ul + p, .acard-body dl + p{margin-top:8px}
+.acard-body ul, .acard-body ol{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:4px}
+.acard-body h4{font-size:13.5px; color:var(--ink); margin-top:12px}
+.idtable{width:100%; border-collapse:collapse; font-size:12.5px}
+.idtable td{border-top:1px solid var(--line); padding:6px 10px 6px 0; vertical-align:top}
+.idtable tr:first-child td{border-top:0}
+.idtable td:first-child{color:var(--muted); white-space:nowrap; width:1%}
+.idtable td:last-child{font-family:var(--mono); font-size:11px; color:var(--muted)}
+.tally{display:flex; gap:8px; flex-wrap:wrap; padding:14px 18px 0}
+.pill{
+  display:inline-flex; align-items:baseline; gap:6px; border:1px solid var(--line); border-radius:999px;
+  padding:4px 12px; font-size:12px; color:var(--muted);
+}
+.pill b{font-family:var(--mono); font-size:14px; color:var(--ink); font-variant-numeric:tabular-nums}
+.pill.blk{border-color:var(--crit)} .pill.blk b{color:var(--crit)}
+.pill.high{border-color:var(--warn)} .pill.high{color:var(--muted)} .pill.high b{color:var(--warn)}
+.pill.ok{border-color:var(--ok)} .pill.ok b{color:var(--ok)}
+.tally-hint{padding:9px 18px 0; font-size:12px; color:var(--muted)}
+.find{display:grid; grid-template-columns:auto auto minmax(0,1fr); gap:12px; padding:13px 18px; border-top:1px solid var(--line)}
+.find.is-done{background:var(--surface-2)}
+.find.is-done h4{color:var(--muted); text-decoration:line-through; text-decoration-color:var(--line-2)}
+.find.is-done .code-chip{background:var(--sunken); color:var(--muted)}
+.find.hide{display:none}
+.code-chip{
+  font-family:var(--mono); font-size:11px; font-weight:600; padding:2px 7px; border-radius:5px; height:fit-content;
+  background:var(--sunken); color:var(--muted);
+}
+.find.blk .code-chip{background:var(--crit-soft); color:var(--crit)}
+.find.high .code-chip{background:var(--warn-soft); color:var(--warn)}
+.find.med .code-chip{background:var(--accent-soft); color:var(--accent-2)}
+.find h4{font-size:14px; letter-spacing:-.005em}
+.find .where{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:3px; word-break:break-all}
+.find .fix{font-size:13.5px; color:var(--ink-2); margin-top:6px; max-width:74ch}
+.find .linked{font-family:var(--mono); font-size:10.5px; color:var(--accent); margin-top:5px; display:inline-block}
+.oklist{padding:12px 18px 16px; display:flex; flex-direction:column; gap:5px; font-size:13.5px; color:var(--ink-2)}
+.oklist li{list-style:none; padding-left:20px; position:relative}
+.oklist li::before{content:"✓"; position:absolute; left:0; color:var(--ok); font-weight:700}
+#ppText{min-height:280px}
+#ppTabs{border:1px solid var(--line); border-radius:8px; overflow:hidden}
+#ppTabs button{flex:1}
+.toast{
+  position:fixed; left:50%; bottom:26px; transform:translateX(-50%); z-index:70;
+  background:var(--surface); border:1px solid var(--line-2); border-radius:10px;
+  box-shadow:0 6px 28px -10px rgba(0,0,0,.45); padding:11px 16px; font-size:13px;
+  color:var(--ink); max-width:min(520px, calc(100vw - 32px)); text-align:center;
+}
+.toast[hidden]{display:none}
+.empty{padding:34px 18px; text-align:center; color:var(--muted); font-size:13.5px}
+footer{max-width:1200px; margin:0 auto; padding:0 20px 40px; color:var(--muted); font-size:12px}
+
+@media print{
+  /* Paper is always light: repaint every token, and beat both the
+     dark media query and an explicit dark stamp. */
+  :root, :root[data-theme="dark"], :root[data-theme="light"], :root:not([data-theme="light"]){
+    --ground:#fff; --surface:#fff; --surface-2:#fff; --sunken:#F2F4F7;
+    --line:#C4CCD7; --line-2:#96A3B2;
+    --ink:#000; --ink-2:#26313D; --muted:#4C5A69;
+    --accent:#1B33A0; --accent-2:#1B33A0; --accent-soft:#EDF0FB;
+    --ok:#0F5C3C; --ok-soft:#EAF3EE; --warn:#6E440C; --warn-soft:#F8F0E2;
+    --crit:#8C1B12; --crit-soft:#F8E7E5;
+    --shadow:none;
+  }
+  body{background:#fff; color:var(--ink); font-size:10.5px; line-height:1.45}
+  .topbar,.side,.controls,.modal,.no-print{display:none !important}
+  .shell{display:block; padding:0; max-width:none}
+  .stack{gap:14px}
+  .intro,.sec,.gauge{box-shadow:none}
+  .print-head{
+    display:block; border-bottom:2px solid var(--ink); padding:0 0 8px; margin-bottom:14px;
+    font-family:var(--cond); font-size:15px;
+  }
+  .print-head span{
+    display:block; font-family:var(--mono); font-size:10px; font-weight:400;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-top:3px;
+  }
+  .sec{break-inside:auto}
+  .sec-head{break-after:avoid; background:none; border-bottom:1px solid var(--ink)}
+  .item{break-inside:avoid; padding:9px 12px}
+  .intro .legend{display:none}
+  /* Backgrounds are dropped by default when printing, so the tick has to be drawn
+     with ink, not with a filled box. */
+  .chk input:checked + .box{background:#fff; border-color:var(--ink)}
+  :root .chk input:checked + .box::after,
+  :root[data-theme="dark"] .chk input:checked + .box::after,
+  :root:not([data-theme="light"]) .chk input:checked + .box::after{border-color:var(--ink)}
+  .tabs{background:none; break-inside:avoid}
+  .tabs-bar{display:none}
+  .tabs-panel{padding:9px 12px}
+  .tabs-panel + .tabs-panel{border-top:1px solid var(--line)}
+  a{color:var(--ink); text-decoration:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <span class="mark" id="mark">Rilis</span>
+      <h1 id="pageTitle">Store Launch Checklist</h1>
+      <span class="slash" aria-hidden="true">/</span>
+      <input id="appName" class="app-input" type="text" maxlength="48" spellcheck="false" placeholder="Nama aplikasi" aria-label="Nama aplikasi yang sedang disiapkan">
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" id="platformSeg">
+        <button type="button" data-plat="a" aria-pressed="true">Android</button>
+        <button type="button" data-plat="i" aria-pressed="false">iOS</button>
+      </div>
+      <div class="seg" role="group" id="viewSeg">
+        <button type="button" data-view="check" aria-pressed="true" data-i18n="vCheck">Checklist</button>
+        <button type="button" data-view="audit" aria-pressed="false" data-i18n="vAudit">Audit</button>
+        <button type="button" data-view="ref" aria-pressed="false" data-i18n="vRef">Referensi</button>
+      </div>
+      <div class="seg" role="group" id="filterSeg">
+        <button type="button" data-filter="all" aria-pressed="true" data-i18n="fAll">Semua</button>
+        <button type="button" data-filter="open" aria-pressed="false" data-i18n="fOpen">Belum</button>
+        <button type="button" data-filter="done" aria-pressed="false" data-i18n="fDone">Selesai</button>
+      </div>
+      <div class="seg lang" role="group" id="langSeg">
+        <button type="button" data-lang="id" aria-pressed="true">ID</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button type="button" class="btn" id="privacyBtn" data-i18n="privacyBtn">Template privasi</button>
+      <button type="button" class="btn" id="exportBtn" data-i18n="exportBtn">Simpan ke file</button>
+      <button type="button" class="btn" id="printBtn" data-i18n="print">Cetak</button>
+      <button type="button" class="btn" id="resetBtn" data-i18n="reset" title="Kosongkan untuk project baru">Reset</button>
+    </div>
+  </div>
+</header>
+
+<div class="print-head" id="printHead" aria-hidden="true"></div>
+
+<main class="shell">
+  <aside class="side">
+    <div class="gauge">
+      <div class="gauge-top">
+        <svg class="ring" viewBox="0 0 56 56" aria-hidden="true">
+          <circle class="bg" cx="28" cy="28" r="24"></circle>
+          <circle class="fg" cx="28" cy="28" r="24" id="ringFg" stroke-dasharray="0 150.79644737231007" style="stroke-linecap: butt;"></circle>
+        </svg>
+        <div>
+          <div class="gauge-num" id="pct">0%</div>
+          <div class="gauge-lbl" id="gaugeLbl">selesai</div>
+        </div>
+      </div>
+      <div class="gauge-sub">
+        <span><b id="cDone">0</b> <span data-i18n="done">selesai</span></span>
+        <span><b id="cLeft">60</b> <span data-i18n="left">tersisa</span></span>
+      </div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <p class="side-note" id="sideNote">Spesifikasi store berubah 1–2 kali setahun. Verifikasi ulang di App Store Connect dan Play Console saat submit. Status berasal dari blok PROJECT di dalam file ini, jadi setiap orang yang membukanya melihat hal yang sama. Centang baru bersifat sementara sampai Anda menekan Simpan ke file — tombol itu menulis ulang file HTML ini.</p>
+  </aside>
+
+  <div class="stack">
+    <section class="intro" id="intro">
+      <div class="intro-kicker" id="introKicker"></div>
+      <h2 id="introTitle">Checklist rilis App Store &amp; Google Play</h2>
+      <p id="introBody">Checklist operasional untuk membawa aplikasi mobile ke produksi. Setiap poin yang berbeda antar platform punya tab Android dan iOS — pilih platform di bar atas, semua tab ikut berpindah. Tab Audit memuat hasil pemeriksaan repo beserta perbaikannya, tab Referensi memuat acuan lintas project, dan tombol Template privasi memuat draft kebijakan yang bisa disalin.</p>
+      <div class="legend">
+        <span><span class="tag tag-must">must</span> <em id="lgMust">wajib, submit akan ditolak tanpa ini</em></span>
+        <span><span class="tag tag-rec">rec</span> <em id="lgRec">sangat disarankan</em></span>
+        <span id="lgTabs">Poin dengan tab berarti aturannya berbeda per platform</span>
+      </div>
+      <p class="gen-hint" id="genHint">Tab Audit dan Referensi berisi hasil pemeriksaan project ini — keduanya baru muncul setelah prompt di README dijalankan, dan kosong pada file yang masih bersih.</p>
+    </section>
+    <div id="sections"></div>
+  </div>
+</main>
+
+<div class="modal" id="ppModal" role="dialog" aria-modal="true" aria-labelledby="ppTitle">
+  <div class="modal-box">
+    <h3 id="ppTitle"></h3>
+    <div class="tabs-bar" id="ppTabs" role="tablist">
+      <button type="button" role="tab" data-pp="polid" aria-selected="true">Kebijakan (ID)</button>
+      <button type="button" role="tab" data-pp="polen" aria-selected="false">Policy (EN)</button>
+      <button type="button" role="tab" data-pp="del" aria-selected="false">Hapus data</button>
+    </div>
+    <p id="ppBody"></p>
+    <textarea id="ppText" readonly="" spellcheck="false"></textarea>
+    <div class="modal-actions">
+      <span class="ok" id="ppOk" hidden=""></span>
+      <button type="button" class="btn" id="ppClose"></button>
+      <button type="button" class="btn primary" id="ppCopy"></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <h3 id="modalTitle">Simpan status ke dalam file</h3>
+    <p id="modalBody">Status yang dilihat rekan kerja adalah isi file ini, bukan centang di browser Anda. Tekan Simpan file untuk menulis ulang file HTML ini beserta status terbaru — Chrome akan menanyakan lokasinya, pilih file yang sama untuk menimpanya. Atau salin potongan di bawah dan tempel manual kalau ingin diff git yang rapi.</p>
+    <textarea id="snippet" readonly="" spellcheck="false"></textarea>
+    <div class="modal-actions">
+      <span class="ok" id="copyOk">menulis file…</span>
+      <button type="button" class="btn" id="closeModal">Tutup</button>
+      <button type="button" class="btn" id="copySnippet">Salin</button>
+      <button type="button" class="btn primary" id="saveFileBtn">Simpan file</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">menulis file…</div>
+
+<footer id="foot">Status tersimpan di dalam file HTML ini; browser hanya mengingat pilihan bahasa dan platform. Tidak ada data yang dikirim ke mana pun. Checklist, audit, referensi, dan template privasi seluruhnya ada di file yang sama · direview 2026-08-29.</footer>
+
+<script>
+/* ------------------------------------------------------------------ *
+ * UI strings
+ * ------------------------------------------------------------------ */
+const UI = {
+  id:{
+    title:"Store Launch Checklist", mark:"Rilis",
+    fAll:"Semua", fOpen:"Belum", fDone:"Selesai", print:"Cetak", reset:"Reset",
+    appPh:"Nama aplikasi", appLbl:"Nama aplikasi yang sedang disiapkan",
+    exportBtn:"Simpan ke file",
+    exportDirty:"Simpan ke file ({n})",
+    statusAs:"status per",
+    modalTitle:"Simpan status ke dalam file",
+    modalBody:"Status yang dilihat rekan kerja adalah isi file ini, bukan centang di browser Anda. Tekan Simpan file untuk menulis ulang file HTML ini beserta status terbaru — Chrome akan menanyakan lokasinya, pilih file yang sama untuk menimpanya. Atau salin potongan di bawah dan tempel manual kalau ingin diff git yang rapi.",
+    copy:"Salin", copied:"Tersalin", close:"Tutup", printedOn:"dicetak",
+    vCheck:"Checklist", vAudit:"Audit", vRef:"Referensi",
+    privacyBtn:"Template privasi",
+    ppTitle:"Template kebijakan privasi",
+    ppBody:"Template generik. Ganti setiap placeholder <...>, hapus kategori data yang tidak dikumpulkan aplikasi Anda, samakan isinya dengan jawaban App Privacy dan Data Safety, mintakan review legal, lalu host di URL HTTPS publik.",
+    ppTabs:["Kebijakan (ID)","Policy (EN)","Hapus data"],
+    auditTitle:"Hasil audit repo", auditSub:"repo {repo} · commit {commit} · {date}",
+    blockers:"blocker", high:"high", med:"medium", okLbl:"sudah benar",
+    ofTotal:"dari {n}", gaugeAudit:"temuan beres", fixedHint:"Centang temuan yang sudah Anda perbaiki — statusnya ikut tersimpan ke dalam file.",
+    identity:"Identitas & konfigurasi", findings:"Temuan & perbaikan", okTitle:"Sudah benar",
+    linkedTo:"→ ", noAudit:"Belum ada data audit di file ini. Isi objek AUDIT di dalam <script>.",
+    refTitle:"Referensi",
+    genChip:"dari prompt",
+    genHint:"Tab Audit dan Referensi berisi hasil pemeriksaan project ini — keduanya baru muncul setelah prompt di README dijalankan, dan kosong pada file yang masih bersih.",
+    resetTitle:"Kosongkan untuk project baru",
+    modalTitleClear:"File sudah dikosongkan",
+    saveFile:"Simpan file", saveClean:"Simpan file bersih",
+    saving:"menulis file…", savedOk:"file tersimpan", savedDl:"terunduh — timpa file lama", saveErr:"gagal menyimpan",
+    resetSaved:"File sudah ditimpa dan sekarang bersih — siap dipakai untuk project baru.",
+    resetLinked:"File sudah ditimpa dan sekarang bersih. Filenya juga sudah terhubung, jadi penyimpanan berikutnya langsung menimpa tanpa dialog.",
+    savedLinked:"tersimpan — file terhubung, simpan berikutnya tanpa dialog",
+    savedReload:"Tersimpan ke file — memuat ulang halaman…",
+    savedDlFile:"Halaman ini dibuka lewat file://, dan Chrome melarang penulisan file dari sana. File terbaru diunduh ke folder Download — timpakan ke file lama, atau buka halaman ini lewat server lokal agar bisa menimpa langsung.",
+    resetDlFile:"Halaman ini dibuka lewat file://, jadi Chrome tidak boleh menimpa file. File bersih diunduh ke folder Download — timpakan ke file lama untuk menyelesaikan reset.",
+    saveNoLayer:"Gagal: blok PROJECT tidak ditemukan di antara penanda PROJECT-LAYER. Pastikan penanda dan baris const PROJECT = { ... }; masih ada di dalam <script>.",
+    resetDl:"File bersih terunduh ke folder Download. Timpakan ke file yang lama untuk menyelesaikan reset.",
+    resetCancel:"Tampilan sudah dikosongkan, tapi file belum ditimpa — refresh akan mengembalikan isinya.",
+    modalBodyClear:"Centang, catatan, hasil audit, dan referensi sudah dibuang dari tampilan — tetapi filenya belum berubah, jadi refresh akan memunculkannya lagi. Tekan Simpan file bersih untuk menulis ulang file ini tanpa data project, atau salin potongan di bawah dan timpakan sendiri ke bagian di antara penanda PROJECT-LAYER.",
+    done:"selesai", left:"tersisa", gauge:"selesai",
+    introTitle:"Checklist rilis App Store & Google Play",
+    introBody:"Checklist operasional untuk membawa aplikasi mobile ke produksi. Setiap poin yang berbeda antar platform punya tab Android dan iOS — pilih platform di bar atas, semua tab ikut berpindah. Tab Audit memuat hasil pemeriksaan repo beserta perbaikannya, tab Referensi memuat acuan lintas project, dan tombol Template privasi memuat draft kebijakan yang bisa disalin.",
+    lgMust:"wajib, submit akan ditolak tanpa ini",
+    lgRec:"sangat disarankan",
+    lgTabs:"Poin dengan tab berarti aturannya berbeda per platform",
+    empty:"Tidak ada poin pada filter ini.",
+    note:"Spesifikasi store berubah 1–2 kali setahun. Verifikasi ulang di App Store Connect dan Play Console saat submit.",
+    scoped:"Status berasal dari blok PROJECT di dalam file ini, jadi setiap orang yang membukanya melihat hal yang sama. Centang baru bersifat sementara sampai Anda menekan Simpan ke file — tombol itu menulis ulang file HTML ini.",
+    foot:"Status tersimpan di dalam file HTML ini; browser hanya mengingat pilihan bahasa dan platform. Tidak ada data yang dikirim ke mana pun. Checklist, audit, referensi, dan template privasi seluruhnya ada di file yang sama · direview 2026-08-29.",
+    resetConfirm:"Kosongkan file ini untuk project baru? Centang, catatan, hasil audit, dan referensi dibuang, lalu file ini langsung ditimpa."
+  },
+  en:{
+    title:"Store Launch Checklist", mark:"Release",
+    fAll:"All", fOpen:"Open", fDone:"Done", print:"Print", reset:"Reset",
+    appPh:"App name", appLbl:"Name of the app being prepared",
+    exportBtn:"Save to file",
+    exportDirty:"Save to file ({n})",
+    statusAs:"status as of",
+    modalTitle:"Save this state into the file",
+    modalBody:"What your colleagues see is this file's contents, not the ticks in your browser. Press Save file to rewrite this HTML file with the current status — Chrome asks where to put it, pick the same file to overwrite it. Or copy the snippet below and paste it by hand if you prefer a tidy git diff.",
+    copy:"Copy", copied:"Copied", close:"Close", printedOn:"printed",
+    vCheck:"Checklist", vAudit:"Audit", vRef:"Reference",
+    privacyBtn:"Privacy template",
+    ppTitle:"Privacy policy template",
+    ppBody:"A generic template. Replace every <...> placeholder, delete any data category your app does not collect, keep it consistent with your App Privacy and Data Safety answers, run it past legal, then host it at a public HTTPS URL.",
+    ppTabs:["Policy (ID)","Policy (EN)","Deletion page"],
+    auditTitle:"Repository audit", auditSub:"repo {repo} · commit {commit} · {date}",
+    blockers:"blockers", high:"high", med:"medium", okLbl:"already fine",
+    ofTotal:"of {n}", gaugeAudit:"findings closed", fixedHint:"Tick a finding once you have fixed it — the state is saved into the file.",
+    identity:"Identity & configuration", findings:"Findings & fixes", okTitle:"Already correct",
+    linkedTo:"→ ", noAudit:"This file carries no audit data. Fill the AUDIT object inside the <script>.",
+    refTitle:"Reference",
+    genChip:"generated",
+    genHint:"The Audit and Reference tabs hold this project's findings — they appear only after the prompt in the README has been run, and stay empty in a clean copy of this file.",
+    resetTitle:"Clear for a new project",
+    modalTitleClear:"File cleared",
+    saveFile:"Save file", saveClean:"Save clean file",
+    saving:"writing the file…", savedOk:"file saved", savedDl:"downloaded — replace the old file", saveErr:"could not save",
+    resetSaved:"The file has been overwritten and is clean — ready for a new project.",
+    resetLinked:"The file was overwritten and is clean. It is now linked too, so later saves overwrite it with no dialog.",
+    savedLinked:"saved — file linked, later saves need no dialog",
+    savedReload:"Saved to the file — reloading…",
+    savedDlFile:"This page was opened over file://, where Chrome forbids writing files. The updated file was downloaded instead — replace the old one, or open this page through a local server to overwrite in place.",
+    resetDlFile:"This page was opened over file://, so Chrome may not overwrite the file. A clean file was downloaded — replace the old one to finish the reset.",
+    saveNoLayer:"Failed: no PROJECT block between the PROJECT-LAYER markers. Make sure the markers and the const PROJECT = { ... }; line are still inside the <script>.",
+    resetDl:"A clean file was downloaded. Replace the old file with it to finish the reset.",
+    resetCancel:"The view is cleared, but the file was not overwritten — a refresh brings its contents back.",
+    modalBodyClear:"Ticks, notes, audit findings, and reference cards are gone from the view — but the file itself is unchanged, so a refresh brings them back. Press Save clean file to rewrite this file without any project data, or copy the snippet below and paste it between the PROJECT-LAYER markers yourself.",
+    done:"done", left:"left", gauge:"complete",
+    introTitle:"App Store & Google Play release checklist",
+    introBody:"An operational checklist for taking a mobile app to production. Every point that differs by platform carries Android and iOS tabs — pick a platform in the top bar and every tab follows. The Audit tab carries the repository findings and their fixes, the Reference tab holds cross-project guidance, and the Privacy template button holds a copyable policy draft.",
+    lgMust:"required, submission fails without it",
+    lgRec:"strongly recommended",
+    lgTabs:"A point with tabs means the rule differs per platform",
+    empty:"No items match this filter.",
+    note:"Store specs change once or twice a year. Re-verify in App Store Connect and Play Console at submission time.",
+    scoped:"Status comes from the PROJECT block inside this file, so everyone who opens it sees the same thing. New ticks are temporary until you press Save to file — that button rewrites this HTML file.",
+    foot:"Status lives inside this HTML file; the browser only remembers your language and platform choice. Nothing is sent anywhere. Checklist, audit, reference, and privacy template all live in the same file · reviewed 2026-08-29.",
+    resetConfirm:"Clear this file for a new project? Ticks, notes, audit findings, and reference cards are removed, then this file is overwritten."
+  }
+};
+
+/* ------------------------------------------------------------------ *
+ * Checklist data — t: title, d: shared detail, p: {a: Android, i: iOS}
+ * ------------------------------------------------------------------ */
+const DATA = [
+{
+ id:"legal", t:{id:"Legal & privasi", en:"Legal & privacy"},
+ items:[
+  {id:"pp-host", r:"must",
+   t:{id:"Privacy policy di URL publik HTTPS", en:"Privacy policy on a public HTTPS URL"},
+   d:{id:"Halaman web (bukan PDF), bisa dibuka tanpa login, tidak bisa diedit publik, tidak redirect ke homepage, dan tetap hidup selama app ada di store.",
+      en:"A web page (not a PDF), reachable without login, not publicly editable, no redirect to the homepage, and kept alive for as long as the app is listed."},
+   p:{a:{id:"Play Console → App content → Privacy policy, dan juga di Store listing. Wajib untuk semua app, apalagi yang meminta lokasi.",
+         en:"Play Console → App content → Privacy policy, plus the Store listing field. Mandatory for every app, more so with location permissions."},
+      i:{id:"App Store Connect → App Information → Privacy Policy URL. Bisa diisi per bahasa listing.",
+         en:"App Store Connect → App Information → Privacy Policy URL. Can be set per listing language."}}},
+
+  {id:"pp-content", r:"must",
+   t:{id:"Isi privacy policy lengkap", en:"Privacy policy content is complete"},
+   d:{id:"Nama app & badan hukum, tanggal berlaku, kategori data yang dikumpulkan, tujuan tiap kategori, dasar hukum, pihak ketiga/processor, transfer lintas negara, retensi, keamanan, hak pengguna, prosedur hapus akun, kebijakan anak, izin perangkat, cara pemberitahuan perubahan, kontak.",
+      en:"App and legal entity name, effective date, data categories collected, purpose per category, legal basis, third parties/processors, cross-border transfers, retention, security, user rights, account deletion process, children policy, device permissions, how changes are announced, contact."}},
+
+  {id:"pp-inapp", r:"rec",
+   t:{id:"Privacy policy & ToS dapat dibuka dari dalam app", en:"Privacy policy & ToS reachable inside the app"},
+   d:{id:"Tautan di layar login dan di halaman Setelan/Profil, mengarah ke URL yang sama dengan yang didaftarkan di store. Isi dialog in-app harus sama persis dengan dokumen yang di-host.",
+      en:"Link them on the sign-in screen and in Settings/Profile, pointing at the same URL registered with the store. In-app dialog text must match the hosted document exactly."}},
+
+  {id:"tos", r:"rec",
+   t:{id:"Terms of Service / EULA", en:"Terms of Service / EULA"},
+   d:{id:"Butuh bila ada akun, konten user, atau kewajiban kerja: kelayakan pengguna, larangan penyalahgunaan, kepemilikan konten, penangguhan akun, batasan tanggung jawab, hukum yang berlaku.",
+      en:"Needed where there are accounts, user content, or work obligations: eligibility, prohibited use, content ownership, account suspension, liability limits, governing law."},
+   p:{a:{id:"Tidak ada field khusus — taruh tautannya di deskripsi listing dan di dalam app.",
+         en:"No dedicated field — put the link in the store description and inside the app."},
+      i:{id:"App Store Connect → App Information → License Agreement. Kosongkan bila memakai EULA standar Apple.",
+         en:"App Store Connect → App Information → License Agreement. Leave empty to use Apple's standard EULA."}}},
+
+  {id:"delete", r:"must",
+   t:{id:"Jalur penghapusan akun & data", en:"Account & data deletion path"},
+   d:{id:"Halaman publik yang bisa dibuka tanpa login, menjelaskan data apa yang dihapus, data apa yang ditahan beserta dasar hukumnya, dan SLA penyelesaian.",
+      en:"A public page reachable without login, stating what gets deleted, what is retained and on what legal basis, and the completion SLA."},
+   p:{a:{id:"Play mewajibkan jalur di dalam app <em>dan</em> URL web untuk app yang punya akun. URL diisikan di Data safety → Data deletion.",
+         en:"Play requires an in-app path <em>and</em> a web URL for any app with accounts. The URL goes into Data safety → Data deletion."},
+      i:{id:"Guideline 5.1.1(v): app yang mendukung pembuatan akun wajib menyediakan penghapusan akun di dalam app. Jika akun dibuat oleh organisasi (tidak ada registrasi in-app), tulis pengecualian ini di review notes.",
+         en:"Guideline 5.1.1(v): apps supporting account creation must offer in-app account deletion. If accounts are provisioned by an organisation (no in-app signup), state that exemption in the review notes."}}},
+
+  {id:"inventory", r:"must",
+   t:{id:"Inventaris data & SDK dari kode", en:"Data & SDK inventory taken from the code"},
+   d:{id:"Daftar konkret: field apa yang dikirim ke server, permission apa yang diminta, SDK pihak ketiga apa yang tertanam. Inventaris ini jadi sumber tunggal untuk privacy policy, App Privacy, dan Data Safety agar tiga-tiganya konsisten.",
+      en:"A concrete list: which fields go to the server, which permissions are requested, which third-party SDKs are embedded. This inventory is the single source for the privacy policy, App Privacy, and Data Safety so all three agree."}},
+
+  {id:"license", r:"rec",
+   t:{id:"Lisensi aset & merek pihak ketiga", en:"Asset & third-party trademark licences"},
+   d:{id:"Font, ikon, ilustrasi, musik: simpan bukti lisensi. Logo login pihak ketiga harus mengikuti brand guideline resmi pemiliknya.",
+      en:"Fonts, icons, illustrations, audio: keep the licence evidence. Third-party sign-in logos must follow the owner's official brand guidelines."}}
+ ]},
+
+{
+ id:"assets", t:{id:"Aset visual", en:"Visual assets"},
+ items:[
+  {id:"icon", r:"must",
+   t:{id:"Ikon aplikasi", en:"App icon"},
+   p:{a:{id:"<dl class='kv'><dt>Ukuran</dt><dd>512 × 512 px</dd><dt>Format</dt><dd>PNG 32-bit, maks 1 MB</dd><dt>Alpha</dt><dd>boleh, tapi latar sebaiknya solid</dd><dt>Sudut</dt><dd>jangan dibulatkan sendiri — Play menerapkan mask</dd><dt>Adaptif</dt><dd>foreground 108 dp dengan safe zone 66 dp di tengah</dd></dl>",
+         en:"<dl class='kv'><dt>Size</dt><dd>512 × 512 px</dd><dt>Format</dt><dd>32-bit PNG, max 1 MB</dd><dt>Alpha</dt><dd>allowed, but keep the ground solid</dd><dt>Corners</dt><dd>do not round them yourself — Play applies a mask</dd><dt>Adaptive</dt><dd>108 dp foreground with a 66 dp centre safe zone</dd></dl>"},
+      i:{id:"<dl class='kv'><dt>Ukuran</dt><dd>1024 × 1024 px</dd><dt>Format</dt><dd>PNG/JPEG, RGB, flattened</dd><dt>Alpha</dt><dd><b>dilarang</b> — upload ditolak</dd><dt>Sudut</dt><dd>persegi; sistem yang memotong</dd></dl><p class='note'>Cek cepat: <code>sips -g hasAlpha icon.png</code> harus <code>no</code>.</p>",
+         en:"<dl class='kv'><dt>Size</dt><dd>1024 × 1024 px</dd><dt>Format</dt><dd>PNG/JPEG, RGB, flattened</dd><dt>Alpha</dt><dd><b>forbidden</b> — the upload is rejected</dd><dt>Corners</dt><dd>square; the system masks it</dd></dl><p class='note'>Quick check: <code>sips -g hasAlpha icon.png</code> must say <code>no</code>.</p>"}}},
+
+  {id:"shots-phone", r:"must",
+   t:{id:"Screenshot ponsel", en:"Phone screenshots"},
+   p:{a:{id:"<dl class='kv'><dt>Jumlah</dt><dd>2–8 (praktik baik 4–8)</dd><dt>Rasio</dt><dd>16:9 atau 9:16 — tepat</dd><dt>Sisi</dt><dd>320–3840 px; rekomendasi 1080 × 1920</dd><dt>Format</dt><dd>PNG/JPEG 24-bit, tanpa alpha, maks 8 MB</dd></dl>",
+         en:"<dl class='kv'><dt>Count</dt><dd>2–8 (4–8 in practice)</dd><dt>Ratio</dt><dd>exactly 16:9 or 9:16</dd><dt>Sides</dt><dd>320–3840 px; 1080 × 1920 recommended</dd><dt>Format</dt><dd>24-bit PNG/JPEG, no alpha, max 8 MB</dd></dl>"},
+      i:{id:"<dl class='kv'><dt>Wajib</dt><dd>iPhone 6,9\": 1290 × 2796 atau 1320 × 2868</dd><dt>Opsional</dt><dd>iPhone 6,5\": 1242 × 2688 / 1284 × 2778</dd><dt>Jumlah</dt><dd>1–10 per ukuran per bahasa</dd><dt>Format</dt><dd>PNG/JPEG, RGB, flattened, <b>tanpa alpha</b></dd></dl><p class='note'>Set 6,9\" dipakai ulang otomatis untuk iPhone yang lebih kecil.</p>",
+         en:"<dl class='kv'><dt>Required</dt><dd>iPhone 6.9\": 1290 × 2796 or 1320 × 2868</dd><dt>Optional</dt><dd>iPhone 6.5\": 1242 × 2688 / 1284 × 2778</dd><dt>Count</dt><dd>1–10 per size per language</dd><dt>Format</dt><dd>PNG/JPEG, RGB, flattened, <b>no alpha</b></dd></dl><p class='note'>The 6.9\" set is reused automatically for smaller iPhones.</p>"}}},
+
+  {id:"shots-tablet", r:"must",
+   t:{id:"Screenshot tablet / iPad", en:"Tablet / iPad screenshots"},
+   d:{id:"Hanya bila app mendeklarasikan dukungan layar besar. Kalau tidak diuji di tablet, lebih aman mencabut dukungannya daripada mengunggah screenshot seadanya.",
+      en:"Only if the app declares large-screen support. If it has not been tested on tablets, dropping support is safer than shipping filler screenshots."},
+   p:{a:{id:"Screenshot 7\" dan 10\" dibutuhkan agar app layak tampil di Play untuk tablet dan Chromebook; rasio dan batas ukuran sama dengan ponsel.",
+         en:"7\" and 10\" screenshots are needed for the app to surface well on Play for tablets and Chromebooks; same ratio and size limits as phone."},
+      i:{id:"Jika <code>TARGETED_DEVICE_FAMILY</code> mencakup iPad, screenshot iPad 13\" (2064 × 2752 atau 2048 × 2732) <b>wajib</b> — dan app harus benar-benar jalan baik di iPad.",
+         en:"If <code>TARGETED_DEVICE_FAMILY</code> includes iPad, 13\" iPad screenshots (2064 × 2752 or 2048 × 2732) are <b>mandatory</b> — and the app must genuinely work well there."}}},
+
+  {id:"feature-graphic", r:"must",
+   t:{id:"Feature graphic (khusus Play)", en:"Feature graphic (Play only)"},
+   p:{a:{id:"1024 × 500, PNG/JPEG tanpa alpha, maks 15 MB. Wajib. Hindari menaruh teks penting di area kanan-bawah karena tertutup tombol play saat ada video promo.",
+         en:"1024 × 500, PNG/JPEG without alpha, max 15 MB. Mandatory. Keep important text out of the lower-right area — the play button covers it when a promo video exists."},
+      i:{id:"Tidak ada padanannya di App Store. Yang setara secara peran adalah App Preview video dan screenshot pertama.",
+         en:"No App Store equivalent. The nearest thing in role is the App Preview video and the first screenshot."}}},
+
+  {id:"video", r:"rec",
+   t:{id:"Video promo / App Preview", en:"Promo video / App Preview"},
+   p:{a:{id:"URL YouTube publik, tanpa iklan, tidak berumur (age-restricted). Opsional tapi menaikkan konversi.",
+         en:"A public YouTube URL, ad-free and not age-restricted. Optional but lifts conversion."},
+      i:{id:"15–30 detik, maks 3 per ukuran device, hanya rekaman layar perangkat, resolusi sama dengan screenshot, tanpa harga/promo.",
+         en:"15–30 seconds, max 3 per device size, device screen capture only, same resolution as screenshots, no pricing or promos."}}},
+
+  {id:"shots-rules", r:"must",
+   t:{id:"Isi screenshot mematuhi aturan konten", en:"Screenshot content follows the rules"},
+   d:{id:"Diambil dari build yang benar-benar disubmit; tanpa data pribadi asli; tanpa sudut membulat/transparansi buatan; tanpa banner DEBUG, skeleton loading, atau teks placeholder; tanpa klaim peringkat, lencana palsu, harga menyesatkan, atau tombol Install tiruan; tanpa menyebut platform lain.",
+      en:"Captured from the build you actually submit; no real personal data; no self-made rounded corners or transparency; no DEBUG banner, loading skeletons, or placeholder text; no ranking claims, fake badges, misleading pricing, or imitation Install buttons; no mention of the other platform."},
+   p:{a:{id:"Play menolak grafis yang menutupi UI dengan teks berlebihan atau meniru elemen UI Play Store.",
+         en:"Play rejects graphics that bury the UI under heavy text or imitate Play Store UI elements."},
+      i:{id:"Guideline 2.3.3: screenshot harus mencerminkan fungsi app. Frame device Apple boleh, asal akurat dan model terbaru; normalkan status bar (jam 9:41).",
+         en:"Guideline 2.3.3: screenshots must reflect actual app function. Apple device frames are fine when accurate and current; normalise the status bar (9:41)."}}}
+ ]},
+
+{
+ id:"metadata", t:{id:"Metadata listing", en:"Store listing metadata"},
+ items:[
+  {id:"name", r:"must",
+   t:{id:"Nama aplikasi", en:"App name"},
+   d:{id:"Maksimal 30 karakter di kedua store. Dilarang menyisipkan keyword atau nama kompetitor, kata \"gratis/free\", klaim promosi, atau menyebut platform lain.",
+      en:"Max 30 characters on both stores. No stuffed keywords or competitor names, no \"free\", no promotional claims, no mention of the other platform."},
+   p:{a:{id:"Play juga melarang emoji dan simbol promosi di judul, serta ikon/teks yang meniru lencana Play.",
+         en:"Play also bans emoji and promotional symbols in the title, plus anything imitating Play badges."},
+      i:{id:"Nama harus sama dengan yang muncul di perangkat (<code>CFBundleDisplayName</code>) — perbedaan mencolok memicu pertanyaan reviewer.",
+         en:"The name should match what shows on device (<code>CFBundleDisplayName</code>) — a visible mismatch draws reviewer questions."}}},
+
+  {id:"shortdesc", r:"must",
+   t:{id:"Deskripsi singkat", en:"Short description"},
+   p:{a:{id:"Short description: maks <b>80</b> karakter. Ini teks pertama yang dibaca di halaman listing dan ikut diindeks pencarian Play.",
+         en:"Short description: max <b>80</b> characters. It is the first line people read and it feeds Play search."},
+      i:{id:"Subtitle: maks <b>30</b> karakter. Promotional text: maks <b>170</b> karakter dan bisa diubah kapan saja tanpa review ulang.",
+         en:"Subtitle: max <b>30</b> characters. Promotional text: max <b>170</b> characters and editable any time without a new review."}}},
+
+  {id:"longdesc", r:"must",
+   t:{id:"Deskripsi panjang", en:"Full description"},
+   d:{id:"Maksimal 4.000 karakter di kedua store. Harus cocok dengan fungsi nyata app. Untuk app yang aksesnya terbatas, sebut eksplisit bahwa akun dibuat oleh organisasi — kalimat ini yang mencegah tolakan \"tidak bisa dicoba\".",
+      en:"Max 4,000 characters on both stores. It must match what the app actually does. For access-restricted apps, state plainly that accounts are provisioned by an organisation — that sentence heads off the \"cannot be evaluated\" rejection."}},
+
+  {id:"keywords", r:"rec",
+   t:{id:"Keyword & penemuan", en:"Keywords & discovery"},
+   p:{a:{id:"Tidak ada field keyword. Relevansi diambil dari judul, deskripsi singkat, dan deskripsi panjang — tulis natural, jangan menumpuk kata kunci.",
+         en:"There is no keyword field. Relevance comes from title, short description, and full description — write naturally, do not stuff."},
+      i:{id:"Field Keywords: maks 100 karakter, dipisah koma <b>tanpa spasi</b>. Jangan mengulang kata yang sudah ada di nama/subtitle, jangan pakai merek pihak lain.",
+         en:"Keywords field: max 100 characters, comma-separated <b>without spaces</b>. Do not repeat words already in the name/subtitle, and do not use other brands."}}},
+
+  {id:"category", r:"must",
+   t:{id:"Kategori & rating usia", en:"Category & age rating"},
+   d:{id:"Pilih kategori yang jujur; kategori yang dipaksakan melanggar kebijakan metadata di kedua store.",
+      en:"Pick an honest category; a stretched category breaks metadata policy on both stores."},
+   p:{a:{id:"Kategori + hingga 5 tag. Rating usia lewat kuesioner IARC di App content → Content rating; jawaban tidak jujur bisa berujung penangguhan.",
+         en:"Category plus up to 5 tags. Age rating comes from the IARC questionnaire in App content → Content rating; dishonest answers can lead to suspension."},
+      i:{id:"Kategori primer + sekunder. Age rating dari kuesioner Apple; app bisnis biasanya 4+.",
+         en:"Primary plus secondary category. Age rating from Apple's questionnaire; business apps usually land at 4+."}}},
+
+  {id:"relnotes", r:"must",
+   t:{id:"Catatan rilis", en:"Release notes"},
+   p:{a:{id:"What's new: maks <b>500</b> karakter per bahasa.",
+         en:"What's new: max <b>500</b> characters per language."},
+      i:{id:"What's New in This Version: maks <b>4.000</b> karakter. Wajib diisi untuk update, boleh kosong untuk rilis pertama.",
+         en:"What's New in This Version: max <b>4,000</b> characters. Required for updates, optional for a first release."}}},
+
+  {id:"urls", r:"must",
+   t:{id:"URL & kontak dukungan", en:"Support URLs & contact"},
+   p:{a:{id:"Email kontak developer wajib dan tampil publik; website dan telepon opsional.",
+         en:"A developer contact email is mandatory and shown publicly; website and phone are optional."},
+      i:{id:"Support URL wajib dan harus berisi cara menghubungi Anda; Marketing URL opsional. Isi juga App Review Contact (nama, telepon, email aktif).",
+         en:"A Support URL is mandatory and must offer a way to reach you; Marketing URL is optional. Also fill the App Review Contact (name, phone, live email)."}}}
+ ]},
+
+{
+ id:"privacyforms", t:{id:"Form privasi di store", en:"Store privacy forms"},
+ items:[
+  {id:"form-fill", r:"must",
+   t:{id:"Form privasi terisi dari inventaris data", en:"Privacy form filled from the data inventory"},
+   p:{a:{id:"<b>Data safety</b> (App content). Per tipe data: dikumpulkan / dibagikan, wajib atau opsional, tujuan, ephemeral atau tidak. Tambahan wajib: enkripsi saat transit, dan apakah user bisa meminta penghapusan data.",
+         en:"<b>Data safety</b> (App content). Per data type: collected / shared, required or optional, purpose, ephemeral or not. Also required: encryption in transit, and whether users can request deletion."},
+      i:{id:"<b>App Privacy</b> (nutrition label). Per tipe data: dikumpulkan, tujuan, ditautkan ke identitas user, dipakai untuk tracking. Tipe umum: Contact Info, Location, Identifiers, User Content, Usage Data, Diagnostics.",
+         en:"<b>App Privacy</b> (nutrition label). Per data type: collected, purpose, linked to the user, used for tracking. Common types: Contact Info, Location, Identifiers, User Content, Usage Data, Diagnostics."}}},
+
+  {id:"form-consistency", r:"must",
+   t:{id:"Form ↔ policy ↔ kode konsisten", en:"Form ↔ policy ↔ code all agree"},
+   d:{id:"Reviewer membandingkan jawaban form dengan privacy policy, permission di manifest, dan trafik jaringan app. Ketidakcocokan di Play berujung penangguhan app, bukan sekadar tolakan rilis.",
+      en:"Reviewers compare form answers against the privacy policy, manifest permissions, and the app's network traffic. On Play a mismatch means app suspension, not just a rejected release."}},
+
+  {id:"tracking", r:"must",
+   t:{id:"Deklarasi tracking & iklan", en:"Tracking & advertising declaration"},
+   p:{a:{id:"Deklarasikan Ads di App content. Jika memakai Advertising ID, permission <code>AD_ID</code> harus dideklarasikan dan penggunaannya dijawab di Data safety.",
+         en:"Declare Ads in App content. If you use the Advertising ID, the <code>AD_ID</code> permission must be declared and its use answered in Data safety."},
+      i:{id:"\"Tracking\" berarti menggabungkan data dengan data pihak ketiga untuk iklan atau mengirim ke data broker. Jika ya: wajib App Tracking Transparency — <code>NSUserTrackingUsageDescription</code> + <code>requestTrackingAuthorization</code>.",
+         en:"\"Tracking\" means linking data with third-party data for advertising, or sharing with data brokers. If yes: App Tracking Transparency is mandatory — <code>NSUserTrackingUsageDescription</code> + <code>requestTrackingAuthorization</code>."}}},
+
+  {id:"manifest", r:"must",
+   t:{id:"Deklarasi teknis privasi di build", en:"In-build privacy declarations"},
+   p:{a:{id:"Manifest bersih dari permission yang tidak dipakai; permission sensitif butuh formulir deklarasi terpisah (lihat bagian Kebijakan store).",
+         en:"Keep the manifest free of unused permissions; sensitive permissions need their own declaration form (see the store policy section)."},
+      i:{id:"<code>PrivacyInfo.xcprivacy</code> wajib bila app memakai <i>required reason API</i> (UserDefaults, file timestamp, disk space, boot time) dan setiap SDK dalam daftar Apple harus membawa manifest bertanda tangan. Verifikasi: <code>find . -name \"*.xcprivacy\"</code>.",
+         en:"<code>PrivacyInfo.xcprivacy</code> is required when the app uses a required-reason API (UserDefaults, file timestamp, disk space, boot time), and every SDK on Apple's list must ship a signed manifest. Verify with <code>find . -name \"*.xcprivacy\"</code>."}}},
+
+  {id:"export", r:"must",
+   t:{id:"Kepatuhan ekspor enkripsi", en:"Encryption export compliance"},
+   p:{a:{id:"Play menampilkan pernyataan kepatuhan hukum ekspor AS saat rilis; tidak ada formulir terpisah untuk HTTPS standar.",
+         en:"Play asks you to affirm US export compliance at release; there is no separate form for standard HTTPS."},
+      i:{id:"<code>ITSAppUsesNonExemptEncryption</code> di Info.plist. HTTPS/enkripsi bawaan sistem → <code>false</code> (exempt). Kriptografi proprietary → butuh dokumen CCATS/ERN.",
+         en:"<code>ITSAppUsesNonExemptEncryption</code> in Info.plist. Standard HTTPS/system crypto → <code>false</code> (exempt). Proprietary crypto → CCATS/ERN paperwork."}}}
+ ]},
+
+{
+ id:"policy", t:{id:"Kebijakan store & tipe aplikasi", en:"Store policy & app type"},
+ items:[
+  {id:"apptype", r:"must",
+   t:{id:"Jalur distribusi dipilih sebelum listing dibuat", en:"Distribution route chosen before the listing exists"},
+   d:{id:"App khusus perusahaan tidak harus terbit publik. Menukar jalur setelah rilis berarti mengulang setup, dan sebagian jalur butuh app record baru.",
+      en:"A company app does not have to be public. Switching route after release means redoing the setup, and some routes need a brand new app record."},
+   p:{a:{id:"<dl class='kv'>" +
+           "<dt>Publik</dt><dd>siapa saja; perlu App access + akun demo bila login-gated</dd>" +
+           "<dt>Private app</dt><dd>hanya organisasi yang ditarget lewat Organization ID di managed Google Play; tidak muncul di Play publik</dd>" +
+           "<dt>Managed only</dt><dd>hanya pengguna/perangkat yang dikelola EMM</dd>" +
+           "<dt>Closed test</dt><dd>daftar email tester atau Google Group; bukan jalur produksi</dd>" +
+           "<dt>Luar Play</dt><dd>sideload/MDM/Firebase App Distribution; tanpa auto-update Play</dd>" +
+           "</dl><p class='note'>Play <b>tidak</b> punya mode unlisted. Padanan terdekatnya private app di managed Google Play.</p>",
+         en:"<dl class='kv'>" +
+           "<dt>Public</dt><dd>anyone; needs App access plus a demo account when login-gated</dd>" +
+           "<dt>Private app</dt><dd>only organisations you target by Organization ID in managed Google Play; invisible on public Play</dd>" +
+           "<dt>Managed only</dt><dd>EMM-managed users and devices only</dd>" +
+           "<dt>Closed test</dt><dd>tester email list or Google Group; not a production route</dd>" +
+           "<dt>Off Play</dt><dd>sideload/MDM/Firebase App Distribution; no Play auto-update</dd>" +
+           "</dl><p class='note'>Play has <b>no</b> unlisted mode. The nearest equivalent is a managed Google Play private app.</p>"},
+      i:{id:"<dl class='kv'>" +
+           "<dt>Publik</dt><dd>siapa saja; muncul di pencarian dan chart</dd>" +
+           "<dt>Unlisted</dt><dd>di App Store tapi hanya lewat link langsung — tidak muncul di pencarian, browse, chart, atau rekomendasi</dd>" +
+           "<dt>Custom App</dt><dd>hanya organisasi yang Anda tentukan lewat Organization ID Apple Business/School Manager</dd>" +
+           "<dt>Enterprise</dt><dd>Apple Developer Enterprise Program: hanya karyawan sendiri, tanpa App Review, lewat MDM</dd>" +
+           "<dt>Ad Hoc</dt><dd>maks 100 perangkat per tipe per tahun via UDID; uji saja</dd>" +
+           "</dl>",
+         en:"<dl class='kv'>" +
+           "<dt>Public</dt><dd>anyone; appears in search and charts</dd>" +
+           "<dt>Unlisted</dt><dd>on the App Store but reachable only by direct link — no search, browse, charts, or recommendations</dd>" +
+           "<dt>Custom App</dt><dd>only organisations you name by Apple Business/School Manager Organization ID</dd>" +
+           "<dt>Enterprise</dt><dd>Apple Developer Enterprise Program: your own employees only, no App Review, via MDM</dd>" +
+           "<dt>Ad Hoc</dt><dd>max 100 devices per type per year by UDID; testing only</dd>" +
+           "</dl>"}}},
+
+  {id:"restricted", r:"rec",
+   t:{id:"Prasyarat jalur terbatas sudah diurus", en:"Restricted-route prerequisites handled"},
+   d:{id:"Setiap jalur non-publik punya syarat administratif yang memakan waktu berhari-hari sampai berminggu-minggu. Urus di awal, bukan di hari rilis.",
+      en:"Every non-public route carries administrative prerequisites that take days to weeks. Start them early, not on release day."},
+   p:{a:{id:"<ul>" +
+           "<li>Kumpulkan <b>Organization ID</b> tiap enterprise yang akan menerima private app.</li>" +
+           "<li>Sepakati siapa yang mengelola EMM di sisi klien dan bagaimana app di-push ke perangkat.</li>" +
+           "<li>Untuk penerbitan lewat iframe managed Google Play milik EMM, siapkan akses akun yang benar.</li>" +
+           "<li>Private app tetap wajib Data safety, privacy policy, dan content rating.</li>" +
+           "</ul>",
+         en:"<ul>" +
+           "<li>Collect the <b>Organization ID</b> of every enterprise that will receive the private app.</li>" +
+           "<li>Agree who runs the EMM on the customer side and how the app reaches devices.</li>" +
+           "<li>For publishing through an EMM managed Google Play iframe, line up the right account access.</li>" +
+           "<li>A private app still needs Data safety, a privacy policy, and a content rating.</li>" +
+           "</ul>"},
+      i:{id:"<ul>" +
+           "<li><b>Unlisted:</b> app harus sudah lolos App Review, lalu ajukan lewat formulir permintaan Unlisted App Distribution di Apple Developer — bukan sakelar di App Store Connect. Perpindahan diproses manual dan berlaku untuk semua versi &amp; wilayah.</li>" +
+           "<li><b>Unlisted bukan kontrol akses:</b> siapa pun yang punya link bisa mengunduh, jadi pembatasan sebenarnya tetap harus di lapisan login.</li>" +
+           "<li><b>Custom App:</b> minta Organization ID ABM/ASM tiap klien; tentukan gratis atau volume purchase.</li>" +
+           "<li><b>Enterprise Program:</b> syarat kelayakan ketat dan banyak pengajuan ditolak; sertifikat serta profil harus diperpanjang, dan pencabutan mematikan app di semua perangkat.</li>" +
+           "<li>Semua jalur ini tetap terikat kewajiban privasi, permission, dan kelengkapan app.</li>" +
+           "</ul>",
+         en:"<ul>" +
+           "<li><b>Unlisted:</b> the app must pass App Review first, then request it through Apple Developer's Unlisted App Distribution request form — there is no switch in App Store Connect. The change is processed manually and applies to every version and region.</li>" +
+           "<li><b>Unlisted is not access control:</b> anyone holding the link can download, so real restriction still has to live behind sign-in.</li>" +
+           "<li><b>Custom App:</b> collect each customer's ABM/ASM Organization ID; decide free or volume purchase.</li>" +
+           "<li><b>Enterprise Program:</b> eligibility is strict and many applications are refused; certificates and profiles need renewal, and revocation kills the app on every device.</li>" +
+           "<li>All of these routes still carry the privacy, permission, and completeness obligations.</li>" +
+           "</ul>"}}},
+
+  {id:"demo", r:"must",
+   t:{id:"Akun demo untuk app di balik login", en:"Demo account for a login-gated app"},
+   d:{id:"Akun aktif selama review, berisi data contoh yang cukup untuk melihat semua fitur utama, tanpa 2FA/OTP, tanpa pembatasan wilayah atau IP.",
+      en:"An account that stays live through review, holds enough sample data to exercise every main feature, has no 2FA/OTP, and no region or IP restriction."},
+   p:{a:{id:"Play Console → App content → App access: pilih \"All or some functionality is restricted\" dan isi kredensial + langkah reproduksi per fitur.",
+         en:"Play Console → App content → App access: choose \"All or some functionality is restricted\" and add credentials plus reproduction steps per feature."},
+      i:{id:"App Store Connect → App Review Information → Sign-in required. Reviewer Apple umumnya menguji dari jaringan AS.",
+         en:"App Store Connect → App Review Information → Sign-in required. Apple reviewers typically test from US networks."}}},
+
+  {id:"thirdlogin", r:"must",
+   t:{id:"Login pihak ketiga", en:"Third-party sign-in"},
+   p:{a:{id:"Tidak ada kewajiban menyediakan alternatif login. Pastikan saja alur Google/Facebook Sign-In tidak memblokir reviewer.",
+         en:"No obligation to offer an alternative sign-in. Just make sure the Google/Facebook flow does not block the reviewer."},
+      i:{id:"Guideline <b>4.8</b>: app yang memakai login sosial sebagai cara utama membuat akun wajib menyediakan alternatif setara (Sign in with Apple). Pengecualian: sistem akun milik perusahaan sendiri, akun enterprise/pendidikan yang sudah ada, dan app klien untuk satu layanan pihak ketiga. Klaim pengecualian secara eksplisit di review notes.",
+         en:"Guideline <b>4.8</b>: apps using social login as the primary way to create an account must offer an equivalent privacy-preserving option (Sign in with Apple). Exemptions: your own company account system, existing enterprise/education accounts, and single-service client apps. State the exemption explicitly in the review notes."}}},
+
+  {id:"perm-min", r:"must",
+   t:{id:"Permission seminimal fungsi", en:"Permissions cut to what ships"},
+   d:{id:"Setiap permission harus dipakai fitur yang terlihat di app. Hapus sisa permission dari eksperimen atau library yang sudah tidak dipakai.",
+      en:"Every permission must back a visible feature. Strip leftovers from experiments and dependencies you no longer ship."},
+   p:{a:{id:"Cek manifest hasil merge (termasuk yang disuntik library). Permission sensitif butuh formulir deklarasi: <code>ACCESS_BACKGROUND_LOCATION</code>, <code>QUERY_ALL_PACKAGES</code>, SMS/Call Log, <code>MANAGE_EXTERNAL_STORAGE</code>, AccessibilityService, <code>REQUEST_INSTALL_PACKAGES</code>, media foto/video, full-screen intent, <code>SCHEDULE_EXACT_ALARM</code>.",
+         en:"Check the merged manifest (including library-injected entries). Sensitive permissions need a declaration form: <code>ACCESS_BACKGROUND_LOCATION</code>, <code>QUERY_ALL_PACKAGES</code>, SMS/Call Log, <code>MANAGE_EXTERNAL_STORAGE</code>, AccessibilityService, <code>REQUEST_INSTALL_PACKAGES</code>, photo/video media, full-screen intent, <code>SCHEDULE_EXACT_ALARM</code>."},
+      i:{id:"Setiap string <code>NS…UsageDescription</code> harus spesifik dan menyebut manfaat bagi user, dalam bahasa listing. Jangan mendeklarasikan izin yang lebih luas dari yang dipakai — mis. lokasi <i>Always</i> padahal app hanya memakai <i>when in use</i>.",
+         en:"Every <code>NS…UsageDescription</code> string must be specific and state the user benefit, in the listing language. Never declare a broader permission than you use — e.g. <i>Always</i> location when the app only needs <i>when in use</i>."}}},
+
+  {id:"purpose", r:"must",
+   t:{id:"Purpose string spesifik, bukan kalimat generik", en:"Purpose strings are specific, not generic"},
+   d:{id:"Rumusnya: fitur konkret + kapan data diambil + apa yang terjadi dengan datanya. Kalimat seperti \"dibutuhkan untuk fungsionalitas aplikasi\" adalah pola tolakan klasik karena reviewer tidak bisa mencocokkan izin dengan fitur.",
+      en:"The formula: concrete feature + when the data is taken + what happens to it. A line like \"required for app functionality\" is a classic rejection pattern — the reviewer cannot match the permission to a feature."},
+   p:{a:{id:"<p>Android tidak punya purpose string di manifest. Padanannya ada empat, dan keempatnya harus sejalan:</p><ul>" +
+           "<li>Dialog rationale buatan sendiri sebelum dialog izin sistem.</li>" +
+           "<li>Teks tujuan pada Data safety.</li>" +
+           "<li>Justifikasi + video pada Permissions Declaration Form untuk izin sensitif.</li>" +
+           "<li>Penjelasan di deskripsi listing.</li>" +
+           "</ul><p class='note'>Pilih izin yang paling sempit: lokasi perkiraan bila presisi tidak perlu, photo picker daripada izin media penuh.</p>",
+         en:"<p>Android has no manifest purpose string. It has four equivalents, and all four must agree:</p><ul>" +
+           "<li>Your own rationale dialog before the system prompt.</li>" +
+           "<li>The purpose text in Data safety.</li>" +
+           "<li>Justification plus video on the Permissions Declaration Form for sensitive permissions.</li>" +
+           "<li>The explanation in the store listing description.</li>" +
+           "</ul><p class='note'>Pick the narrowest permission: approximate location when precision is not needed, the photo picker over full media access.</p>"},
+      i:{id:"<p>Guideline 5.1.1 menilai isi tiap <code>NS…UsageDescription</code>.</p>" +
+           "<dl class='kv'>" +
+           "<dt>❌</dt><dd>\"App membutuhkan akses lokasi untuk fungsionalitas aplikasi.\"</dd>" +
+           "<dt>✅</dt><dd>\"Lokasi GPS diambil saat Anda menekan Clock In atau Clock Out untuk memverifikasi kehadiran. Lokasi tidak diambil saat aplikasi tidak digunakan.\"</dd>" +
+           "<dt>❌</dt><dd>\"Kami memerlukan izin kamera.\"</dd>" +
+           "<dt>✅</dt><dd>\"Kamera dipakai untuk memindai QR absensi dan memotret bukti kunjungan.\"</dd>" +
+           "</dl><ul>" +
+           "<li>Tulis dalam bahasa listing; lokalkan lewat <code>InfoPlist.strings</code> untuk tiap bahasa.</li>" +
+           "<li>Jangan membuka dengan \"App ini membutuhkan izin…\" atau menyebut \"diwajibkan oleh sistem\".</li>" +
+           "<li>Cukup 1–2 kalimat — teks panjang terpotong di dialog sistem.</li>" +
+           "<li>Jangan menyebut fitur yang belum ada di build ini.</li>" +
+           "</ul>",
+         en:"<p>Guideline 5.1.1 judges the content of every <code>NS…UsageDescription</code>.</p>" +
+           "<dl class='kv'>" +
+           "<dt>❌</dt><dd>\"The app needs location access for app functionality.\"</dd>" +
+           "<dt>✅</dt><dd>\"Your GPS location is read when you tap Clock In or Clock Out to verify attendance. Location is never read while the app is not in use.\"</dd>" +
+           "<dt>❌</dt><dd>\"We require camera permission.\"</dd>" +
+           "<dt>✅</dt><dd>\"The camera scans attendance QR codes and captures visit evidence you attach to a report.\"</dd>" +
+           "</dl><ul>" +
+           "<li>Write in the listing language; localise via <code>InfoPlist.strings</code> for each one.</li>" +
+           "<li>Do not open with \"This app requires permission…\" or cite \"required by the system\".</li>" +
+           "<li>One or two sentences — long text is truncated in the system dialog.</li>" +
+           "<li>Never name a feature that is not in this build.</li>" +
+           "</ul>"}}},
+
+  {id:"disclosure", r:"must",
+   t:{id:"Prominent disclosure sebelum minta data sensitif", en:"Prominent disclosure before sensitive data"},
+   d:{id:"Dialog buatan sendiri sebelum dialog izin sistem: data apa yang diambil, untuk apa, dan apakah diambil saat app tidak aktif. Simpan screenshot alurnya sebagai bukti.",
+      en:"Your own dialog before the system permission prompt: what is collected, what for, and whether it happens while the app is not in use. Keep a screenshot of the flow as evidence."},
+   p:{a:{id:"Diwajibkan kebijakan User Data Play untuk lokasi dan data pribadi. Play kadang meminta video/screenshot alur ini saat review.",
+         en:"Required by Play's User Data policy for location and personal data. Play may ask for a video or screenshot of the flow during review."},
+      i:{id:"Tidak diwajibkan sebagai layar terpisah, tapi tetap praktik baik: minta izin pada saat konteksnya jelas (di layar fitur), bukan saat splash screen.",
+         en:"Not mandated as a separate screen, but still good practice: ask in context, on the feature screen, never at the splash screen."}}},
+
+  {id:"bglocation", r:"rec",
+   t:{id:"Lokasi latar belakang & akses berdurasi panjang", en:"Background location & long-lived access"},
+   d:{id:"Hindari bila tidak esensial — ini pemicu review tambahan paling mahal waktunya di kedua store.",
+      en:"Avoid unless essential — it is the most time-expensive extra review on either store."},
+   p:{a:{id:"<code>ACCESS_BACKGROUND_LOCATION</code> butuh Permissions Declaration Form + video demo yang menunjukkan fitur yang memerlukannya.",
+         en:"<code>ACCESS_BACKGROUND_LOCATION</code> requires the Permissions Declaration Form plus a demo video showing the feature that needs it."},
+      i:{id:"Lokasi <i>Always</i> harus dijustifikasi di review notes dan memicu peringatan berkala ke pengguna; hapus key-nya bila hanya memakai when-in-use.",
+         en:"<i>Always</i> location must be justified in the review notes and triggers periodic user warnings; drop the key if you only use when-in-use."}}},
+
+  {id:"complete", r:"must",
+   t:{id:"App lengkap, tanpa fitur tersembunyi", en:"App is complete, with nothing hidden"},
+   d:{id:"Tanpa layar \"coming soon\", tombol mati, placeholder, atau konten uji. Tanpa feature flag yang mengubah perilaku setelah review — keduanya pelanggaran serius.",
+      en:"No \"coming soon\" screens, dead buttons, placeholders, or test content. No feature flags that change behaviour after review — both are serious violations."},
+   p:{a:{id:"Kebijakan Minimum Functionality: app yang hanya membungkus website atau tidak berfungsi akan ditolak.",
+         en:"Minimum Functionality policy: apps that merely wrap a website or do not work get rejected."},
+      i:{id:"Guideline 2.1 (kelengkapan), 2.3.1 (fitur tersembunyi), 4.2 (fungsi minimum). Crash sekali saja pada perangkat reviewer = tolakan.",
+         en:"Guideline 2.1 (completeness), 2.3.1 (hidden features), 4.2 (minimum functionality). A single crash on the reviewer's device means rejection."}}},
+
+  {id:"payments", r:"must",
+   t:{id:"Pembayaran & konten digital", en:"Payments & digital content"},
+   d:{id:"Jika app menjual konten atau langganan digital, keduanya mewajibkan sistem pembayaran store dengan pengecualian tertentu. Barang/jasa fisik memakai pembayaran pihak ketiga.",
+      en:"If the app sells digital content or subscriptions, both stores require their billing system with limited exemptions. Physical goods and services use third-party payment."},
+   p:{a:{id:"Google Play Billing wajib untuk konten digital; ada pengecualian untuk app enterprise/produktivitas yang lisensinya dibeli organisasi.",
+         en:"Google Play Billing is mandatory for digital content; exemptions exist for enterprise/productivity apps licensed by an organisation."},
+      i:{id:"Guideline 3.1.1: dilarang mengarahkan ke pembayaran eksternal untuk konten digital. App perusahaan yang lisensinya dibeli di luar app (\"reader\"/enterprise) punya jalur pengecualian.",
+         en:"Guideline 3.1.1: no steering to external payment for digital content. Company apps licensed outside the app (reader/enterprise pattern) have an exemption path."}}}
+ ]},
+
+{
+ id:"build", t:{id:"Build & signing", en:"Build & signing"},
+ items:[
+  {id:"appid", r:"must",
+   t:{id:"Identitas aplikasi final", en:"App identity is final"},
+   d:{id:"Application ID / Bundle ID tidak bisa diubah setelah rilis pertama. Pastikan sama lintas platform bila memungkinkan, dan cocok dengan konfigurasi Firebase/OAuth.",
+      en:"The Application ID / Bundle ID cannot change after the first release. Keep it identical across platforms where possible, and matched to your Firebase/OAuth configuration."}},
+
+  {id:"version", r:"must",
+   t:{id:"Versi & nomor build naik", en:"Version & build number incremented"},
+   p:{a:{id:"<code>versionCode</code> harus lebih besar dari rilis sebelumnya (integer, tidak boleh turun); <code>versionName</code> untuk manusia.",
+         en:"<code>versionCode</code> must exceed the previous release (integer, never decreasing); <code>versionName</code> is the human-facing string."},
+      i:{id:"<code>CFBundleShortVersionString</code> (marketing) + <code>CFBundleVersion</code> (build) unik per unggahan; build number boleh naik tanpa menaikkan versi marketing.",
+         en:"<code>CFBundleShortVersionString</code> (marketing) plus a unique <code>CFBundleVersion</code> per upload; the build number can rise without bumping the marketing version."}}},
+
+  {id:"signing", r:"must",
+   t:{id:"Penandatanganan rilis", en:"Release signing"},
+   p:{a:{id:"<ul><li>Upload keystore dibuat dan di-backup di password manager perusahaan.</li><li><code>key.properties</code> di luar version control.</li><li><code>signingConfigs.release</code> memakai keystore rilis, <b>bukan debug</b>.</li><li>Play App Signing aktif sejak rilis pertama.</li></ul><pre>jarsigner -verify -verbose:summary app-release.aab</pre>",
+         en:"<ul><li>Upload keystore created and backed up in the company password manager.</li><li><code>key.properties</code> kept out of version control.</li><li><code>signingConfigs.release</code> uses the release keystore, <b>not debug</b>.</li><li>Play App Signing enabled from the first release.</li></ul><pre>jarsigner -verify -verbose:summary app-release.aab</pre>"},
+      i:{id:"<ul><li>Distribution certificate + App Store provisioning profile (atau automatic signing dengan Team yang benar).</li><li>Capability aktif sesuai fitur: Push Notifications, Sign in with Apple, Associated Domains.</li><li><code>aps-environment</code> = <b>production</b> untuk build rilis.</li><li>APNs Auth Key (.p8) sudah diunggah ke penyedia push.</li></ul>",
+         en:"<ul><li>Distribution certificate plus App Store provisioning profile (or automatic signing with the right Team).</li><li>Capabilities enabled to match features: Push Notifications, Sign in with Apple, Associated Domains.</li><li><code>aps-environment</code> = <b>production</b> for release builds.</li><li>APNs Auth Key (.p8) uploaded to your push provider.</li></ul>"}}},
+
+  {id:"artifact", r:"must",
+   t:{id:"Format artefak unggahan", en:"Upload artifact format"},
+   p:{a:{id:"<b>AAB</b> (Android App Bundle) — APK ditolak untuk app baru. Uji hasil bundle lewat internal testing atau bundletool sebelum production.",
+         en:"<b>AAB</b> (Android App Bundle) — APKs are rejected for new apps. Test the produced bundle via internal testing or bundletool before production."},
+      i:{id:"<b>IPA</b> lewat Xcode Organizer, Transporter, atau <code>xcrun altool</code>. Tunggu email \"processing complete\" sebelum submit.",
+         en:"<b>IPA</b> via Xcode Organizer, Transporter, or <code>xcrun altool</code>. Wait for the \"processing complete\" email before submitting."}}},
+
+  {id:"sdk", r:"must",
+   t:{id:"Target SDK / platform minimum", en:"Target SDK / platform minimum"},
+   p:{a:{id:"Target API level minimum <b>35 (Android 15)</b> untuk app baru dan update sejak 31 Agustus 2025; menjadi <b>36</b> mulai 31 Agustus 2026. 64-bit wajib. Cek deadline terbaru di dashboard Play Console.",
+         en:"Minimum target API level <b>35 (Android 15)</b> for new apps and updates since 31 August 2025; moving to <b>36</b> on 31 August 2026. 64-bit is mandatory. Check the current deadline on the Play Console dashboard."},
+      i:{id:"Build harus memakai SDK iOS yang diwajibkan Apple (umumnya SDK tahun berjalan, berlaku mulai April tahun berikutnya). Perhatikan deprecation seperti <code>UIRequiresFullScreen</code> yang diabaikan di iPadOS terbaru.",
+         en:"Build against the iOS SDK Apple currently requires (usually that year's SDK, enforced from the following April). Watch deprecations such as <code>UIRequiresFullScreen</code>, ignored on recent iPadOS."}}},
+
+  {id:"symbols", r:"rec",
+   t:{id:"Obfuscation & simbol crash", en:"Obfuscation & crash symbols"},
+   p:{a:{id:"R8/ProGuard aktif dengan rules untuk reflection; unggah <code>mapping.txt</code> ke Play agar stack trace terbaca. Flutter: <code>--obfuscate --split-debug-info=</code>.",
+         en:"Enable R8/ProGuard with rules for reflection; upload <code>mapping.txt</code> to Play so stack traces stay readable. Flutter: <code>--obfuscate --split-debug-info=</code>."},
+      i:{id:"Sertakan dSYM saat upload (Xcode \"Include app symbols\") dan arsipkan salinannya; tanpa itu crash report tidak bisa dibaca.",
+         en:"Include dSYMs at upload (Xcode \"Include app symbols\") and archive a copy; without them crash reports are unreadable."}}},
+
+  {id:"clean-build", r:"must",
+   t:{id:"Build produksi bersih", en:"Production build is clean"},
+   d:{id:"Endpoint produksi (bukan dev/staging), log sensitif mati, debug banner mati, tanpa test account hardcoded, tanpa file konfigurasi rahasia yang ikut dibundel sebagai aset.",
+      en:"Production endpoints (not dev/staging), sensitive logging off, debug banner off, no hardcoded test accounts, no secret config files bundled as assets."}},
+
+  {id:"tag", r:"rec",
+   t:{id:"Rilis ditandai & artefak diarsipkan", en:"Release tagged & artifacts archived"},
+   d:{id:"Tag git, changelog, dan simpan artefak (AAB/IPA) beserta mapping/dSYM di storage internal. Tanpa ini, debugging crash versi lama jadi tebakan.",
+      en:"A git tag, a changelog, and archived artifacts (AAB/IPA) with their mapping/dSYM in internal storage. Without them, debugging an old version's crash is guesswork."}}
+ ]},
+
+{
+ id:"qa", t:{id:"QA pra-submit", en:"Pre-submission QA"},
+ items:[
+  {id:"fresh", r:"must",
+   t:{id:"Uji instalasi bersih dari build rilis", en:"Clean-install test of the release build"},
+   d:{id:"Perangkat fisik, bukan build debug atau hot reload: fresh install → onboarding → login → fitur utama → logout → login ulang.",
+      en:"On a physical device, not a debug build or hot reload: fresh install → onboarding → sign-in → main flows → sign-out → sign-in again."},
+   p:{a:{id:"Uji lewat internal testing track agar yang diuji benar-benar artefak yang di-sign dan diproses Play.",
+         en:"Test through the internal testing track so what you exercise is the artifact Play actually signed and processed."},
+      i:{id:"Uji lewat TestFlight internal minimal satu putaran — perilaku push dan entitlement berbeda dari build Debug.",
+         en:"Run at least one TestFlight internal round — push behaviour and entitlements differ from Debug builds."}}},
+
+  {id:"perm-denied", r:"must",
+   t:{id:"Semua state penolakan izin", en:"Every permission-denied state"},
+   d:{id:"Izin ditolak, ditolak permanen, layanan lokasi mati, mode pesawat, notifikasi dimatikan dari setelan sistem: app tidak boleh crash dan harus memberi pesan yang jelas beserta jalan keluarnya.",
+      en:"Denied, permanently denied, location services off, airplane mode, notifications disabled in system settings: the app must not crash and must explain the way out."}},
+
+  {id:"network", r:"must",
+   t:{id:"Kondisi jaringan buruk & error server", en:"Poor network & server errors"},
+   d:{id:"Timeout, 401 token kedaluwarsa, 500, respons kosong: harus ada empty state dan error state, bukan layar putih atau spinner abadi.",
+      en:"Timeouts, 401 expired token, 500s, empty responses: show real empty and error states, not a white screen or an eternal spinner."}},
+
+  {id:"display", r:"must",
+   t:{id:"Tema, skala font, dan ukuran layar", en:"Theme, font scale, and screen sizes"},
+   d:{id:"Mode gelap & terang, ukuran teks aksesibilitas terbesar, perangkat kecil dan besar, notch/dynamic island, dan area aman keyboard.",
+      en:"Dark and light mode, the largest accessibility text size, small and large devices, notch/dynamic island, and keyboard safe areas."},
+   p:{a:{id:"Uji juga tombol navigasi gestur vs 3-tombol, dan display cutout pada perangkat lebar.",
+         en:"Also test gesture vs 3-button navigation, and display cutouts on wide devices."},
+      i:{id:"Uji iPhone terkecil yang didukung dan, bila iPad didukung, window yang bisa diubah ukurannya di iPadOS terbaru.",
+         en:"Test the smallest supported iPhone and, if iPad is supported, resizable windows on recent iPadOS."}}},
+
+  {id:"push", r:"rec",
+   t:{id:"Notifikasi di semua state aplikasi", en:"Notifications across app states"},
+   d:{id:"Foreground, background, dan terminated; termasuk deep link dari notifikasi dan perilaku setelah izin ditolak.",
+      en:"Foreground, background, and terminated; including deep links from a notification and behaviour after the permission is denied."},
+   p:{a:{id:"Cek channel notifikasi, ikon status bar monokrom, dan permintaan <code>POST_NOTIFICATIONS</code> di Android 13+.",
+         en:"Check the notification channel, a monochrome status-bar icon, and the <code>POST_NOTIFICATIONS</code> request on Android 13+."},
+      i:{id:"Uji dengan build TestFlight (APNs production), bukan simulator; pastikan badge dan suara berperilaku benar.",
+         en:"Test with a TestFlight build (production APNs), not the simulator; verify badge and sound behaviour."}}},
+
+  {id:"analyze", r:"must",
+   t:{id:"Analyzer & test bersih", en:"Analyzer & tests clean"},
+   d:{id:"Nol error dan nol warning dari linter/analyzer, unit dan integration test lulus, dependensi tidak ada yang deprecated kritikal.",
+      en:"Zero linter/analyzer errors and warnings, unit and integration tests passing, no critically deprecated dependencies."}},
+
+  {id:"asset-verify", r:"must",
+   t:{id:"Verifikasi teknis aset sebelum unggah", en:"Technical asset check before upload"},
+   d:{id:"Periksa dimensi, rasio, dan alpha channel setiap aset — kesalahan di sini menghentikan proses unggah di menit terakhir.",
+      en:"Check dimensions, ratio, and alpha channel on every asset — a mistake here stalls the upload at the last minute."},
+   p:{a:{id:"Rasio harus tepat 16:9 atau 9:16; feature graphic 1024 × 500 tanpa alpha.<pre>sips -g pixelWidth -g pixelHeight -g hasAlpha shots/*.png</pre>",
+         en:"The ratio must be exactly 16:9 or 9:16; feature graphic 1024 × 500 without alpha.<pre>sips -g pixelWidth -g pixelHeight -g hasAlpha shots/*.png</pre>"},
+      i:{id:"Ikon 1024 dan semua screenshot harus <code>hasAlpha: no</code> dan berukuran persis salah satu resolusi resmi.<pre>sips -g pixelWidth -g pixelHeight -g hasAlpha shots/*.png icon.png</pre>",
+         en:"The 1024 icon and every screenshot must report <code>hasAlpha: no</code> and match an official resolution exactly.<pre>sips -g pixelWidth -g pixelHeight -g hasAlpha shots/*.png icon.png</pre>"}}}
+ ]},
+
+{
+ id:"submit", t:{id:"Submit & review", en:"Submit & review"},
+ items:[
+  {id:"notes", r:"must",
+   t:{id:"Review notes ditulis, bukan dikosongkan", en:"Review notes written, not left blank"},
+   d:{id:"Jelaskan model akses, kredensial demo, langkah mencoba tiap fitur utama, alasan setiap permission, dan pengecualian kebijakan yang Anda klaim beserta dasarnya.",
+      en:"Explain the access model, demo credentials, steps to exercise each main feature, the reason for every permission, and any policy exemption you claim with its basis."},
+   p:{a:{id:"Isi di App access dan, bila ada permission sensitif, lampirkan tautan video demo pada formulir deklarasi.",
+         en:"Fill this in App access and, for sensitive permissions, attach a demo video link on the declaration form."},
+      i:{id:"App Review Information → Notes. Klaim pengecualian 4.8 dan 5.1.1(v) di sini bila relevan; jangan menunggu ditanya reviewer.",
+         en:"App Review Information → Notes. Claim the 4.8 and 5.1.1(v) exemptions here when relevant; do not wait to be asked."}}},
+
+  {id:"content-decl", r:"must",
+   t:{id:"Deklarasi konten & kelayakan", en:"Content & eligibility declarations"},
+   p:{a:{id:"App content: Data safety, Content rating (IARC), Target audience, Ads, News, Government, Financial features, Health, COVID. Semua harus hijau sebelum rollout.",
+         en:"App content: Data safety, Content rating (IARC), Target audience, Ads, News, Government, Financial features, Health, COVID. All must be green before rollout."},
+      i:{id:"Age rating, Content rights, Export compliance, Advertising Identifier, dan kelengkapan App Privacy sebelum tombol submit aktif.",
+         en:"Age rating, Content rights, Export compliance, Advertising Identifier, and a complete App Privacy section before submit unlocks."}}},
+
+  {id:"availability", r:"must",
+   t:{id:"Harga, negara, dan jadwal rilis", en:"Pricing, countries, and release timing"},
+   p:{a:{id:"Pilih negara distribusi, harga (gratis tidak bisa diubah jadi berbayar), dan strategi rollout: internal → closed → open → production.",
+         en:"Choose distribution countries, price (free cannot later become paid), and rollout strategy: internal → closed → open → production."},
+      i:{id:"Availability per negara, harga, dan pilihan rilis: otomatis, manual, atau terjadwal setelah lolos review.",
+         en:"Per-country availability, price, and release option: automatic, manual, or scheduled once approved."}}},
+
+  {id:"testing-req", r:"must",
+   t:{id:"Prasyarat pengujian sebelum production", en:"Testing prerequisites before production"},
+   p:{a:{id:"Akun developer <b>personal</b> yang dibuat setelah November 2023 wajib menjalankan closed testing dengan 12 tester selama 14 hari berturut-turut sebelum bisa rilis production. Akun <b>organisasi</b> tidak terkena syarat ini.",
+         en:"<b>Personal</b> developer accounts created after November 2023 must run closed testing with 12 testers for 14 consecutive days before production. <b>Organisation</b> accounts are exempt."},
+      i:{id:"Tidak ada kuota tester wajib, tapi satu putaran TestFlight internal praktis wajib agar bug entitlement/push tidak lolos ke review.",
+         en:"No mandatory tester quota, but one internal TestFlight round is effectively required so entitlement and push bugs do not reach review."}}},
+
+  {id:"submit-final", r:"must",
+   t:{id:"Submit dan pantau antrean review", en:"Submit and watch the review queue"},
+   d:{id:"Setelah submit: jangan mematikan akun demo, jangan mengubah backend secara breaking, dan siapkan orang yang memantau email review agar balasan tidak menunggu berhari-hari.",
+      en:"After submitting: keep the demo account alive, avoid breaking backend changes, and assign someone to watch the review email so replies do not sit for days."},
+   p:{a:{id:"Review beberapa jam hingga 7 hari; app baru dengan permission sensitif lebih lama.",
+         en:"Review takes a few hours to 7 days; new apps with sensitive permissions take longer."},
+      i:{id:"Review umumnya 24–48 jam. Tolakan berarti mengantre ulang, jadi balas lewat Resolution Center dengan penjelasan konkret, bukan submit ulang buta.",
+         en:"Review is usually 24–48 hours. A rejection means re-queuing, so reply in Resolution Center with concrete detail rather than blindly resubmitting."}}}
+ ]},
+
+{
+ id:"post", t:{id:"Pasca rilis", en:"After release"},
+ items:[
+  {id:"rollout", r:"rec",
+   t:{id:"Rilis bertahap", en:"Staged release"},
+   p:{a:{id:"Staged rollout 5% → 20% → 50% → 100%; bisa dihentikan (halt) bila crash rate naik.",
+         en:"Staged rollout 5% → 20% → 50% → 100%; can be halted if the crash rate climbs."},
+      i:{id:"Phased Release selama 7 hari; bisa dijeda kapan saja. Aktifkan bersama opsi rilis manual bila ingin kontrol penuh.",
+         en:"Phased Release over 7 days; pausable at any time. Pair it with manual release for full control."}}},
+
+  {id:"monitor", r:"must",
+   t:{id:"Pantau kesehatan 48 jam pertama", en:"Watch health for the first 48 hours"},
+   p:{a:{id:"Android vitals: crash rate, ANR rate, dan ambang batas buruk (bad behaviour threshold) yang bisa menurunkan visibilitas app.",
+         en:"Android vitals: crash rate, ANR rate, and the bad-behaviour thresholds that can suppress app visibility."},
+      i:{id:"Xcode Organizer → Crashes dan metrik App Store Connect; perhatikan crash saat peluncuran dan penggunaan memori.",
+         en:"Xcode Organizer → Crashes plus App Store Connect metrics; watch launch crashes and memory use."}}},
+
+  {id:"expiry", r:"must",
+   t:{id:"Kalender kedaluwarsa & tenggat", en:"Expiry & deadline calendar"},
+   d:{id:"Catat tanggalnya sekarang, jangan menunggu notifikasi store.",
+      en:"Put the dates in the calendar now; do not wait for the store to warn you."},
+   p:{a:{id:"Tenggat target API level berikutnya, masa berlaku upload key, dan periode kepatuhan kebijakan Play yang diumumkan berkala.",
+         en:"The next target API level deadline, upload key validity, and the Play policy compliance windows announced periodically."},
+      i:{id:"Distribution certificate (1 tahun), APNs Auth Key, provisioning profile, dan kewajiban SDK iOS terbaru setiap April.",
+         en:"Distribution certificate (1 year), APNs Auth Key, provisioning profiles, and the annual April deadline for the latest iOS SDK."}}},
+
+  {id:"policy-drift", r:"must",
+   t:{id:"Tinjau ulang privasi setiap ada SDK atau data baru", en:"Re-review privacy on every new SDK or data type"},
+   d:{id:"Menambah SDK analitik, permission, atau field data baru berarti memperbarui privacy policy, App Privacy, dan Data Safety pada hari yang sama — bukan pada rilis berikutnya.",
+      en:"Adding an analytics SDK, a permission, or a new data field means updating the privacy policy, App Privacy, and Data Safety the same day — not next release."}},
+
+  {id:"feedback", r:"rec",
+   t:{id:"Jalur ulasan & dukungan pengguna", en:"Review & support channel"},
+   d:{id:"Tentukan siapa yang membalas ulasan dan email dukungan, dan seberapa cepat. Ulasan yang tidak dibalas menurunkan peringkat dan menumpuk laporan bug yang sebenarnya bisa diperbaiki.",
+      en:"Decide who answers reviews and support email, and how fast. Unanswered reviews drag the rating down and bury bug reports you could have fixed."}}
+ ]}
+];
+
+/* >>> PROJECT-LAYER-START — diisi oleh prompt di README atau oleh tombol Simpan file. <<< */
+const PROJECT = { app:"", updated:"", done:[], fixed:[], notes:{} };
+let AUDIT = null;
+let REF = [];
+/* >>> PROJECT-LAYER-END <<< */
+
+/* ------------------------------------------------------------------ *
+ * PRIVACY — draft kebijakan privasi & halaman penghapusan data,
+ * ditampilkan lewat tombol "Template privasi" dan bisa disalin.
+ * Ganti semua placeholder <...> sebelum dipublikasikan.
+ * ------------------------------------------------------------------ */
+const PRIVACY = {
+  polid:"### Kebijakan Privasi Familia Mobile\n\n**Berlaku sejak:** `<tanggal>` · **Terakhir diperbarui:** `<tanggal>`\n\nKebijakan ini menjelaskan bagaimana `PT Angkasa Pura Indonesia (Injourney Airports)` (\"kami\"), beralamat di `<alamat lengkap>`, mengumpulkan dan memproses data pribadi Anda saat Anda menggunakan aplikasi **Familia Mobile** (\"Aplikasi\").\n\n> Untuk aplikasi internal karyawan, tambahkan: akun dibuat dan dikelola oleh perusahaan tempat Anda bekerja. Dalam hubungan itu perusahaan Anda bertindak sebagai **pengendali data** dan kami sebagai **prosesor data** yang memproses data atas instruksinya, sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi.\n\n#### 1. Data yang kami kumpulkan\n\nHapus baris yang tidak berlaku, dan jangan menambah kategori yang tidak benar-benar dikumpulkan — isian di sini harus sama persis dengan App Privacy dan Data Safety.\n\n| Kategori | Contoh data | Sumber |\n|---|---|---|\n| Identitas & kontak | Nama, alamat email, nomor telepon, foto profil | Anda, atau organisasi yang membuatkan akun Anda |\n| Kredensial masuk | Token sesi yang disimpan terenkripsi di perangkat; identitas akun Google/Apple bila Anda memakai login pihak ketiga | Anda |\n| Lokasi | Koordinat GPS, diambil `<sebutkan kapan tepatnya, mis. hanya saat Anda menekan tombol X>` | Perangkat Anda, dengan izin Anda |\n| Konten yang Anda buat | `<sesuaikan dengan fitur: catatan, unggahan, pengajuan, transaksi>` | Anda |\n| Data perangkat & notifikasi | Token notifikasi push, model perangkat, versi sistem operasi, status izin notifikasi | Perangkat Anda |\n| Diagnostik | Laporan error dan crash `<hapus bila tidak memakai SDK crash reporting>` | Perangkat Anda |\n\nKami **tidak** mengumpulkan: `<sebutkan yang relevan, mis. kontak telepon, isi galeri, riwayat penelusuran, data kesehatan, data keuangan, data biometrik>`. Aplikasi `<tidak mengakses / hanya mengakses>` lokasi Anda saat berjalan di latar belakang.\n\n#### 2. Tujuan pemrosesan\n\n- Mengautentikasi Anda dan menjaga sesi tetap aman.\n- `<tujuan utama fitur inti, satu baris per fitur yang memakai data pribadi>`\n- Mengirim notifikasi terkait `<sebutkan jenis notifikasi>`.\n- Menjaga keamanan sistem, mencegah penyalahgunaan, dan memenuhi kewajiban hukum.\n\nKami **tidak** menggunakan data Anda untuk iklan, penjualan data, pelacakan lintas aplikasi, atau profiling otomatis yang menimbulkan akibat hukum. `<Hapus atau sesuaikan bila tidak benar.>`\n\n#### 3. Dasar pemrosesan\n\nPemrosesan dilakukan berdasarkan `<pilih yang berlaku: persetujuan Anda, pelaksanaan kontrak/hubungan kerja, kepentingan sah kami, atau kewajiban hukum>`. Persetujuan untuk akses lokasi dan notifikasi dapat Anda tarik kapan saja melalui pengaturan perangkat.\n\n#### 4. Izin perangkat\n\n| Izin | Kapan diminta | Jika ditolak |\n|---|---|---|\n| `<Lokasi (saat aplikasi digunakan)>` | `<pada layar fitur yang membutuhkannya>` | `<fitur tersebut tidak dapat dipakai; fitur lain tetap berjalan>` |\n| `<Notifikasi>` | `<setelah login>` | `<Anda tidak menerima pemberitahuan>` |\n\n#### 5. Pembagian data\n\nData Anda dapat diakses oleh `<sebutkan: tim internal yang berwenang, atau perusahaan tempat Anda bekerja untuk aplikasi karyawan>` dan oleh penyedia layanan yang bertindak sebagai prosesor kami:\n\n| Pihak | Peran | Kebijakan |\n|---|---|---|\n| `<mis. Google LLC — Firebase Cloud Messaging>` | `<pengiriman notifikasi push>` | `<URL kebijakan privasinya>` |\n| `<penyedia hosting/cloud>` | `<hosting server aplikasi>` | `<URL>` |\n\nKami **tidak menjual** data pribadi Anda dan tidak membagikannya kepada pengiklan atau broker data. Data dapat diungkapkan bila diwajibkan oleh hukum atau permintaan resmi aparat berwenang.\n\n#### 6. Penyimpanan dan transfer\n\nData disimpan pada server di `<lokasi server>`. Bila terjadi transfer data ke luar wilayah Indonesia, kami memastikan tingkat pelindungan yang setara sesuai UU PDP.\n\n#### 7. Retensi\n\n`<Sebutkan per kategori: berapa lama disimpan dan kapan dihapus, mis. selama akun aktif dan <n> tahun setelahnya untuk kewajiban hukum.>` Token notifikasi dihapus saat Anda logout atau menghapus aplikasi, dan token sesi di perangkat dihapus saat logout.\n\n#### 8. Keamanan\n\nSeluruh komunikasi dengan server memakai enkripsi TLS/HTTPS. Token sesi disimpan pada penyimpanan aman perangkat (Keychain di iOS, Keystore di Android). Akses internal dibatasi berdasarkan peran. Meskipun demikian, tidak ada sistem yang sepenuhnya bebas risiko.\n\n#### 9. Hak Anda\n\nAnda berhak memperoleh informasi dan salinan data Anda, memperbaiki data yang tidak akurat, menghapus atau membatasi pemrosesan, menarik persetujuan, menyampaikan keberatan, dan mengajukan pengaduan kepada lembaga pengawas.\n\nHubungi kami di `privacy@injourneyairports.id`; kami menanggapi dalam `<mis. 30 hari kerja>`. `<Untuk aplikasi karyawan, tambahkan bahwa permintaan sebaiknya diajukan lebih dulu ke admin perusahaan Anda.>`\n\n#### 10. Penghapusan akun dan data\n\n`<Pilih salah satu:>`\n\n- **Akun dibuat sendiri oleh pengguna:** Anda dapat menghapus akun langsung dari dalam Aplikasi melalui `<menu>`, atau melalui `<URL formulir penghapusan data>`.\n- **Akun dibuatkan organisasi:** akun tidak dapat dibuat maupun dihapus sendiri melalui Aplikasi. Ajukan permintaan melalui `<URL formulir penghapusan data>` atau `privacy@injourneyairports.id` dari alamat email terdaftar Anda; kami memverifikasinya bersama admin organisasi Anda.\n\nData pribadi Anda dihapus atau dianonimkan dalam `<n>` hari kerja. Data yang wajib disimpan berdasarkan peraturan `<mis. ketenagakerjaan atau perpajakan>` dipertahankan hingga masa simpannya berakhir, lalu dihapus.\n\n#### 11. Anak-anak\n\nAplikasi ditujukan untuk pengguna berusia minimal `18` tahun dan tidak diperuntukkan bagi anak-anak. Kami tidak dengan sengaja mengumpulkan data anak.\n\n#### 12. Perubahan kebijakan\n\nPerubahan dipublikasikan di halaman ini beserta tanggal pembaruannya. Untuk perubahan material, kami memberi tahu melalui aplikasi atau email sebelum berlaku.\n\n#### 13. Kontak\n\n`PT Angkasa Pura Indonesia (Injourney Airports)` · `<alamat>` · Email privasi: `privacy@injourneyairports.id` · Dukungan: `support@injourneyairports.id`",
+  polen:"### Familia Mobile Privacy Policy\n\n**Effective:** `<date>` · **Last updated:** `<date>`\n\nThis policy explains how `PT Angkasa Pura Indonesia (Injourney Airports)` (\"we\"), located at `<full address>`, collects and processes your personal data when you use the **Familia Mobile** app (the \"App\").\n\n> For an internal employee app, add: accounts are created and managed by the company you work for, which acts as the data controller while we act as processor on its instructions, under Indonesian Law No. 27 of 2022 (PDP Law) or the equivalent law in your jurisdiction.\n\n**1. Data we collect** — delete whatever does not apply, and never list a category the app does not actually collect; this section must match your App Privacy and Data Safety answers exactly.\n\n| Category | Examples | Source |\n|---|---|---|\n| Identity & contact | Name, email address, phone number, profile photo | You, or the organisation that provisioned your account |\n| Sign-in credentials | Session token stored encrypted on your device; Google/Apple account identity if you use third-party sign-in | You |\n| Location | GPS coordinates, captured `<state exactly when, e.g. only when you tap X>` | Your device, with your permission |\n| Content you create | `<match your features: notes, uploads, submissions, transactions>` | You |\n| Device & notification data | Push notification token, device model, OS version, notification permission state | Your device |\n| Diagnostics | Error and crash reports `<remove if you ship no crash-reporting SDK>` | Your device |\n\nWe do **not** collect `<list what is relevant: phone contacts, photo library, browsing history, health, financial, or biometric data>`. The App `<does not access / only accesses>` your location while running in the background.\n\n**2. Purposes** — authenticating you and keeping your session secure; `<one line per feature that uses personal data>`; sending notifications about `<notification types>`; security, abuse prevention, and legal compliance. We do not use your data for advertising, data sales, cross-app tracking, or automated profiling with legal effects. `<Amend if untrue.>`\n\n**3. Legal basis** — `<pick what applies: your consent, performance of a contract or employment relationship, our legitimate interest, or a legal obligation>`. Consent for location and notifications can be withdrawn at any time in device settings.\n\n**4. Device permissions** — `<Location (while using the app)>`: requested `<on the feature screen that needs it>`; if denied, `<that feature is unavailable while the rest keeps working>`. `<Notifications>`: requested `<after sign-in>`; if denied, `<you receive no alerts>`.\n\n**5. Sharing** — `<authorised internal staff, or the company you work for in an employee app>` and our processors: `<e.g. Google LLC for Firebase Cloud Messaging>` and `<hosting provider>`. We do not sell personal data. Disclosure may occur where required by law.\n\n**6. Storage and transfers** — data is stored on servers located in `<location>`; any cross-border transfer is protected by safeguards equivalent to the applicable data protection law.\n\n**7. Retention** — `<state it per category: how long each is kept and when it is deleted>`. Notification tokens are deleted at sign-out or app removal; device session tokens are deleted at sign-out.\n\n**8. Security** — TLS/HTTPS for all traffic, session tokens in the device secure storage (Keychain / Android Keystore), role-based internal access. No system is entirely free of risk.\n\n**9. Your rights** — access, correction, deletion, restriction, withdrawal of consent, objection, and complaint to the supervisory authority. Write to `privacy@injourneyairports.id`; we respond within `<30 days>`. `<For an employee app, add that requests should go to the company admin first.>`\n\n**10. Account and data deletion** — `<either>` you can delete your account from inside the App via `<menu>` and at `<deletion request URL>`, `<or>` accounts are provisioned by your organisation and cannot be created or deleted in the App, so requests go through `<deletion request URL>` or `privacy@injourneyairports.id` from your registered address and are verified with your organisation's admin. Personal data is deleted or anonymised within `<n>` business days, except records retained under `<employment or tax law>` until their retention period ends.\n\n**11. Children** — the App is intended for users aged `18` and over and is not directed at children.\n\n**12. Changes** — updates are posted on this page with a revised date; material changes are announced in-app or by email beforehand.\n\n**13. Contact** — `PT Angkasa Pura Indonesia (Injourney Airports)`, `<address>`, `privacy@injourneyairports.id`, support `support@injourneyairports.id`.",
+  del:"Halaman publik terpisah, dapat dibuka tanpa login, misalnya\n`https://example.com/data-deletion`. Isi minimal:\n\n- Nama aplikasi: **Familia Mobile** (`com.injourneyairports.familia` (iOS bundle id sama))\n- Siapa yang dapat mengajukan, dan bagaimana identitas pemohon diverifikasi\n  (untuk aplikasi karyawan: sebutkan bahwa penghapusan diverifikasi bersama admin\n  organisasi karena akun dibuatkan oleh organisasi)\n- Formulir atau alamat email tujuan, beserta data yang perlu disertakan pemohon\n- Data apa yang dihapus, dan data apa yang ditahan beserta dasar hukum serta lama\n  penahanannya\n- SLA respons dan SLA penyelesaian\n- Email kontak untuk tindak lanjut\n\nTautkan halaman ini dari privacy policy, dari Play Console → Data safety → Data\ndeletion, dan dari dalam aplikasi (layar Profil atau Setelan)."
+};
+
+/* ------------------------------------------------------------------ *
+ * State
+ * ------------------------------------------------------------------ */
+// The file is the single source of truth: ticks always start from PROJECT.done
+// and are never written to the browser, so whoever opens this file sees the same
+// status. Only view preferences (language, platform tab) are remembered locally.
+const KEY = "storeChecklist.view|" + location.pathname;
+const state = { app:PROJECT.app || "", lang:"id", plat:"a", filter:"all", view:"check",
+                printing:false, cleared:false,
+                checked:new Set(PROJECT.done || []),
+                fixed:new Set(PROJECT.fixed || []) };
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){
+      const s = JSON.parse(raw);
+      if(s.lang === "en" || s.lang === "id") state.lang = s.lang;
+      if(s.plat === "a" || s.plat === "i") state.plat = s.plat;
+      if(["check","audit","ref"].includes(s.view)) state.view = s.view;
+    }
+  }catch(e){ /* storage unavailable — run with defaults */ }
+}
+function save(){
+  try{
+    localStorage.setItem(KEY, JSON.stringify({ lang:state.lang, plat:state.plat, view:state.view }));
+  }catch(e){ /* ignore quota / private mode */ }
+}
+
+const L = () => UI[state.lang];
+const tx = o => o ? (o[state.lang] || o.id) : "";
+const ALL = DATA.flatMap(s => s.items.map(i => i.id));
+
+/* ------------------------------------------------------------------ *
+ * Render
+ * ------------------------------------------------------------------ */
+function itemHTML(it){
+  const done = state.checked.has(it.id);
+  const tag = it.r === "must"
+    ? '<span class="tag tag-must">' + (state.lang === "id" ? "wajib" : "must") + '</span>'
+    : '<span class="tag tag-rec">' + (state.lang === "id" ? "disarankan" : "recommended") + '</span>';
+  let tabs = "";
+  if(it.p && state.printing){
+    tabs = '<div class="tabs">' +
+      '<div class="tabs-panel"><span class="plat-lbl">Android</span>' + tx(it.p.a) + '</div>' +
+      '<div class="tabs-panel"><span class="plat-lbl">iOS</span>' + tx(it.p.i) + '</div>' +
+    '</div>';
+  } else if(it.p){
+    const aSel = state.plat === "a";
+    tabs =
+      '<div class="tabs" data-tabs>' +
+        '<div class="tabs-bar" role="tablist">' +
+          '<button type="button" role="tab" data-plat="a" aria-selected="' + aSel + '">Android</button>' +
+          '<button type="button" role="tab" data-plat="i" aria-selected="' + !aSel + '">iOS</button>' +
+        '</div>' +
+        '<div class="tabs-panel" role="tabpanel">' + tx(it.p[state.plat]) + '</div>' +
+      '</div>';
+  }
+  const linked = (AUDIT ? AUDIT.findings.filter(f => f.item === it.id) : []);
+  const chips = linked.length
+    ? '<div class="jump-row">' + linked.map(f =>
+        '<button type="button" class="jump" data-goto-find="' + f.c + '" title="' +
+        tx(f.t).replace(/"/g, "&quot;") + '">' + f.c +
+        (state.fixed.has(f.c) ? " ✓" : "") + '</button>').join("") + '</div>'
+    : "";
+  return '<article class="item' + (done ? " is-done" : "") + '" id="item-' + it.id + '" data-id="' + it.id + '">' +
+    '<label class="chk"><input type="checkbox"' + (done ? " checked" : "") +
+      ' aria-label="' + tx(it.t).replace(/"/g, "&quot;") + '"><span class="box"></span></label>' +
+    '<div class="body">' +
+      '<div class="it-head"><h4 class="it-title">' + tx(it.t) + '</h4>' + tag + '</div>' +
+      (it.d ? '<p class="it-desc">' + tx(it.d) + '</p>' : "") +
+      noteHTML(it.id) +
+      chips +
+      tabs +
+    '</div></article>';
+}
+
+function dirtyCount(){
+  const base = new Set(PROJECT.done || []);
+  let n = ALL.filter(id => base.has(id) !== state.checked.has(id)).length;
+  const baseFix = new Set(PROJECT.fixed || []);
+  const codes = AUDIT ? AUDIT.findings.map(f => f.c) : [];
+  n += codes.filter(c => baseFix.has(c) !== state.fixed.has(c)).length;
+  if((state.app || "") !== (PROJECT.app || "")) n++;
+  return n;
+}
+function refreshDirty(){
+  const n = dirtyCount();
+  const b = document.getElementById("exportBtn");
+  b.classList.toggle("primary", n > 0);
+  b.textContent = n ? L().exportDirty.replace("{n}", n) : L().exportBtn;
+}
+let leavingAfterSave = false;
+window.addEventListener("beforeunload", e => {
+  if(!leavingAfterSave && dirtyCount()){ e.preventDefault(); e.returnValue = ""; }
+});
+
+/* An in-place write means the file on disk is now the truth — reload so the page
+   shows exactly what the file says. A download changes nothing here, so it stays. */
+function reloadAfterSave(res){
+  if(res !== "saved" && res !== "linked") return;
+  setTimeout(() => { leavingAfterSave = true; location.reload(); }, 900);
+}
+
+const NOTE_LBL = { ok:{id:"sudah", en:"done"}, todo:{id:"catatan", en:"note"}, blk:{id:"blocker", en:"blocker"} };
+function noteHTML(id){
+  const n = (PROJECT.notes || {})[id];
+  if(!n) return "";
+  const k = n.k || "todo";
+  return '<p class="it-note ' + k + '"><b>' + tx(NOTE_LBL[k]) + '</b>' + tx(n) + '</p>';
+}
+
+function kickerText(){
+  const stamp = PROJECT.updated ? L().statusAs + " " + PROJECT.updated : "";
+  return [state.app, stamp].filter(Boolean).join(" · ");
+}
+
+const scrollMem = { check:0, audit:0, ref:0 };
+
+/* Every re-render keeps the reader where they were. */
+function render(){
+  const y = window.scrollY;
+  renderNow();
+  window.scrollTo(0, y);
+}
+
+function renderNow(){
+  document.documentElement.lang = state.lang;
+  const t = L();
+  document.getElementById("pageTitle").textContent = t.title;
+  const appIn = document.getElementById("appName");
+  appIn.placeholder = t.appPh;
+  appIn.setAttribute("aria-label", t.appLbl);
+  if(appIn.value !== state.app) appIn.value = state.app;
+  document.getElementById("introKicker").textContent = kickerText();
+  document.title = state.app ? state.app + " — " + t.title : t.title;
+  document.getElementById("mark").textContent = t.mark;
+  document.getElementById("introTitle").textContent = t.introTitle;
+  document.getElementById("introBody").textContent = t.introBody;
+  document.getElementById("lgMust").textContent = t.lgMust;
+  document.getElementById("lgRec").textContent = t.lgRec;
+  document.getElementById("lgTabs").textContent = t.lgTabs;
+  document.getElementById("sideNote").textContent = t.note + " " + t.scoped;
+  document.getElementById("foot").textContent = t.foot;
+  document.getElementById("gaugeLbl").textContent = t.gauge;
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t[el.dataset.i18n]; });
+  document.getElementById("resetBtn").title = t.resetTitle;
+
+  const hasAudit = !!AUDIT, hasRef = REF.length > 0;
+  document.querySelector('#viewSeg button[data-view="audit"]').hidden = !hasAudit;
+  document.querySelector('#viewSeg button[data-view="ref"]').hidden = !hasRef;
+  if((state.view === "audit" && !hasAudit) || (state.view === "ref" && !hasRef)) state.view = "check";
+  document.getElementById("genHint").textContent = (hasAudit && hasRef) ? "" : t.genHint;
+  document.getElementById("intro").hidden = state.view !== "check";
+  document.getElementById("filterSeg").hidden = !(state.view === "check" || (state.view === "audit" && AUDIT));
+  if(state.view === "audit"){ renderAudit(); updateGauge(); renderNav(); syncSegs(); refreshDirty(); return; }
+  if(state.view === "ref"){ renderRef(); updateGauge(); renderNav(); syncSegs(); refreshDirty(); return; }
+
+  document.getElementById("sections").innerHTML = DATA.map((sec, n) => {
+    const total = sec.items.length;
+    const done = sec.items.filter(i => state.checked.has(i.id)).length;
+    const rows = sec.items.filter(i => {
+      if(state.filter === "open") return !state.checked.has(i.id);
+      if(state.filter === "done") return state.checked.has(i.id);
+      return true;
+    });
+    const body = rows.length ? rows.map(itemHTML).join("") : '<p class="empty">' + t.empty + '</p>';
+    return '<section class="sec" id="sec-' + sec.id + '">' +
+      '<div class="sec-head">' +
+        '<span class="sec-n">' + String(n + 1).padStart(2, "0") + '</span>' +
+        '<h3>' + tx(sec.t) + '</h3>' +
+        '<span class="bar"><i style="width:' + Math.round(done / total * 100) + '%"></i></span>' +
+        '<span class="sec-count">' + done + "/" + total + '</span>' +
+      '</div>' + body + '</section>';
+  }).join("");
+
+  updateCounters();
+  syncSegs();
+  refreshDirty();
+}
+
+function syncSegs(){
+  document.querySelectorAll("#platformSeg button").forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.plat === state.plat)));
+  document.querySelectorAll("#viewSeg button").forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.view === state.view)));
+  document.querySelectorAll("#filterSeg button").forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.filter === state.filter)));
+  document.querySelectorAll("#langSeg button").forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.lang === state.lang)));
+}
+
+/* ------------------------------------------------------------------ *
+ * Events
+ * ------------------------------------------------------------------ */
+document.getElementById("sections").addEventListener("change", e => {
+  const box = e.target.closest('input[type="checkbox"]');
+  if(!box) return;
+
+  const find = box.closest(".find");
+  if(find){
+    const code = find.dataset.code;
+    if(box.checked) state.fixed.add(code); else state.fixed.delete(code);
+    if(state.filter === "all"){
+      find.classList.toggle("is-done", box.checked);
+      auditCounters();
+    } else {
+      render();
+    }
+    return;
+  }
+
+  const item = box.closest(".item");
+  const id = item.dataset.id;
+  if(box.checked) state.checked.add(id); else state.checked.delete(id);
+  refreshDirty();
+  if(state.filter === "all"){
+    item.classList.toggle("is-done", box.checked);
+    updateCounters();
+  } else {
+    render();
+  }
+});
+
+function updateCounters(){
+  DATA.forEach(sec => {
+    const el = document.getElementById("sec-" + sec.id);
+    if(!el) return;
+    const total = sec.items.length;
+    const done = sec.items.filter(i => state.checked.has(i.id)).length;
+    el.querySelector(".bar i").style.width = Math.round(done / total * 100) + "%";
+    el.querySelector(".sec-count").textContent = done + "/" + total;
+  });
+  renderNav();
+  updateGauge();
+}
+
+function updateGauge(){
+  const auditView = state.view === "audit" && AUDIT;
+  const total = auditView ? AUDIT.findings.length : ALL.length;
+  const done = auditView
+    ? AUDIT.findings.filter(f => state.fixed.has(f.c)).length
+    : ALL.filter(id => state.checked.has(id)).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById("gaugeLbl").textContent = auditView ? L().gaugeAudit : L().gauge;
+  document.getElementById("pct").textContent = pct + "%";
+  document.getElementById("cDone").textContent = done;
+  document.getElementById("cLeft").textContent = total - done;
+  const circ = 2 * Math.PI * 24;
+  const ring = document.getElementById("ringFg");
+  ring.setAttribute("stroke-dasharray", (circ * pct / 100) + " " + circ);
+  ring.style.strokeLinecap = pct ? "round" : "butt";
+}
+
+function navRow(href, n, label, count, cls){
+  return '<a href="#' + href + '" class="' + (cls || "") + '">' +
+    '<span class="n">' + n + '</span><span class="t">' + label + '</span>' +
+    '<span class="c">' + (count || "") + '</span></a>';
+}
+
+function renderNav(){
+  const nav = document.getElementById("nav");
+  const t = L();
+  if(state.view === "audit"){
+    if(!AUDIT){ nav.innerHTML = ""; return; }
+    const sev = k => AUDIT.findings.filter(f => f.s === k).length;
+    nav.innerHTML =
+      navRow("a-identity", "··", t.identity, "") +
+      navRow("a-findings", "!", t.findings,
+             AUDIT.findings.filter(f => state.fixed.has(f.c)).length + "/" + AUDIT.findings.length) +
+      navRow("a-ok", "✓", t.okTitle, AUDIT.ok.length) +
+      (AUDIT.cards || []).map((c, n) => navRow("a-" + c.k, String(n + 1).padStart(2, "0"), tx(c.t), "")).join("");
+    return;
+  }
+  if(state.view === "ref"){
+    nav.innerHTML = REF.map((c, n) => navRow("r-" + n, String(n + 1).padStart(2, "0"), tx(c.t), "")).join("");
+    return;
+  }
+  nav.innerHTML = DATA.map((sec, n) => {
+    const total = sec.items.length;
+    const done = sec.items.filter(i => state.checked.has(i.id)).length;
+    return navRow("sec-" + sec.id, String(n + 1).padStart(2, "0"), tx(sec.t),
+                  done + "/" + total, done === total ? "done" : "");
+  }).join("");
+}
+
+function pointLabel(itemId){
+  const n = DATA.findIndex(sec => sec.items.some(i => i.id === itemId));
+  const sec = DATA[n];
+  if(!sec) return itemId;
+  return String(n + 1).padStart(2, "0") + " " + tx(sec.t) + " · " + itemTitleById(itemId);
+}
+
+let flashTimer = null;
+function jumpTo(selector){
+  const el = document.querySelector(selector);
+  if(!el) return;
+  el.scrollIntoView({ block:"center", behavior:"smooth" });
+  document.querySelectorAll(".is-target").forEach(n => n.classList.remove("is-target"));
+  el.classList.add("is-target");
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => el.classList.remove("is-target"), 2600);
+}
+
+function goToItem(itemId){
+  scrollMem[state.view] = window.scrollY;
+  state.view = "check";
+  state.filter = "all";
+  save(); renderNow();
+  jumpTo('#item-' + CSS.escape(itemId));
+}
+
+function goToFinding(code){
+  if(!AUDIT) return;
+  scrollMem[state.view] = window.scrollY;
+  state.view = "audit";
+  state.filter = "all";
+  save(); renderNow();
+  jumpTo('#find-' + CSS.escape(code));
+}
+
+function itemTitleById(id){
+  for(const sec of DATA){ const it = sec.items.find(i => i.id === id); if(it) return tx(it.t); }
+  return id;
+}
+
+function tallyHTML(){
+  const t = L();
+  const left = k => AUDIT.findings.filter(f => f.s === k && !state.fixed.has(f.c)).length;
+  const total = k => AUDIT.findings.filter(f => f.s === k).length;
+  const cell = (cls, k, label) =>
+    '<span class="pill ' + cls + '"><b>' + left(k) + '</b>' + label +
+    (total(k) !== left(k) ? ' <span style="opacity:.6">' + t.ofTotal.replace("{n}", total(k)) + '</span>' : "") + '</span>';
+  return cell("blk", "blk", t.blockers) + cell("high", "high", t.high) + cell("", "med", t.med) +
+    '<span class="pill ok"><b>' + AUDIT.ok.length + '</b>' + t.okLbl + '</span>';
+}
+
+function auditCounters(){
+  const tally = document.querySelector("#a-identity .tally");
+  if(tally) tally.innerHTML = tallyHTML();
+  renderNav();
+  updateGauge();
+  refreshDirty();
+}
+
+function renderAudit(){
+  const t = L();
+  const host = document.getElementById("sections");
+  if(!AUDIT){ host.innerHTML = '<p class="empty">' + t.noAudit + '</p>'; return; }
+  const sev = k => AUDIT.findings.filter(f => f.s === k).length;
+  const head = (id, title, extra) =>
+    '<div class="sec-head"><span class="sec-n">' + (extra || "··") + '</span><h3>' + title + '</h3>' +
+    '<span class="gen-chip">' + t.genChip + '</span></div>';
+
+  const rows = AUDIT.findings.filter(f => {
+    if(state.filter === "open") return !state.fixed.has(f.c);
+    if(state.filter === "done") return state.fixed.has(f.c);
+    return true;
+  });
+  const findings = rows.length ? rows.map(f =>
+    '<div class="find ' + f.s + (state.fixed.has(f.c) ? " is-done" : "") +
+      '" id="find-' + f.c + '" data-code="' + f.c + '">' +
+      '<label class="chk"><input type="checkbox"' + (state.fixed.has(f.c) ? " checked" : "") +
+        ' aria-label="' + f.c + '"><span class="box"></span></label>' +
+      '<span class="code-chip">' + f.c + '</span>' +
+      '<div><h4>' + tx(f.t) + '</h4>' +
+        (f.where ? '<p class="where">' + f.where + '</p>' : "") +
+        '<p class="fix">' + tx(f.f) + '</p>' +
+        (f.code ? '<pre>' + f.code.replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</pre>' : "") +
+        (f.item ? '<button type="button" class="jump" data-goto-item="' + f.item + '">' +
+                  t.linkedTo + pointLabel(f.item) + '</button>' : "") +
+      '</div></div>').join("") : '<p class="empty">' + t.empty + '</p>';
+
+  host.innerHTML =
+    '<section class="acard" id="a-identity">' + head("a-identity", t.auditTitle) +
+      '<div class="tally">' + tallyHTML() + '</div>' +
+      '<p class="tally-hint">' + t.fixedHint + '</p>' +
+      '<div class="acard-body"><p class="where" style="font-family:var(--mono);font-size:11px;color:var(--muted)">' +
+        t.auditSub.replace("{repo}", AUDIT.repo).replace("{commit}", AUDIT.commit).replace("{date}", AUDIT.date) +
+      '</p><table class="idtable">' +
+        AUDIT.identity.map(r => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>').join("") +
+      '</table></div></section>' +
+
+    '<section class="acard" id="a-findings">' + head("a-findings", t.findings, "!") + findings + '</section>' +
+
+    '<section class="acard" id="a-ok">' + head("a-ok", t.okTitle, "✓") +
+      '<ul class="oklist">' + AUDIT.ok.map(o => '<li>' + tx(o) + '</li>').join("") + '</ul></section>' +
+
+    (AUDIT.cards || []).map((c, n) =>
+      '<section class="acard" id="a-' + c.k + '">' +
+        head("a-" + c.k, tx(c.t), String(n + 1).padStart(2, "0")) +
+        '<div class="acard-body">' + tx(c.b) + '</div></section>').join("");
+}
+
+function sectionOf(itemId){
+  const sec = DATA.find(s => s.items.some(i => i.id === itemId));
+  return sec ? sec.id : "";
+}
+
+function renderRef(){
+  const t = L();
+  document.getElementById("sections").innerHTML = REF.map((c, n) =>
+    '<section class="acard" id="r-' + n + '">' +
+      '<div class="sec-head"><span class="sec-n">' + String(n + 1).padStart(2, "0") + '</span><h3>' + tx(c.t) + '</h3>' +
+      '<span class="gen-chip">' + t.genChip + '</span></div>' +
+      '<div class="acard-body">' + tx(c.b) + '</div></section>').join("");
+}
+
+document.getElementById("sections").addEventListener("click", e => {
+  const toItem = e.target.closest("[data-goto-item]");
+  if(toItem){ goToItem(toItem.dataset.gotoItem); return; }
+  const toFind = e.target.closest("[data-goto-find]");
+  if(toFind){ goToFinding(toFind.dataset.gotoFind); return; }
+
+  const tab = e.target.closest("[data-tabs] button");
+  if(!tab) return;
+  state.plat = tab.dataset.plat;
+  save();
+  render();
+});
+
+document.getElementById("platformSeg").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  state.plat = b.dataset.plat; save(); render();
+});
+document.getElementById("viewSeg").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  scrollMem[state.view] = window.scrollY;   // remember where this tab was
+  state.view = b.dataset.view;
+  save(); renderNow();
+  window.scrollTo(0, scrollMem[state.view] || 0);
+});
+document.getElementById("filterSeg").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  state.filter = b.dataset.filter; render();
+});
+document.getElementById("langSeg").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  state.lang = b.dataset.lang; save(); render();
+});
+document.getElementById("appName").addEventListener("input", e => {
+  state.app = e.target.value.trim();
+  refreshDirty();
+  document.getElementById("introKicker").textContent = kickerText();
+  document.title = state.app ? state.app + " — " + L().title : L().title;
+});
+const LAYER_START = "/* >>> PROJECT-LAYER-START";
+const LAYER_END = "/* >>> PROJECT-LAYER-END <<< */";
+
+function layerSource(){
+  if(state.cleared){
+    return 'const PROJECT = { app:"", updated:"", done:[], fixed:[], notes:{} };\n' +
+           'let AUDIT = null;\n' +
+           'let REF = [];';
+  }
+  const proj = {
+    app: state.app,
+    updated: new Date().toISOString().slice(0, 10),
+    done: ALL.filter(id => state.checked.has(id)),
+    fixed: AUDIT ? AUDIT.findings.map(f => f.c).filter(c => state.fixed.has(c)) : [],
+    notes: PROJECT.notes || {}
+  };
+  return 'const PROJECT = ' + JSON.stringify(proj, null, 1) + ';';
+}
+
+/* End index of the object literal that starts after `from`, including its
+   trailing semicolon. Brace counting, so a one-line PROJECT block and a
+   pretty-printed one both work. */
+function literalEnd(src, from){
+  let i = src.indexOf("{", from);
+  if(i < 0) return -1;
+  let depth = 0, str = null, esc = false;
+  for(; i < src.length; i++){
+    const ch = src[i];
+    if(str){
+      if(esc){ esc = false; continue; }
+      if(ch === "\\"){ esc = true; continue; }
+      if(ch === str) str = null;
+      continue;
+    }
+    if(ch === '"' || ch === "'" || ch === "`"){ str = ch; continue; }
+    if(ch === "/" && src[i + 1] === "/"){ i = src.indexOf("\n", i); if(i < 0) return -1; continue; }
+    if(ch === "/" && src[i + 1] === "*"){ i = src.indexOf("*/", i); if(i < 0) return -1; i++; continue; }
+    if(ch === "{"){ depth++; continue; }
+    if(ch === "}"){
+      depth--;
+      if(depth === 0){
+        let j = i + 1;
+        while(j < src.length && /\s/.test(src[j])) j++;
+        return src[j] === ";" ? j + 1 : i + 1;
+      }
+    }
+  }
+  return -1;
+}
+
+/* Rebuild this page's own source with a fresh project layer. */
+function buildFileSource(){
+  const root = document.documentElement.cloneNode(true);
+  root.querySelector("#sections").innerHTML = "";
+  root.querySelector("#nav").innerHTML = "";
+  root.querySelector("#printHead").innerHTML = "";
+  root.querySelectorAll(".modal").forEach(m => m.removeAttribute("open"));
+  root.querySelectorAll("textarea").forEach(t => { t.textContent = ""; });
+  root.querySelector("#appName").removeAttribute("value");
+  root.querySelectorAll("[hidden]").forEach(el => {
+    if(el.id !== "copyOk" && el.id !== "ppOk") el.removeAttribute("hidden");
+  });
+  const script = [...root.querySelectorAll("script")].pop();
+  const src = script.textContent;
+  const a = src.indexOf(LAYER_START), b = src.indexOf(LAYER_END);
+  if(a < 0 || b < 0) return null;
+
+  if(state.cleared){
+    // Wipe the whole layer: PROJECT, AUDIT, and REF all go.
+    script.textContent = src.slice(0, a) + LAYER_START +
+      " — diisi oleh prompt di README atau oleh tombol Simpan file. <<< */\n" +
+      layerSource() + "\n" + src.slice(b);
+  } else {
+    // Only PROJECT changes; AUDIT and REF keep their formatting and comments
+    // so the git diff stays readable.
+    // Anchored at line start so the sample inside the comment above is skipped.
+    const at = src.indexOf("\nconst PROJECT = {", a);
+    const pStart = at < 0 ? -1 : at + 1;
+    const pEnd = pStart < 0 ? -1 : literalEnd(src, pStart);
+    if(pStart < 0 || pEnd < 0 || pEnd > b) return null;
+    script.textContent = src.slice(0, pStart) + layerSource() + src.slice(pEnd);
+  }
+  return "<!doctype html>\n" + root.outerHTML + "\n";
+}
+
+let toastTimer = null;
+function showToast(msg, ms){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, ms || 4000);
+}
+
+/* The picked file handle is remembered, so the file is asked for once and every
+   later save overwrites it straight away. */
+const FS_DB = "storeChecklistFS", FS_STORE = "handles";
+function fsdb(){
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(FS_DB, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(FS_STORE);
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+async function readHandle(){
+  try{
+    const db = await fsdb();
+    return await new Promise(res => {
+      const r = db.transaction(FS_STORE, "readonly").objectStore(FS_STORE).get(location.pathname);
+      r.onsuccess = () => res(r.result || null);
+      r.onerror = () => res(null);
+    });
+  }catch(e){ return null; }
+}
+async function writeHandle(handle){
+  try{
+    const db = await fsdb();
+    await new Promise((res, rej) => {
+      const tx = db.transaction(FS_STORE, "readwrite");
+      const store = tx.objectStore(FS_STORE);
+      if(handle) store.put(handle, location.pathname); else store.delete(location.pathname);
+      tx.oncomplete = res;
+      tx.onerror = () => rej(tx.error);
+      tx.onabort = () => rej(tx.error);
+    });
+  }catch(e){ /* private mode or an unclonable handle — the picker asks again next time */ }
+}
+
+async function saveFile(){
+  const source = buildFileSource();
+  if(!source) return "nolayer";
+  const blob = new Blob([source], { type:"text/html" });
+  const name = (location.pathname.split("/").pop() || "store-launch-checklist.html");
+  if(window.showSaveFilePicker){
+    try{
+      let handle = await readHandle();
+      let linked = false;
+      if(handle){
+        let perm = await handle.queryPermission({ mode:"readwrite" });
+        if(perm !== "granted") perm = await handle.requestPermission({ mode:"readwrite" });
+        if(perm !== "granted") handle = null;
+      }
+      if(!handle){
+        handle = await window.showSaveFilePicker({
+          suggestedName: name,
+          types:[{ description:"HTML", accept:{ "text/html":[".html"] } }]
+        });
+        await writeHandle(handle);
+        linked = true;
+      }
+      const w = await handle.createWritable();
+      await w.write(blob); await w.close();
+      return linked ? "linked" : "saved";
+    }catch(err){
+      if(err && err.name === "AbortError") return "cancel";
+      await writeHandle(null);   // stale or moved file: forget it, fall back to a download
+    }
+  }
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = name;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 5000);
+  return location.protocol === "file:" ? "downloaded-file" : "downloaded";
+}
+
+function snippetText(){
+  if(state.cleared){
+    return 'const PROJECT = { app:"", updated:"", done:[], notes:{} };\n' +
+           'let AUDIT = null;\n' +
+           'let REF = [];';
+  }
+  const ids = ALL.filter(id => state.checked.has(id));
+  const lines = [];
+  let line = "  done:[";
+  ids.forEach((id, n) => {
+    const piece = JSON.stringify(id) + (n === ids.length - 1 ? "]," : ",");
+    if(line.length + piece.length > 74){ lines.push(line); line = "        "; }
+    line += piece;
+  });
+  lines.push(ids.length ? line : "  done:[],");
+  const today = new Date().toISOString().slice(0, 10);
+  const fixedList = AUDIT ? AUDIT.findings.map(f => f.c).filter(c => state.fixed.has(c)) : [];
+  return '  app:' + JSON.stringify(state.app) + ',\n' +
+         '  updated:' + JSON.stringify(today) + ',\n' +
+         '  fixed:' + JSON.stringify(fixedList) + ',\n' + lines.join("\n");
+}
+
+const modal = document.getElementById("modal");
+function openModal(){
+  const t = L();
+  document.getElementById("modalTitle").textContent = state.cleared ? t.modalTitleClear : t.modalTitle;
+  document.getElementById("modalBody").textContent = state.cleared ? t.modalBodyClear : t.modalBody;
+  document.getElementById("copySnippet").textContent = t.copy;
+  document.getElementById("saveFileBtn").textContent = state.cleared ? t.saveClean : t.saveFile;
+  document.getElementById("closeModal").textContent = t.close;
+  document.getElementById("copyOk").hidden = true;
+  const ta = document.getElementById("snippet");
+  ta.value = snippetText();
+  modal.setAttribute("open", "");
+  ta.focus(); ta.select();
+}
+function closeModal(){ modal.removeAttribute("open"); }
+
+document.getElementById("exportBtn").addEventListener("click", openModal);
+document.getElementById("closeModal").addEventListener("click", closeModal);
+modal.addEventListener("click", e => { if(e.target === modal) closeModal(); });
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape"){ closeModal(); ppModal.removeAttribute("open"); }
+});
+document.getElementById("saveFileBtn").addEventListener("click", async () => {
+  const flag = document.getElementById("copyOk");
+  const t = L();
+  flag.textContent = t.saving; flag.hidden = false;
+  const res = await saveFile();
+  if(res === "cancel"){ flag.hidden = true; return; }
+  flag.textContent = res === "saved" ? t.savedOk : res === "linked" ? t.savedLinked
+                     : res === "downloaded" ? t.savedDl
+                     : res === "downloaded-file" ? t.savedDlFile
+                     : res === "nolayer" ? t.saveNoLayer : t.saveErr;
+  if(res === "downloaded-file" || res === "nolayer") showToast(flag.textContent, 11000);
+  if(res === "saved" || res === "linked"){ showToast(t.savedReload, 3000); reloadAfterSave(res); }
+});
+
+document.getElementById("copySnippet").addEventListener("click", async () => {
+  const ta = document.getElementById("snippet");
+  ta.select();
+  let ok = false;
+  try{ await navigator.clipboard.writeText(ta.value); ok = true; }
+  catch(e){ try{ ok = document.execCommand("copy"); }catch(e2){ ok = false; } }
+  const flag = document.getElementById("copyOk");
+  flag.textContent = ok ? L().copied : "⌘C";
+  flag.hidden = false;
+});
+function buildPrintHead(){
+  const t = L();
+  const done = ALL.filter(id => state.checked.has(id)).length;
+  const pct = Math.round(done / ALL.length * 100);
+  const stamp = PROJECT.updated ? t.statusAs + " " + PROJECT.updated : "";
+  document.getElementById("printHead").innerHTML =
+    [state.app || t.title, t.title].filter(Boolean).join(" — ") +
+    '<span>' + [stamp, done + "/" + ALL.length + " (" + pct + "%)",
+                t.printedOn + " " + new Date().toISOString().slice(0, 10)]
+               .filter(Boolean).join(" · ") + '</span>';
+}
+window.addEventListener("beforeprint", () => {
+  state.printing = true;
+  buildPrintHead();
+  render();
+});
+window.addEventListener("afterprint", () => {
+  state.printing = false;
+  render();
+});
+/* ---- privacy template popup ---- */
+let ppKey = "polid";
+const ppModal = document.getElementById("ppModal");
+function paintPrivacy(){
+  const t = L();
+  document.getElementById("ppTitle").textContent = t.ppTitle;
+  document.getElementById("ppBody").textContent = t.ppBody;
+  document.getElementById("ppCopy").textContent = t.copy;
+  document.getElementById("ppClose").textContent = t.close;
+  document.getElementById("ppOk").hidden = true;
+  [...document.querySelectorAll("#ppTabs button")].forEach((b, i) => {
+    b.textContent = t.ppTabs[i];
+    b.setAttribute("aria-selected", String(b.dataset.pp === ppKey));
+  });
+  document.getElementById("ppText").value = PRIVACY[ppKey];
+}
+document.getElementById("privacyBtn").addEventListener("click", () => {
+  ppKey = state.lang === "en" ? "polen" : "polid";
+  paintPrivacy();
+  ppModal.setAttribute("open", "");
+  const ta = document.getElementById("ppText"); ta.focus(); ta.select();
+});
+document.getElementById("ppTabs").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  ppKey = b.dataset.pp; paintPrivacy();
+});
+document.getElementById("ppClose").addEventListener("click", () => ppModal.removeAttribute("open"));
+ppModal.addEventListener("click", e => { if(e.target === ppModal) ppModal.removeAttribute("open"); });
+document.getElementById("ppCopy").addEventListener("click", async () => {
+  const ta = document.getElementById("ppText"); ta.select();
+  let ok = false;
+  try{ await navigator.clipboard.writeText(ta.value); ok = true; }
+  catch(e){ try{ ok = document.execCommand("copy"); }catch(e2){ ok = false; } }
+  const flag = document.getElementById("ppOk");
+  flag.textContent = ok ? L().copied : "⌘C";
+  flag.hidden = false;
+});
+
+document.getElementById("printBtn").addEventListener("click", () => window.print());
+document.getElementById("resetBtn").addEventListener("click", async () => {
+  const t = L();
+  if(!confirm(t.resetConfirm)) return;
+  state.checked = new Set();
+  state.fixed = new Set();
+  state.app = "";
+  state.cleared = true;
+  PROJECT.app = ""; PROJECT.updated = ""; PROJECT.done = []; PROJECT.notes = {}; PROJECT.fixed = [];
+  AUDIT = null;
+  REF = [];
+  if(state.view !== "check") state.view = "check";
+  render();
+  showToast(t.saving, 20000);
+  const res = await saveFile();
+  if(res === "cancel"){ showToast(t.resetCancel, 8000); return; }
+  showToast(res === "saved" ? t.resetSaved : res === "linked" ? t.resetLinked
+            : res === "downloaded" ? t.resetDl : res === "downloaded-file" ? t.resetDlFile
+            : res === "nolayer" ? t.saveNoLayer : t.saveErr, 11000);
+  reloadAfterSave(res);
+});
+
+load();
+render();
+</script>
+
+
+
+
+
+
+</body></html>

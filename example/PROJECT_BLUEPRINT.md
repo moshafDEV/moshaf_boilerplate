@@ -1,4 +1,4 @@
-# PROJECT BLUEPRINT — example
+# PROJECT BLUEPRINT — Example App
 
 > This document describes the architecture, conventions, and code patterns used in this project.
 > Use it as a reference when adding a new feature, during PR review (manual or automated), or when onboarding a new developer.
@@ -29,6 +29,7 @@ lib/
 ├── app.dart               ← MaterialApp.router, wiring only, no business logic
 ├── main.dart
 ├── main_dev.dart          ← dev flavor entry point
+├── main_staging.dart      ← staging flavor entry point
 ├── main_prod.dart         ← prod flavor entry point
 │
 ├── core/
@@ -39,9 +40,11 @@ lib/
 │   │   └── loggers/       ← crashlytic_logger.dart
 │   ├── constants/         ← api_path_constant.dart, colors.dart, textstyle.dart,
 │   │                        assets.gen.dart (generated, see §9), assets_gen/ (per-folder generated files)
+│   ├── developer_tools/   ← hidden debug menu (see §11); api_logs/, dialogs/ subfolders
 │   ├── env/               ← env.dart (envied), secure_storage_key.dart
 │   ├── error/              ← failure.dart, exception.dart
-│   ├── http_client/        ← dio_config.dart, main_client.dart, interceptors/
+│   ├── feature_flags/     ← FeatureFlagApi, FeatureFlagNotifier (see §12)
+│   ├── http_client/        ← dio_config.dart, main_client.dart, interceptors/ (incl. ApiLoggerInterceptor)
 │   ├── routes/             ← app_path.dart, app_routes.dart, app_router.dart (GoRouter), route_error_page.dart
 │   ├── services/           ← navigation_service.dart
 │   └── utils/              ← storage_data, validators, safe_pop, navigator_stack_guard, bloc_providers, etc.
@@ -53,10 +56,11 @@ lib/
 │   │   └── [feature]/
 │   │       ├── request/    ← *_req_model.dart
 │   │       └── response/   ← *_model.dart / *_response_model.dart
-│   └── repository_impls/   ← *_repo_impl.dart; @Injectable(as: Repository)
+│   └── repository_impls/   ← *_repo_impl.dart; @Injectable(as: Repository) — feature_flag_repository_impl.dart included
 │
 ├── domain/
 │   ├── entities/
+│   │   ├── feature_flags/  ← FeatureFlagState + one <Module>FeatureFlags entity per module
 │   │   └── [feature]/      ← *_entity.dart (@freezed, MUST have an .initial() factory)
 │   ├── repositories/       ← *_repository.dart (abstract)
 │   └── usecase/
@@ -67,12 +71,13 @@ lib/
     │   └── [feature]/      ← *_bloc.dart (+ part *_event.dart, *_state.dart, *.freezed.dart)
     ├── components/         ← shared widgets across pages (chip, dialog_popup, avatar_profile, etc.)
     └── pages/
+        ├── settings/       ← about_page.dart — hidden entry point into developer_tools (see §11)
         └── [feature]/
             ├── [feature]_page.dart
             └── components/     ← widgets local to this page
 ```
 
-**Project root** (outside `lib/`): `assets/`, `flavorizr.yaml`, `flutter_launcher_icons.yaml`, `flutter_native_splash.yaml`, `Jenkinsfile` + `ci/` (optional, safe to delete if you don't use Jenkins), `test/`.
+**Project root** (outside `lib/`): `assets/`, `flavorizr.yaml`, `flutter_launcher_icons.yaml`, `flutter_native_splash.yaml`, `.env.dev`/`.env.staging`/`.env.prod` (starter files, placeholder values), `Jenkinsfile` + `ci/` (optional, safe to delete if you don't use Jenkins), `test/`.
 
 ---
 
@@ -89,9 +94,9 @@ lib/
 | Entity | `[name]_entity.dart` | `[Name]Entity`, must have `.initial()` | `login_param_entity.dart` → `LoginParamEntity` |
 | UseCase | `[name].dart` | `[Name]Usecase`, single `execute()` method | `login.dart` → `LoginUsecase.execute()` |
 | Repository (abstract) | `[feature]_repository.dart` | `[Feature]Repository` | `auth_repository.dart` → `AuthRepository` |
-| Repository (impl) | `[feature]_repo_impl.dart` | **should be** `[Feature]RepoImpl` — see §11, in practice it's still `[Feature]RemoteDatasourceImpl` | — |
+| Repository (impl) | `[feature]_repo_impl.dart` | **should be** `[Feature]RepoImpl` — see §13, in practice it's still `[Feature]RemoteDatasourceImpl` | — |
 | Datasource | `[feature]_remote_datasource.dart` | `[Feature]RemoteDatasource` + `[Feature]RemoteDatasourceImpl` in one file | `auth_remote_datasource.dart` |
-| Response model | `[name]_model.dart` | `[Name]Model` (or `[Name]ResponseModel` for a wrapper) — **keep it consistent**, see §11 | — |
+| Response model | `[name]_model.dart` | `[Name]Model` (or `[Name]ResponseModel` for a wrapper) — **keep it consistent**, see §13 | — |
 | Request model | `[name]_req_model.dart` | `[Name]ReqParamModel`, uses `@JsonSerializable` + `.fromDomain()` | `login_req_param_model.dart` → `LoginReqParamModel` |
 
 ### Variables & Functions
@@ -256,7 +261,7 @@ class XxxRemoteDatasourceImpl implements XxxRemoteDatasource {
 
 ### Data — Repository Impl
 
-**The correct class name** is `XxxRepoImpl` (matching the file name) — see §11: in the code that exists today (`auth_repo_impl.dart`/`profile_repo_impl.dart`) the class got copy-pasted as `XxxRemoteDatasourceImpl` instead. Follow the pattern BELOW for new code — don't copy the old one.
+**The correct class name** is `XxxRepoImpl` (matching the file name) — see §13: in the code that exists today (`auth_repo_impl.dart`/`profile_repo_impl.dart`) the class got copy-pasted as `XxxRemoteDatasourceImpl` instead. Follow the pattern BELOW for new code — don't copy the old one.
 
 ```dart
 import 'package:injectable/injectable.dart';
@@ -423,7 +428,7 @@ final GoRouter appRouter = GoRouter(
   initialLocation: Paths.splash,
   routes: appRoutes,
   redirect: _redirect,
-  observers: [ChuckerFlutter.navigatorObserver, navigatorStackGuard],
+  observers: [navigatorStackGuard],
   errorBuilder: (context, state) { /* -> RouteErrorPage, reports to ErrorReporter */ },
 );
 ```
@@ -506,7 +511,35 @@ Done **per method in the datasource**, not through a centralized helper:
 
 `ErrorHandling.handleException` (in `core/error/exception.dart`) EXISTS but **isn't called anywhere** — don't treat it as the reference; follow the inline pattern above for new datasources.
 
+### Repository impl: guard the model→entity conversion too
+
+The datasource guards its own JSON parsing (`fromJson` inside a try/catch, see above) — but `.toDomain()` runs one layer up, in the repository impl, and needs its **own** try/catch, or an exception there skips the `Either` contract entirely (the `Future` completes with an error instead of a `Left`):
+```dart
+final TokenData response = (apiResult as Right).value;
+try {
+  return right(response.toDomain());
+} catch (e) {
+  return left(ServerFailure('Failed to parse login response', e.toString()));
+}
+```
+Today's models are defensive enough (`??` everywhere, no force-unwraps) that this hasn't actually thrown yet — but a new model without that discipline will, so this guard is not optional for new repository impls.
+
 ### Consuming errors in the Bloc
+
+Guard the usecase call itself, too — an unguarded `await` here has the same failure mode as an unguarded `.toDomain()`: nothing throws a `Failure`, the `Future` just errors, and if `isLoading: true` was already emitted, it never gets reset. Wrap the usecase call (and anything after it that can fail, e.g. a secure-storage write) in try/catch, and emit an error state from the `catch`:
+```dart
+emit(state.copyWith(isLoading: true));
+try {
+  final result = await usecase.execute(params);
+  await result.fold(
+    (failure) async => emit(state.copyWith(isLoading: false, errorResponseMessage: failure.message)),
+    (response) async { /* ... */ },
+  );
+} catch (e) {
+  emit(state.copyWith(isLoading: false, errorResponseMessage: 'Something went wrong. Please try again.'));
+}
+```
+Note the `await` in front of `result.fold(...)` — both branches are `async`, so without it the `try` can return before a throw inside either branch actually happens.
 
 State in this project uses a `String errorResponseMessage` field (not a `Failure?` auto-reset via a "flash & reset" pattern like some sibling projects) — reset manually at the start of the next event handler (`emit(state.copyWith(errorResponseMessage: ''))`), not an automatic double-emit.
 
@@ -542,11 +575,42 @@ dart run flutter_native_splash:create
 
 ## 10. FLAVOR / ENVIRONMENT
 
-Three entry points: `main.dart` (default), `main_dev.dart`, `main_prod.dart`. Native flavor config (application id, bundle id, icon, launch screen) is managed by `flutter_flavorizr` via `flavorizr.yaml` — run `dart run flutter_flavorizr -f` after any flavor config change. Env vars via `envied` (`core/env/env.dart`); tokens/session via `flutter_secure_storage` (`core/utils/storage_data.dart`).
+Three flavors — `dev`, `staging`, `prod` — each with its own entry point (`main_dev.dart`, `main_staging.dart`, `main_prod.dart`) that calls shared `mainCommon()` in `main.dart`. Native flavor config (application id, bundle id, icon, launch screen) is managed by `flutter_flavorizr` via `flavorizr.yaml` — run `dart run flutter_flavorizr -f` after any flavor config change.
+
+⚠️ `dev` and `staging` share one `applicationId`/`bundleId` on purpose (`flavorizr.yaml`) — a device can only have one of the two installed at a time; they're not meant to coexist side by side. `prod` has its own, separate one. The display name (`app.name` per flavor) still differs, so the two remain visually distinguishable even sharing a package id.
+
+Env vars via `envied` (`core/env/env.dart`); tokens/session via `flutter_secure_storage` (`core/utils/storage_data.dart`). `.env.dev`/`.env.staging`/`.env.prod` ship as starter files (placeholder values) at the project root — `moshaf_boilerplate pre_launch_task <flavor>` copies the matching one to `.env`.
+
+⚠️ `android/app/build.gradle.kts` sets `compileSdk = maxOf(flutter.compileSdkVersion, 37)`, not Flutter's plain default — `flutter_secure_storage` v11+ requires compileSdk 37 (permanently, per its own changelog) and Flutter's own default hasn't caught up regardless of Flutter version. Building against it needs Android SDK Platform 37 installed on every machine that builds this project, including CI agents (`sdkmanager "platforms;android-37"` — Android Studio auto-downloads it interactively, a headless agent won't). Bump the `37` in that line (generator source: `bin/src/generator/android_compile_sdk.dart`) if a future dependency needs higher.
+
+**Adding a new flavor**: `moshaf_boilerplate flavor add <name>` scaffolds the entry point, `flavorizr.yaml` block, starter `.env.<name>`, and a VS Code task — it does not run `flutter_flavorizr` for you (native regen touches every flavor at once, worth reviewing first). `moshaf_boilerplate flavor icons` additionally draws a "DEV"/"STAGING"-style ribbon on the app icon for non-prod flavors.
 
 ---
 
-## 11. KNOWN INCONSISTENCIES (do not copy, documented as-is)
+## 11. DEVELOPER TOOLS (`core/developer_tools/`)
+
+An Android-Developer-Options-style debug layer, invisible to normal users until unlocked:
+
+- **Unlock entry point**: tapping the logo on the Welcome/Login page (`GestureDetector`, no visible button) opens `presentation/pages/settings/about_page.dart` — deliberately not gated by auth (`Paths.about` is in `app_router.dart`'s `alwaysAllowedRoutes`, not `publicRoutes` — it's reachable whether signed in or out, never redirected either way).
+- **Unlock gesture**: `DeveloperUnlockService.registerTap()` counts taps on the app version text on that page — 7 within a 3s window flips `DeveloperModeNotifier.isEnabled`. `dev` calls `.enable()` unconditionally at startup instead (`main.dart`); `prod` additionally requires a PIN (`developer_pin_gate.dart`, `DEVELOPER_PIN` in `.env` — empty means no PIN is enforced).
+- **`DeveloperOverlay`** wraps `MaterialApp.router`'s `builder` — renders `DraggableDebugButton` only while `isEnabled` AND no developer-tools screen is currently open (`isDeveloperPageVisible`, a `ValueNotifier` toggled by `pushDeveloperPage()` in `developer_navigation.dart`).
+- Developer-tools screens (menu, API logs, feature flags) are **pushed directly onto the root `Navigator`** (`appRouter.routerDelegate.navigatorKey.currentState`), not registered as `go_router` routes — keeps them unreachable by path/deep-link.
+- **`ApiLoggerInterceptor`** (`core/http_client/interceptors/`) is constructor-injected with `DeveloperModeNotifier`/`ApiLogStore` (not read off `getIt` internally, for testability) and wired into `MainClient` unconditionally — it self-gates on `isEnabled` at request time, capped at 100 entries, masking `Authorization`/`password`/`token` fields before they're ever stored.
+
+If you add a new developer-tools screen, follow the same `pushDeveloperPage()` pattern — don't add it to `app_routes.dart`.
+
+## 12. FEATURE FLAGS (`core/feature_flags/`, `domain/entities/feature_flags/`)
+
+Remote-config-backed, fetched once at startup (`main.dart`, before `runApp`) from `GET <API_URL>/v1/config/feature-flags`, grouped per module so one module never reads another's flags:
+
+- `FeatureFlagState` aggregates one `<Module>FeatureFlags` entity per module (`AuthFeatureFlags`, `ProfileFeatureFlags` today). Each parses its own slice of `{"features": {...}}` independently — one module's malformed JSON falls back to that module's `.disabled` default without affecting the others.
+- `FeatureFlagRepositoryImpl.getFeatureFlags()` returns a plain `FeatureFlagState`, **not** `Either<Failure, T>` like every other repository in this project — a broken flags endpoint should degrade silently to all-off, never surface as a user-facing error. Its own try/catch is the reference for this: don't add a `Failure` case for this one repository.
+- `toJson()` on `FeatureFlagState`/each module entity mirrors `fromJson()` exactly — it's the single source both the Developer Tools Feature Flags screen and its "copy expected response" button derive from. **Adding a new flag**: add the field + `fromJson`/`toJson` entries on the module entity (or a new module entity + a field on `FeatureFlagState`) — nothing in `core/developer_tools/dialogs/feature_flags_dialog.dart` needs touching.
+- Consuming a flag in UI: `context.watch<FeatureFlagNotifier>().state.<module>.<flag>` (see `password_input_field.dart`'s "Forgot Password" button for the reference example) — never fetch flags directly in a widget.
+
+---
+
+## 13. KNOWN INCONSISTENCIES (do not copy, documented as-is)
 
 This section is documented honestly because this project is still an early-stage boilerplate — the following exist in the code today but deviate from the patterns described above. When building a new feature, follow the patterns in §3-9, NOT these examples:
 
@@ -560,7 +624,6 @@ This section is documented honestly because this project is still an early-stage
 | `core/error/exception.dart` | `ErrorHandling.handleException()` + the special-cased `NotFoundException` for status 400 — dead code, never called anywhere. |
 | `core/http_client/interceptors/custom_interceptor.dart` | The 401/403 auto-logout logic (`onResponse`/`onError`) is entirely commented out — no automatic expired-token handling yet. |
 | `core/utils/bloc_providers.dart` | Empty scaffold, never called from `app.dart` — see §7. |
-| `test/widget_test.dart` | Still the default Flutter template (counter app `+`/`0`/`1`) — **will fail if run**, doesn't represent this app at all. Replace or delete it before adding other tests. |
 | `presentation/pages/login/login_page.dart` | `LoginBloc` is constructed manually (`LoginBloc(getIt<LoginUsecase>(), getIt<ProfileUsecase>())`) even though the class is `@injectable` — could be simplified to `getIt<LoginBloc>()`. |
 
 ---
@@ -574,8 +637,12 @@ This section is documented honestly because this project is still an early-stage
 | `toDomain()` lives on the model | Model → entity conversion lives on the model (data layer), not in the repo impl |
 | Datasource abstract + impl = 1 file | Not split across separate files |
 | 1 usecase file = 1 `execute()` method | Not one class holding many domain methods per feature |
-| Errors are always `Either`, never `throw` | `left(Failure)` from the datasource, propagated up to the Bloc |
+| Errors are always `Either`, never `throw` | `left(Failure)` from the datasource, propagated up to the Bloc — **except** `FeatureFlagRepository`, see §12 |
+| Repo impl guards `.toDomain()` in try/catch | Not just the datasource's `fromJson` — see §8 |
+| Bloc guards the usecase call in try/catch | Prevents a stuck `isLoading: true` with no error shown — see §8 |
 | Entities must have `.initial()` | Consistent across every entity, including new ones |
 | Auth gate lives in `redirect`, not on the page | Don't check the token manually in `initState`/a button handler — update `app_router.dart` |
 | Assets via `Assets.xxx.yyy` | Not a raw string path — regenerate with `moshaf_boilerplate assets` |
 | Colors/text via `kMain*`/`genStyle()` | Not a literal hex/`TextStyle` directly in a widget |
+| Developer-tools screens use `pushDeveloperPage()` | Not a `go_router` route — see §11 |
+| Feature flags: add once to `toJson()`/`fromJson()` | UI and the "copy expected response" button both derive from it — see §12 |

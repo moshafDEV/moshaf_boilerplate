@@ -26,12 +26,12 @@ const generatorDependencies = [
   'flutter_dotenv',
   'easy_localization',
   'flutter_screenutil',
-  'chucker_flutter',
   'flutter_svg',
   'awesome_extensions',
   'cached_network_image',
   'json_annotation',
   'freezed_annotation',
+  'provider',
 ];
 
 /// Dev dependencies (code generators, linter) installed into every
@@ -46,4 +46,5 @@ const generatorDevDependencies = [
   'flutter_flavorizr',
   'flutter_native_splash',
   'flutter_launcher_icons',
+  'mocktail',
 ];

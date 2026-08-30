@@ -122,10 +122,17 @@ flutter clean
 bash ci/run-pipeline.sh staging --skip-tests --android-only
 ```
 
+### Android build fails with an "AAR metadata"/compileSdk mismatch
+`android/app/build.gradle.kts` sets `compileSdk = maxOf(flutter.compileSdkVersion, 37)` — a floor, since `flutter_secure_storage` requires compileSdk 37 while Flutter's own default is still lower as of this writing. Building against it requires Android SDK Platform 37 to be installed on this agent, not just on developer machines — Android Studio auto-downloads a missing platform interactively, but a headless CI agent won't prompt for the SDK license, so install it explicitly once per agent:
+```bash
+sdkmanager "platforms;android-37"   # bump to match compileSdk's floor if that number changes
+```
+
 ## Requirements
 
 - `fvm` installed
 - Flutter SDK via fvm
+- Android SDK Platform 37 (or whatever `compileSdk`'s floor in `android/app/build.gradle.kts` currently is) installed on the agent
 - `.env.dev` and `.env.prod` files exist
 - Export options plist files exist (iOS)
 

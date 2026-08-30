@@ -56,7 +56,7 @@ class WelcomePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     40.verticalSpace,
-                    _buildLogo(),
+                    _buildLogo(context),
                     18.verticalSpace,
                     _buildMainContent(),
                     const Spacer(flex: 1),
@@ -72,15 +72,21 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildLogo() {
+  // Tapping the logo opens About — the entry point into the developer-mode
+  // unlock flow (see about_page.dart), deliberately not a visible button:
+  // there's nothing here to tell a normal user it's tappable.
+  Widget _buildLogo(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ColorFiltered(
-          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-          child: Image.network(
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/MIT_logo_2003-2023.svg/330px-MIT_logo_2003-2023.svg.png',
-            width: 90,
+        GestureDetector(
+          onTap: () => context.push(Paths.about),
+          child: ColorFiltered(
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+            child: Image.network(
+              'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/MIT_logo_2003-2023.svg/330px-MIT_logo_2003-2023.svg.png',
+              width: 90,
+            ),
           ),
         ),
       ],
@@ -115,7 +121,7 @@ class WelcomePage extends StatelessWidget {
 
   Widget _buildStartButton(BuildContext context) {
     return PrimaryButton(
-      text: 'Mulai',
+      text: 'Get Started',
       onPressed: () => _navigateToNextPage(context),
       width: double.infinity,
       height: 40,

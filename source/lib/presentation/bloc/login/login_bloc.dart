@@ -86,77 +86,99 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         }
 
         emit(state.copyWith(isLoading: true));
-        final result = await loginUsecase.execute(
-          LoginParamEntity(
-            email: state.email.value,
-            password: state.password.value,
-          ),
-        );
-        result.fold(
-          (failure) => emit(
+        // Guarded end-to-end: an uncaught throw anywhere in here (a bad
+        // toDomain() conversion, a secure-storage failure, ...) would
+        // otherwise leave isLoading stuck true forever with no error
+        // shown, since nothing after the throw ever runs.
+        try {
+          final result = await loginUsecase.execute(
+            LoginParamEntity(
+              email: state.email.value,
+              password: state.password.value,
+            ),
+          );
+          await result.fold(
+            (failure) async => emit(
+              state.copyWith(
+                isLoading: false,
+                errorResponseMessage: failure.message,
+              ),
+            ),
+            (response) async {
+              // Validate the response and store the token data
+              final authJson = AuthResponseModel.fromDomain(
+                response,
+              ).data?.toJson();
+              if (authJson == null) {
+                emit(
+                  state.copyWith(
+                    isLoading: false,
+                    successLogin: false,
+                    errorResponseMessage: 'Invalid response data',
+                  ),
+                );
+                return;
+              }
+              await SecureStorageUtils.setStorage(
+                bearerToken,
+                response.accessToken,
+              );
+              await SecureStorageUtils.setStorageJSON(authData, authJson);
+
+              // Set the bearer token for the HTTP service
+              // httpService.setLanguage('en');
+              // httpService.setBearer(response.accessToken);
+              // MainClient(null).addBearer(response.accessToken);
+
+              // Fetch user profile information
+              add(const LoginEvent.getInfoProfile());
+            },
+          );
+        } catch (e) {
+          emit(
             state.copyWith(
               isLoading: false,
-              errorResponseMessage: failure.message,
+              errorResponseMessage: 'Something went wrong. Please try again.',
             ),
-          ),
-          (response) async {
-            // Validate the response and store the token data
-            final authJson = AuthResponseModel.fromDomain(
-              response,
-            ).data?.toJson();
-            if (authJson == null) {
-              emit(
-                state.copyWith(
-                  isLoading: false,
-                  successLogin: false,
-                  errorResponseMessage: 'Invalid response data',
-                ),
-              );
-              return;
-            }
-            await SecureStorageUtils.setStorage(
-              bearerToken,
-              response.accessToken,
-            );
-            await SecureStorageUtils.setStorageJSON(authData, authJson);
-
-            // Set the bearer token for the HTTP service
-            // httpService.setLanguage('en');
-            // httpService.setBearer(response.accessToken);
-            // MainClient(null).addBearer(response.accessToken);
-
-            // Fetch user profile information
-            add(const LoginEvent.getInfoProfile());
-          },
-        );
+          );
+        }
       case _GetInfoProfile():
-        final result = await profileUsecase.execute();
-        result.fold(
-          (failure) => emit(
+        try {
+          final result = await profileUsecase.execute();
+          await result.fold(
+            (failure) async => emit(
+              state.copyWith(
+                isLoading: false,
+                errorResponseMessage: failure.message,
+              ),
+            ),
+            (response) async {
+              // Store the profile data
+              final profileJson = ProfileResponseModel.fromDomain(
+                response,
+              ).data?.toJson();
+              if (profileJson == null) {
+                emit(
+                  state.copyWith(
+                    isLoading: false,
+                    successLogin: false,
+                    errorResponseMessage: 'Invalid response profile data',
+                  ),
+                );
+                return;
+              }
+              emit(state.copyWith(isLoading: false, successLogin: true));
+              await SecureStorageUtils.setStorageJSON(userData, profileJson);
+            },
+          );
+        } catch (e) {
+          emit(
             state.copyWith(
               isLoading: false,
-              errorResponseMessage: failure.message,
+              errorResponseMessage: 'Something went wrong. Please try again.',
             ),
-          ),
-          (response) async {
-            // Store the profile data
-            final profileJson = ProfileResponseModel.fromDomain(
-              response,
-            ).data?.toJson();
-            if (profileJson == null) {
-              emit(
-                state.copyWith(
-                  isLoading: false,
-                  successLogin: false,
-                  errorResponseMessage: 'Invalid response profile data',
-                ),
-              );
-              return;
-            }
-            emit(state.copyWith(isLoading: false, successLogin: true));
-            await SecureStorageUtils.setStorageJSON(userData, profileJson);
-          },
-        );
+          );
+        }
         break;
     }
     return Future.value();

@@ -8,4 +8,7 @@ class ApiPath {
 
   /// Profile paths
   static const UUserProfile = '/profile';
+
+  /// Feature flag paths
+  static const UFeatureFlags = '/v1/config/feature-flags';
 }

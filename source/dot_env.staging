@@ -1,0 +1,8 @@
+# Copied to .env by `moshaf_boilerplate pre_launch_task staging` — see
+# env.dart for what each key does. Placeholder values only — replace with
+# your real staging API URL, and consider moving real values to your team's
+# secret store instead of committing them if this stops being a placeholder.
+APP_NAME=ProjectDisplayName Staging
+API_URL=https://staging-api.example.com
+ENABLE_FIREBASE=false
+DEVELOPER_PIN=

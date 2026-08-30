@@ -138,11 +138,12 @@ def reportBuildflightFailure(String bundleId, String platform) {
 }
 
 // Local-only build timeline for an optional menu bar / status-monitoring
-// app — it polls ~/jenkins-agent/current-build.json on this same Mac, no
-// Jenkins API token needed. init() resets the file with the full stage list for this
-// branch's flow (also self-heals any stale 'running' left by a run that
-// crashed before reaching its own cleanup); update()/finish() are called at
-// each transition.
+// app — it polls ~/jenkins-agent/builds/<job>#<build>.json on this same Mac,
+// no Jenkins API token needed (one file per build, so overlapping jobs/branches
+// on a shared agent can't overwrite each other's timeline). init() resets the
+// file with the full stage list for this branch's flow (also self-heals any
+// stale 'running' left by a run that crashed before reaching its own
+// cleanup); update()/finish() are called at each transition.
 def initBuildTimeline(List stageNames) {
     sh "bash ci/scripts/report-stage-status.sh init '${env.JOB_NAME}' '${env.BUILD_NUMBER}' '${env.BUILD_URL}' ${stageNames.collect { "'${it}'" }.join(' ')}"
 }
@@ -189,7 +190,9 @@ def deferTestFlightSubmission(String environment, String bundleId, String buildN
         string(credentialsId: env.CRED_APPSTORE_API_ISSUER_ID, variable: 'APPSTORE_API_ISSUER_ID')
     ]) {
         submitScript = sh(
-            script: "bash ci/scripts/compile-testflight-submit.sh '${bundleId}' '${buildNumber}' '${internalGroupId}' '${externalGroupId}'",
+            // APP_VERSION scopes the build lookup to this marketing version —
+            // build numbers repeat across versions (1.5.3 (1) vs 1.5.4 (1)).
+            script: "bash ci/scripts/compile-testflight-submit.sh '${bundleId}' '${buildNumber}' '${internalGroupId}' '${externalGroupId}' '${env.APP_VERSION}'",
             returnStdout: true
         )
     }
@@ -335,8 +338,21 @@ pipeline {
                 }
                 failure {
                     reportStageStatus('Run Unit Tests', 'failure')
-                    finishBuildTimeline('FAILURE')
                     cleanBuildArtifacts()
+                }
+                cleanup {
+                    // Cancelling from Jenkins runs neither success{} nor
+                    // failure{} — ABORTED is not FAILURE — leaving cleanup{}
+                    // as the only block that still fires. Without this a
+                    // cancelled build never gets a finishedAt, so its row sits
+                    // in the menu bar until the app's stall cutoff reaps it
+                    // hours later. The SUCCESS case belongs to whichever stage
+                    // actually ends the run.
+                    script {
+                        if (currentBuild.currentResult != 'SUCCESS') {
+                            finishBuildTimeline(currentBuild.currentResult)
+                        }
+                    }
                 }
             }
         }
@@ -374,11 +390,24 @@ pipeline {
                     // in docker mode, curl needs to be back inside the
                     // Flutter image, hence runMaybeInDocker again here too.
                     script { runMaybeInDocker { reportBuildflightFailure(env.ANDROID_BUNDLE_ID_STAGING, 'android') } }
-                    finishBuildTimeline('FAILURE')
                     // On success the APK stays in the workspace for the iOS
                     // stage right after — only clean up here if we're not
                     // getting there.
                     cleanBuildArtifacts()
+                }
+                cleanup {
+                    // Cancelling from Jenkins runs neither success{} nor
+                    // failure{} — ABORTED is not FAILURE — leaving cleanup{}
+                    // as the only block that still fires. Without this a
+                    // cancelled build never gets a finishedAt, so its row sits
+                    // in the menu bar until the app's stall cutoff reaps it
+                    // hours later. The SUCCESS case belongs to whichever stage
+                    // actually ends the run.
+                    script {
+                        if (currentBuild.currentResult != 'SUCCESS') {
+                            finishBuildTimeline(currentBuild.currentResult)
+                        }
+                    }
                 }
             }
         }
@@ -507,11 +536,24 @@ pipeline {
                             runMaybeInDocker { reportBuildflightFailure(env.ANDROID_BUNDLE_ID_PRODUCTION, 'android') }
                         }
                     }
-                    finishBuildTimeline('FAILURE')
                     cleanBuildArtifacts()
                 }
-                // No cleanup on success — the iOS production stage right
-                // after still needs this workspace (or syncs from it) too.
+                // No artifact cleanup on success — the iOS production stage
+                // right after still needs this workspace (or syncs from it).
+                cleanup {
+                    // Cancelling from Jenkins runs neither success{} nor
+                    // failure{} — ABORTED is not FAILURE — leaving cleanup{}
+                    // as the only block that still fires. Without this a
+                    // cancelled build never gets a finishedAt, so its row sits
+                    // in the menu bar until the app's stall cutoff reaps it
+                    // hours later. The SUCCESS case belongs to whichever stage
+                    // actually ends the run.
+                    script {
+                        if (currentBuild.currentResult != 'SUCCESS') {
+                            finishBuildTimeline(currentBuild.currentResult)
+                        }
+                    }
+                }
             }
         }
 

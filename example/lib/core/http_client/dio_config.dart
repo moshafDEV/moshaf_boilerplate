@@ -6,10 +6,19 @@ import 'package:dio/dio.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:example/core/config/app_config.dart';
+import 'package:example/core/config/di_module/init_config.dart';
+import 'package:example/core/developer_tools/api_logs/api_log_store.dart';
+import 'package:example/core/developer_tools/developer_mode_notifier.dart';
+import 'package:example/core/http_client/interceptors/api_logger_interceptor.dart';
 import 'package:example/core/http_client/interceptors/custom_interceptor.dart';
 
 void setLoggerInterceptor(Dio dio) {
   dio.interceptors.add(CustomInterceptor());
+  // Self-gates on DeveloperModeNotifier.isEnabled at request/response time —
+  // safe to always attach regardless of flavor or current state.
+  dio.interceptors.add(
+    ApiLoggerInterceptor(getIt<DeveloperModeNotifier>(), getIt<ApiLogStore>()),
+  );
   dio.interceptors.add(
     PrettyDioLogger(
       requestHeader: true,
