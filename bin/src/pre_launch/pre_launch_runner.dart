@@ -4,15 +4,14 @@ import '../common/console.dart';
 import '../common/version_utils.dart';
 import 'build_runner_strategy.dart';
 
-const _envFileByFlavor = {'dev': '.env.dev', 'prod': '.env.prod'};
-const _googleServiceFileByFlavor = {
-  'dev': 'GoogleService-Info-dev.plist',
-  'prod': 'GoogleService-Info-prod.plist',
-};
-
 /// Prepares a generated project for a given [flavor] before running it:
 /// copies the matching `.env` and `GoogleService-Info.plist`, then
 /// (optionally) runs build_runner.
+///
+/// File names are derived by convention (`.env.<flavor>`,
+/// `GoogleService-Info-<flavor>.plist`) rather than a fixed lookup table —
+/// this must work for any flavor a project defines (see `flavor add`), not
+/// just the built-in "dev"/"prod".
 Future<void> mainPLT(List<String> arguments) async {
   await _checkDartVersion();
 
@@ -22,11 +21,7 @@ Future<void> mainPLT(List<String> arguments) async {
   }
 
   final flavor = arguments[0];
-  final envFile = _envFileByFlavor[flavor];
-  if (envFile == null) {
-    logError('Unknown flavor. Use "dev" or "prod".');
-    exit(1);
-  }
+  final envFile = '.env.$flavor';
 
   _copyEnvFile(envFile);
   _copyGoogleServiceFile(flavor);
@@ -96,10 +91,10 @@ void _copyEnvFile(String envFile) {
 
 void _copyGoogleServiceFile(String flavor) {
   final cwd = Directory.current.path;
-  final googleServiceFile = _googleServiceFileByFlavor[flavor];
+  final googleServiceFile = 'GoogleService-Info-$flavor.plist';
   final googleServiceFilePath = '$cwd/ios/Runner/$googleServiceFile';
 
-  if (googleServiceFile == null || !File(googleServiceFilePath).existsSync()) {
+  if (!File(googleServiceFilePath).existsSync()) {
     logWarn('GoogleService-Info file not found for this flavor.');
     return;
   }

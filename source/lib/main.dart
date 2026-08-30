@@ -5,14 +5,18 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:ProjectName/app.dart';
 import 'package:ProjectName/core/analytics/analytic.dart';
 import 'package:ProjectName/core/config/app_config.dart';
 import 'package:ProjectName/core/config/di_module/init_config.dart';
 import 'package:ProjectName/core/config/firebase_support.dart';
 import 'package:ProjectName/core/config/startup_error_app.dart';
+import 'package:ProjectName/core/developer_tools/api_logs/api_log_store.dart';
+import 'package:ProjectName/core/developer_tools/developer_mode_notifier.dart';
 import 'package:ProjectName/core/env/env.dart';
 import 'package:ProjectName/core/env/secure_storage_key.dart';
+import 'package:ProjectName/core/feature_flags/feature_flag_notifier.dart';
 import 'package:ProjectName/core/utils/bloc_providers.dart';
 import 'package:ProjectName/core/utils/error_reporter.dart';
 import 'package:ProjectName/core/utils/storage_data.dart';
@@ -36,6 +40,16 @@ Future<void> mainCommon({required Flavor flavor}) async {
     // setup analytic
     final analytic = getIt<Analytic>();
     await analytic.init();
+
+    // fetch remote feature flags before first frame; falls back to all-off
+    // internally on any failure, so this never throws.
+    await getIt<FeatureFlagNotifier>().initialize();
+
+    // Dev: developer tools are always on, no gesture needed. Staging/prod
+    // stay off until unlocked from About (see developer_unlock_service.dart).
+    if (AppConfig.isDev) {
+      getIt<DeveloperModeNotifier>().enable();
+    }
 
     locale = await storage.read(key: localeLangId);
   } catch (e, s) {
@@ -61,21 +75,28 @@ Future<void> mainCommon({required Flavor flavor}) async {
   runApp(
     ScreenUtilInit(
       builder: (_, __) => getBlocWrapper(
-        EasyLocalization(
-          supportedLocales: const [Locale('en'), Locale('id')],
-          path: 'assets/translations',
-          fallbackLocale: const Locale('en'),
-          startLocale: Locale(locale ?? 'en'),
-          // Default is a bare ErrorWidget — the grey box again. A failed
-          // translation load must not take the whole app down with it.
-          errorWidget: (message) => StartupErrorApp(
-            error: message ?? 'Translations failed to load',
-            onRetry: () async {
-              await getIt.reset();
-              await mainCommon(flavor: flavor);
-            },
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(value: getIt<FeatureFlagNotifier>()),
+            ChangeNotifierProvider.value(value: getIt<DeveloperModeNotifier>()),
+            ChangeNotifierProvider.value(value: getIt<ApiLogStore>()),
+          ],
+          child: EasyLocalization(
+            supportedLocales: const [Locale('en'), Locale('id')],
+            path: 'assets/translations',
+            fallbackLocale: const Locale('en'),
+            startLocale: Locale(locale ?? 'en'),
+            // Default is a bare ErrorWidget — the grey box again. A failed
+            // translation load must not take the whole app down with it.
+            errorWidget: (message) => StartupErrorApp(
+              error: message ?? 'Translations failed to load',
+              onRetry: () async {
+                await getIt.reset();
+                await mainCommon(flavor: flavor);
+              },
+            ),
+            child: const App(),
           ),
-          child: const App(),
         ),
       ),
     ),

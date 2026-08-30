@@ -5,24 +5,45 @@ app:
 flavors:
   dev:
     app:
-      name: "ProjectName Dev"
+      name: "ProjectDisplayName [DEV]"
     android:
-      applicationId: "com.example.ProjectName.dev"
-      # Drop your dev google-services.json in android/app/src/dev/ and
-      # uncomment the line below to have flavorizr wire it in for you on
-      # the next `dart run flutter_flavorizr -f`.
+      # Deliberately the SAME as staging's — dev and staging install as one
+      # app on a device rather than side-by-side, per this project's
+      # convention (see DEV_NOTES.md). Since the applicationId matches,
+      # this is also the same Firebase-registered Android app as staging:
+      # copy staging's google-services.json into android/app/src/dev/
+      # (once staging's is in place) rather than registering a second one
+      # in the console.
+      applicationId: "com.example.ProjectName.staging"
       # firebase:
       #   config: "android/app/src/dev/google-services.json"
     ios:
-      bundleId: "com.example.ProjectName.dev"
-      # Drop your dev GoogleService-Info.plist somewhere in the repo and
-      # point to it here, then re-run flavorizr the same way as above.
+      # Same as android/applicationId above — matches staging's bundleId
+      # on purpose.
+      bundleId: "com.example.ProjectName.staging"
       # firebase:
       #   config: "ios/config/dev/GoogleService-Info.plist"
 
+  staging:
+    app:
+      name: "ProjectDisplayName [STAGING]"
+    android:
+      applicationId: "com.example.ProjectName.staging"
+      # Drop your staging google-services.json in android/app/src/staging/
+      # and uncomment the line below to have flavorizr wire it in for you
+      # on the next `dart run flutter_flavorizr -f`.
+      # firebase:
+      #   config: "android/app/src/staging/google-services.json"
+    ios:
+      bundleId: "com.example.ProjectName.staging"
+      # Drop your staging GoogleService-Info.plist somewhere in the repo
+      # and point to it here, then re-run flavorizr the same way as above.
+      # firebase:
+      #   config: "ios/config/staging/GoogleService-Info.plist"
+
   prod:
     app:
-      name: "ProjectName"
+      name: "ProjectDisplayName"
     android:
       applicationId: "com.example.ProjectName"
       # firebase:

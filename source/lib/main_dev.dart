@@ -15,7 +15,7 @@ void main() {
       FlavorConfig(
         name: "DEV",
         color: Colors.red,
-        location: BannerLocation.topStart,
+        location: BannerLocation.bottomEnd,
         variables: {"mode": Flavor.dev},
       );
       await mainCommon(flavor: Flavor.dev);

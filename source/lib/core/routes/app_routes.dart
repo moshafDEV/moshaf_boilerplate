@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ProjectName/presentation/pages/forgot_password/forgot_password_page.dart';
 import 'package:ProjectName/presentation/pages/login/login_page.dart';
 import 'package:ProjectName/presentation/pages/register/register_page.dart';
+import 'package:ProjectName/presentation/pages/settings/about_page.dart';
 import 'package:ProjectName/presentation/pages/splash_screen/splash_screen.dart';
 import 'package:ProjectName/presentation/pages/welcome/welcome_page.dart';
 
@@ -32,5 +33,9 @@ final List<RouteBase> appRoutes = [
   GoRoute(
     path: Paths.forgotPassword,
     builder: (context, state) => const ForgotPasswordPage(),
+  ),
+  GoRoute(
+    path: Paths.about,
+    builder: (context, state) => const AboutPage(),
   ),
 ];

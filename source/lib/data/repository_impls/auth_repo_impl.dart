@@ -26,7 +26,11 @@ class AuthRemoteDatasourceImpl implements AuthRepository {
       return left((apiResult as Left).value);
     }
     final TokenData response = (apiResult as Right).value;
-    return right(response.toDomain());
+    try {
+      return right(response.toDomain());
+    } catch (e) {
+      return left(ServerFailure('Failed to parse login response', e.toString()));
+    }
   }
 
   @override
@@ -36,6 +40,10 @@ class AuthRemoteDatasourceImpl implements AuthRepository {
       return left((apiResult as Left).value);
     }
     final AuthResponseModel response = (apiResult as Right).value;
-    return right(response.toDomain());
+    try {
+      return right(response.toDomain());
+    } catch (e) {
+      return left(ServerFailure('Failed to parse logout response', e.toString()));
+    }
   }
 }

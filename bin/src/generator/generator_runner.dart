@@ -7,6 +7,7 @@ import '../common/package_locator.dart';
 import '../common/process_utils.dart';
 import '../common/version_utils.dart';
 import '../pre_launch/build_runner_strategy.dart';
+import 'android_compile_sdk.dart';
 import 'constants.dart';
 import 'dependency_installer.dart';
 import 'flavorizr_runner.dart';
@@ -29,17 +30,21 @@ void printHelp() {
   stdout.writeln(
       '  assets                     Regenerate lib/core/constants/assets.gen.dart from assets/');
   stdout.writeln(
+      '  flavor add <name>          Scaffold a new build flavor (e.g. staging, qa)');
+  stdout.writeln(
+      '  flavor icons               Generate ribboned dev/staging app icons');
+  stdout.writeln(
       '  version                    Show the boilerplate generator version');
   stdout.writeln('  help                       Show this help message\n');
   stdout.writeln('pre_launch_task:');
   stdout.writeln(
       '  Copies the correct .env and GoogleService-Info.plist for the given flavor,');
   stdout.writeln('  then optionally runs build_runner (auto-yes after 5 s).\n');
-  stdout.writeln('  Flavors:');
   stdout.writeln(
-      '    dev    Copies .env.dev  → .env  and GoogleService-Info-dev.plist');
+      '  Works for any flavor name, e.g. "dev" copies .env.dev → .env and');
   stdout.writeln(
-      '    prod   Copies .env.prod → .env  and GoogleService-Info-prod.plist\n');
+      '  GoogleService-Info-dev.plist (same for "prod", or any flavor added via');
+  stdout.writeln('  "flavor add").\n');
   stdout.writeln('  Execution strategy (first success wins):');
   stdout.writeln('    fvm flutter pub run build_runner build');
   stdout.writeln('    dart run build_runner build');
@@ -54,11 +59,33 @@ void printHelp() {
   stdout.writeln(
       '  Runs automatically once during "create"; re-run it anytime after adding');
   stdout.writeln('  or removing files under assets/.\n');
+  stdout.writeln('flavor add <name>:');
+  stdout.writeln(
+      '  Registers a new flavor in the Flavor enum, scaffolds lib/main_<name>.dart,');
+  stdout.writeln(
+      '  appends a block to flavorizr.yaml, creates a starter .env.<name>, and adds');
+  stdout.writeln(
+      '  a matching VS Code task. Does NOT run flutter_flavorizr for you — native');
+  stdout.writeln(
+      '  Android/iOS wiring stays a deliberate, reviewable step (prints the exact');
+  stdout.writeln('  next commands to run).\n');
+  stdout.writeln('flavor icons:');
+  stdout.writeln(
+      '  Draws a "DEV"/"STAGING" ribbon across flutter_launcher_icons.yaml\'s base');
+  stdout.writeln(
+      '  icon and writes flutter_launcher_icons-dev.yaml / -staging.yaml pointing at');
+  stdout.writeln(
+      '  the result — flutter_launcher_icons picks those up on its own next run.');
+  stdout.writeln(
+      '  prod gets its own unribboned copy of the config (same convention as the');
+  stdout.writeln('  in-app flavor banner — no ribbon there either).\n');
   stdout.writeln('Examples:');
   stdout.writeln('  moshaf_boilerplate create');
   stdout.writeln('  moshaf_boilerplate pre_launch_task dev');
   stdout.writeln('  moshaf_boilerplate pre_launch_task prod');
   stdout.writeln('  moshaf_boilerplate assets');
+  stdout.writeln('  moshaf_boilerplate flavor add staging');
+  stdout.writeln('  moshaf_boilerplate flavor icons');
   stdout.writeln('  moshaf_boilerplate version');
 }
 
@@ -83,6 +110,12 @@ Future<void> runGenerator() async {
   if (projectName == null) return;
 
   if (!_confirmSafeToGenerateInto(projectName)) return;
+
+  // Separate from projectName on purpose: that one is constrained to a
+  // valid Dart package identifier (lowercase snake_case), which makes a
+  // poor human-facing app name/title. Optional — left blank, it falls
+  // back to a title-cased version of projectName.
+  final appDisplayName = _promptAppDisplayName(projectName);
 
   logInfo(
       'Initializing the setup for your Flutter project: "$projectName". Please hold on...');
@@ -110,6 +143,7 @@ Future<void> runGenerator() async {
       await executeCommand('flutter create $projectName');
       await raiseIosDeploymentTarget(projectDir);
       await addMacosKeychainEntitlement(projectDir, projectName);
+      await raiseAndroidCompileSdk(projectDir);
     });
 
     await runStep('Merging template into project for project: $projectName',
@@ -120,6 +154,7 @@ Future<void> runGenerator() async {
 
       await copyFolder(source.path, projectDir);
       await modifyFilesInFolder(projectDir, 'ProjectName', projectName);
+      await modifyFilesInFolder(projectDir, 'ProjectDisplayName', appDisplayName);
 
       if (overrides != null) {
         await applyPubspecVersionOverrides(generatedPubspec, overrides);
@@ -352,6 +387,29 @@ String? _promptProjectName() {
   }
 
   return projectName;
+}
+
+/// Prompts for a human-facing app name/title — no format constraints
+/// (unlike the project name), since it never has to be a valid identifier.
+/// Left blank, falls back to a title-cased version of [projectName].
+String _promptAppDisplayName(String projectName) {
+  final fallback = _titleCaseFromSnakeCase(projectName);
+  stdout.write(
+      'Please enter the app display name (press Enter to use "$fallback"): ');
+  final input = stdin.readLineSync();
+
+  if (input == null || input.trim().isEmpty) {
+    return fallback;
+  }
+  return input.trim();
+}
+
+String _titleCaseFromSnakeCase(String name) {
+  return name
+      .split('_')
+      .where((word) => word.isNotEmpty)
+      .map((word) => word[0].toUpperCase() + word.substring(1))
+      .join(' ');
 }
 
 /// Guards the one way `create` can clobber existing work now that

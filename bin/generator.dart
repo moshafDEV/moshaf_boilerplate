@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'src/assets/assets_runner.dart';
+import 'src/flavor/flavor_runner.dart';
 import 'src/generator/generator_runner.dart';
 import 'src/pre_launch/pre_launch_runner.dart';
 
@@ -23,6 +24,10 @@ Future<void> main(List<String> args) async {
 
     case 'assets':
       await mainAssets(args.sublist(1));
+      break;
+
+    case 'flavor':
+      await mainFlavor(args.sublist(1));
       break;
 
     case 'version':

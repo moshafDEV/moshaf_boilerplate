@@ -127,6 +127,10 @@ boilerplate-generator.ps1
 # never commit the real ones. Share values through your team's secret store
 # instead, or commit a sanitized .env.example if you want a checked-in template.
 .env
+# Exception: this repo's own checked-in example/.env is intentionally
+# committed (placeholder values only, no real secrets — see its own header
+# comment) so the example app in this package runs out of the box.
+!.env
 
 # Firebase / Google Services config — secrets, placed per flavor (see README > Flavors)
 **/GoogleService-Info.plist

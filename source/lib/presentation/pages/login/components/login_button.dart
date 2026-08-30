@@ -48,7 +48,7 @@ class _LoginButtonState extends State<LoginButton> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               PrimaryButton(
-                text: 'Masuk',
+                text: 'Log In',
                 onPressed: () {
                   context.read<LoginBloc>().add(LoginEvent.onSubmit());
                 },
@@ -72,9 +72,9 @@ class _LoginButtonState extends State<LoginButton> {
       child: RichText(
         text: TextSpan(
           children: [
-            TextSpan(text: 'Belum punya akun? ', style: genStyle14Regular),
+            TextSpan(text: "Don't have an account? ", style: genStyle14Regular),
             TextSpan(
-              text: 'Daftar di sini.',
+              text: 'Sign up here.',
               style: genStyle14Medium,
               recognizer: TapGestureRecognizer()..onTap = _handleRegister,
             ),
