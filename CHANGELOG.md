@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.0.1
 - Root README opens with a "what is this for" infographic (`flutter create` vs `moshaf_boilerplate create`, good fit / probably not) and a collapsible detailed comparison with measured numbers (119 vs 1 Dart files in `lib/`, 11 vs 1 tests, 39 vs 1 packages, 3 vs 0 flavors, 15 shared components), including the trade-offs.
 - Visual docs: root README gained a CLI infographic (image in `assets/readme/`, HTML source in `assets/readme/src/`, since pub.dev doesn't render Mermaid). The per-project README was cut from ~220 to ~90 lines to what a team in a generated repo needs: quick start (incl. the build_runner step a fresh clone needs), commands, flavor table, request-flow diagram, and short pointers. Routing and developer-tools unlock diagrams moved into `PROJECT_BLUEPRINT.md` (§6, §11).
 - Developer Tools: the API-error snackbar no longer spams while developer mode is on — at most one per 4 s (`ErrorToastThrottle`, extras shown as "+N more"), it replaces the visible one instead of queueing, and a new "API Error Toasts" tile in the Developer Menu mutes it (failures are still logged). Added `error_toast_throttle_test.dart`. Root README gained a Developer Tools screenshot (`assets/readme/img_developer_tools.png`).
