@@ -122,6 +122,12 @@ flutter clean
 bash ci/run-pipeline.sh staging --skip-tests --android-only
 ```
 
+### iOS: "No IPA in build/ios/ipa despite a successful archive"
+`flutter build ipa` exits 0 when the archive succeeds but `exportArchive` fails, so the script checks for the `.ipa` itself. The real error (almost always signing: wrong profile type, expired profile, certificate not in the profile) is in the `Building App Store IPA` output *above* that line, and the `[cert]`/`[profile]` lines printed by the signing step name the likely culprit.
+
+### Switching flavors on a reused workspace
+`.env` is a hidden file that `build_runner` doesn't track, so the scripts run `build_runner clean` before building — otherwise `env.g.dart` from a previous flavor can survive and a prod build would silently use the staging API. If you replace the scripts, keep the clean.
+
 ### Android build fails with an "AAR metadata"/compileSdk mismatch
 `android/app/build.gradle.kts` sets `compileSdk = maxOf(flutter.compileSdkVersion, 37)` — a floor, since `flutter_secure_storage` requires compileSdk 37 while Flutter's own default is still lower as of this writing. Building against it requires Android SDK Platform 37 to be installed on this agent, not just on developer machines — Android Studio auto-downloads a missing platform interactively, but a headless CI agent won't prompt for the SDK license, so install it explicitly once per agent:
 ```bash

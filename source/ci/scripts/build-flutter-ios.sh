@@ -26,7 +26,20 @@ cp "$GOOGLE_SERVICE_INFO" ios/Runner/GoogleService-Info.plist
 fvm install
 cp "$ENV_FILE" .env
 fvm flutter pub get
-fvm dart run build_runner build --delete-conflicting-outputs
+# Not every project uses codegen; run build_runner only when it's installed
+# (`set -e` would otherwise fail the script on a missing package).
+# envied reads .env (copied above) via lib/core/env/env.dart, and env.g.dart
+# is git-ignored, so build_runner has to run here.
+if grep -qE '^[[:space:]]+build_runner:' pubspec.yaml; then
+    # .env is a hidden file, so build_runner doesn't track changes to it:
+    # without a clean, env.g.dart from a previous run (another flavor, with the
+    # workspace reused via PRESERVE_WORKSPACE_NATIVE) would carry over and prod
+    # could end up using the staging API.
+    fvm dart run build_runner clean
+    fvm dart run build_runner build --delete-conflicting-outputs
+else
+    echo "build_runner not in pubspec.yaml — skipping codegen."
+fi
 
 # Clean pods if pod install fails (outdated specs or lock file conflicts)
 echo "Running pod install..."
@@ -34,6 +47,17 @@ if ! fvm flutter build ipa --release --flavor "$FLAVOR" -t "$ENTRYPOINT" --expor
     echo "First build attempt failed, cleaning pods and retrying..."
     rm -f ios/Podfile.lock
     fvm flutter build ipa --release --flavor "$FLAVOR" -t "$ENTRYPOINT" --export-options-plist="$EXPORT_OPTIONS_PLIST"
+fi
+
+# `flutter build ipa` exits 0 when the archive succeeds but exportArchive
+# fails, so the exit code alone doesn't prove an IPA exists. Without this the
+# build carries on (uploading dSYMs, then failing in upload-testflight.sh with
+# "find: build/ios/ipa: No such file or directory"), which says nothing about
+# the signing error that actually caused it.
+if ! ls build/ios/ipa/*.ipa >/dev/null 2>&1; then
+    echo "No IPA in build/ios/ipa despite a successful archive — exportArchive failed." >&2
+    echo "The signing error is in the 'Building App Store IPA' output above, not here." >&2
+    exit 1
 fi
 
 # `flutter build ipa` never uploads dSYMs to Crashlytics on its own — there is

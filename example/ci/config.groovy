@@ -35,6 +35,9 @@ return [
     // ================================================================
     CRED_ANDROID_KEYSTORE      : 'example-android-keystore',   // .jks / .keystore file credential
     CRED_ANDROID_KEY_PROPERTIES: 'example-key-properties',     // key.properties file credential
+    // key.properties' storeFile may be a bare name ("release.jks", copied to
+    // android/app/) or a path with a directory ("app/release.jks", relative
+    // to android/) — match whatever your build.gradle(.kts) resolves.
 
     // ================================================================
     // iOS signing — staging ships Ad Hoc, production ships App
@@ -72,6 +75,12 @@ return [
     CRED_APPSTORE_API_KEY      : 'yourorg-appstore-api-key',       // .p8 file credential
     CRED_APPSTORE_API_KEY_ID   : 'yourorg-appstore-api-key-id',    // string credential
     CRED_APPSTORE_API_ISSUER_ID: 'yourorg-appstore-api-issuer-id', // string credential
+    // Staging and production on different Apple teams? Uncomment and fill
+    // these — a _STAGING key wins for staging builds, while production keeps
+    // using the unsuffixed keys above (no _PRODUCTION variant needed).
+    // CRED_APPSTORE_API_KEY_STAGING      : '',
+    // CRED_APPSTORE_API_KEY_ID_STAGING   : '',
+    // CRED_APPSTORE_API_ISSUER_ID_STAGING: '',
 
     // Google Play service account — used only to upload the production .aab
     // to a Play Console testing track. Needs "Release apps to testing
@@ -89,9 +98,16 @@ return [
     //                `flutter build ipa` always writes to the same
     //                build/ios/ipa/ regardless of export options, so the Ad
     //                Hoc one must upload before the second build overwrites it.
-    // 'testflight'/'both' need an App Store Connect record + an App Store
-    // (not Ad Hoc) profile for IOS_EXPORT_OPTIONS_STAGING_TESTFLIGHT below —
-    // neither exists just from setting this flag.
+    // 'testflight-buildflight' — like 'testflight' (one App Store build, only
+    //                the _TESTFLIGHT credentials), and the same .ipa is also
+    //                uploaded to buildflight so its version/build stay
+    //                current. Not installable OTA from buildflight (it
+    //                redirects to TestFlight); no Ad Hoc profile needed, one
+    //                build instead of two.
+    // 'testflight'/'both'/'testflight-buildflight' need an App Store Connect
+    // record + an App Store (not Ad Hoc) profile for
+    // IOS_EXPORT_OPTIONS_STAGING_TESTFLIGHT below — neither exists just from
+    // setting this flag.
     IOS_STAGING_DISTRIBUTION             : 'adhoc',
     IOS_EXPORT_OPTIONS_STAGING_TESTFLIGHT: 'ios/ExportOptionsStagingTestFlight.plist', // .plist
 
@@ -105,6 +121,14 @@ return [
     //                 build already does. In this mode, CRED_APPSTORE_*
     //                 and CRED_PLAYSTORE_SERVICE_ACCOUNT below are never
     //                 read — only CRED_BUILDFLIGHT_API_KEY is needed.
+    // 'both'        — store flow above AND a buildflight upload. Android
+    //                 builds twice (.apk for buildflight, .aab for Play);
+    //                 iOS also re-exports Ad Hoc for buildflight, which needs
+    //                 the *_PRODUCTION_ADHOC keys below filled in.
+    // 'testflight-buildflight' (iOS only) — store flow with a single App Store
+    //                 build; the same .ipa also goes to buildflight (version/
+    //                 build stay current, redirects to TestFlight, not
+    //                 installable OTA). No Ad Hoc credentials needed.
     ANDROID_PRODUCTION_DISTRIBUTION: 'store',
     IOS_PRODUCTION_DISTRIBUTION    : 'store',
 
@@ -115,6 +139,13 @@ return [
     // testing track. Track name is fixed to 'internal' in the Jenkinsfile —
     // not worth a config key for just one value.
     ANDROID_INTERNAL_TESTING_ENABLED: 'false',
+
+    // Only read when IOS_PRODUCTION_DISTRIBUTION is 'both' (Ad Hoc re-export
+    // for buildflight, after the App Store build). Leave blank otherwise.
+    CRED_IOS_PROFILE_PRODUCTION_ADHOC              : '', // .mobileprovision file credential (Ad Hoc)
+    CRED_IOS_EXTRA_PROFILES_PRODUCTION_ADHOC       : '', // .zip of extra Ad Hoc profiles — blank if none
+    IOS_PROVISIONING_PROFILE_FILENAME_PRODUCTION_ADHOC: '', // .mobileprovision
+    IOS_EXPORT_OPTIONS_PRODUCTION_ADHOC            : 'ios/ExportOptionsProductionAdHoc.plist', // .plist
 
     // ================================================================
     // TestFlight beta group auto-submit — off by default. Uploading alone

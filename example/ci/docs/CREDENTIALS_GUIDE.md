@@ -46,7 +46,14 @@ The certificate is **team-wide** (one cert can be used by many apps); the provis
 3. **Double-click the `.cer`** on the same Mac (the one whose private key came from step 1) — it installs automatically as a single identity.
 4. In Keychain Access, find that certificate (it must show a disclosure triangle when expanded, indicating the private key inside) → right-click → **Export** → save as `.p12` → **set a password** (do not leave it empty).
 
-⚠️ If there is no disclosure triangle on export, or importing into Jenkins only reports **"1 certificate imported"** (without "identity"/"key"), the private key was not included — repeat from step 1 on the correct Mac.
+⚠️ If there is no disclosure triangle on export, the private key was not included — repeat from step 1 on the correct Mac.
+
+Upload the `.p12` **as exported** — not zipped, not base64-encoded. The build log (`install-ios-signing.sh`) prints a diagnostic for every iOS credential before importing it, so you can tell what went wrong without a replay:
+- `[cert] WRONG: this is a ZIP archive` / `contents are text (base64 or PEM)` → wrong file uploaded; re-upload the original `.p12`.
+- `[cert] Password does not match this .p12` → fix the password credential, not the file.
+- `[cert] WARNING: no private key inside` → exported the certificate only; re-export the identity's parent row.
+- `[cert] ... none of the imported certificates are among the N certificate(s) this profile accepts` → the `.p12` and the `.mobileprovision` belong to different identities; regenerate the profile against this certificate.
+- The profile's name, app id, team, type (app store / ad hoc / enterprise) and expiry are printed too — check them against what you intended.
 
 Upload to Jenkins: **Kind = Secret file**, ID e.g. `<team>-ios-distribution-cert-staging` (staging) / `<project>-ios-appstore-cert` (production).
 

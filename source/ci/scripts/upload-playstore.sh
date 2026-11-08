@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-# Usage: upload-playstore.sh <service-account-json> <package-name> <aab-file> <track>
+# Usage: upload-playstore.sh <service-account-json> <package-name> <aab-file> <track> [mapping-file]
 # Uploads an .aab and assigns it to a Play Console track (e.g. 'internal') via
 # the Play Developer Publishing API — no Gradle plugin, plain curl, same
 # style as the App Store Connect scripts.
@@ -8,6 +8,7 @@ KEY_FILE="$1"
 PACKAGE_NAME="$2"
 AAB_FILE="$3"
 TRACK="$4"
+MAPPING_FILE="${5:-}"
 
 # curl's --fail-with-body still emits Google's actual error JSON on a 4xx/5xx
 # — but piping that straight into a python parser expecting a success field
@@ -52,6 +53,20 @@ VERSION_CODE=$(call_api \
     --header "Content-Type: application/octet-stream" \
     --data-binary "@${AAB_FILE}" \
     | python3 -c "import json, sys; print(json.load(sys.stdin)['versionCode'])")
+
+# Uploads R8/ProGuard's mapping.txt so Android vitals can de-obfuscate crash
+# stack traces in the Play Console — without this, every production crash
+# report shows minified names like "a.b.c()" and is unreadable. Optional:
+# skipped when the caller doesn't pass a mapping file (e.g. a debug build).
+if [ -n "$MAPPING_FILE" ] && [ -f "$MAPPING_FILE" ]; then
+    call_api \
+        --request POST \
+        --url "https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/${PACKAGE_NAME}/edits/${EDIT_ID}/apks/${VERSION_CODE}/deobfuscationFiles/proguard?uploadType=media" \
+        --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+        --header "Content-Type: application/octet-stream" \
+        --data-binary "@${MAPPING_FILE}" \
+        > /dev/null
+fi
 
 call_api \
     --request PUT \

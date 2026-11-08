@@ -10,4 +10,16 @@ set -euo pipefail
 # writing on a retry/second run, hence -f (same fix as install-ios-signing.sh).
 cp -f "$KEY_PROPERTIES_FILE" android/key.properties
 STORE_FILE=$(grep ^storeFile= android/key.properties | cut -d= -f2-)
-cp -f "$KEYSTORE_FILE" "android/app/$STORE_FILE"
+# storeFile comes in two valid shapes, depending on how build.gradle(.kts)
+# resolves it:
+#   - bare name ("release.jks")      -> resolved relative to android/app/
+#   - path with a dir ("app/x.jks")  -> resolved relative to android/, i.e. a
+#     project using rootProject.file()
+# Without telling them apart the second shape becomes android/app/app/x.jks
+# and cp fails.
+case "$STORE_FILE" in
+    */*) KEYSTORE_DEST="android/$STORE_FILE" ;;
+    *)   KEYSTORE_DEST="android/app/$STORE_FILE" ;;
+esac
+mkdir -p "$(dirname "$KEYSTORE_DEST")"
+cp -f "$KEYSTORE_FILE" "$KEYSTORE_DEST"
