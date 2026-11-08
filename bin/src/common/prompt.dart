@@ -37,7 +37,9 @@ String? promptSelect(String label, List<String> options) {
     // hasTerminal said yes but raw mode isn't available (e.g. /dev/null).
     return null;
   }
-  stdout.writeln('$yellow$label$reset ${cyan}(↑/↓ to move, Enter to select)$reset');
+  stdout.writeln(
+    '$yellow$label$reset ${cyan}(↑/↓ to move, Enter to select)$reset',
+  );
   stdout.write('\x1B[?25l');
 
   try {
@@ -57,8 +59,11 @@ String? promptSelect(String label, List<String> options) {
         // ESC [ A / ESC [ B
         if (stdin.readByteSync() == 91) {
           final arrow = stdin.readByteSync();
-          if (arrow == 65) index = (index - 1 + options.length) % options.length;
-          if (arrow == 66) index = (index + 1) % options.length;
+          if (arrow == 65) {
+            index = (index - 1 + options.length) % options.length;
+          } else if (arrow == 66) {
+            index = (index + 1) % options.length;
+          }
         }
       } else if (key == 107) {
         index = (index - 1 + options.length) % options.length; // k
@@ -79,10 +84,7 @@ String? promptSelect(String label, List<String> options) {
 
 /// Asks for a line of text, re-asking until [validator] returns null.
 /// Returns null when stdin isn't interactive.
-String? promptText(
-  String label, {
-  String? Function(String value)? validator,
-}) {
+String? promptText(String label, {String? Function(String value)? validator}) {
   if (!isInteractive) return null;
   while (true) {
     stdout.write('$yellow$label$reset ');
@@ -114,8 +116,11 @@ int _editDistance(String a, String b) {
     final curr = List<int>.filled(b.length + 1, 0)..[0] = i;
     for (var j = 1; j <= b.length; j++) {
       final cost = a[i - 1] == b[j - 1] ? 0 : 1;
-      curr[j] = [prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost]
-          .reduce((x, y) => x < y ? x : y);
+      curr[j] = [
+        prev[j] + 1,
+        curr[j - 1] + 1,
+        prev[j - 1] + cost,
+      ].reduce((x, y) => x < y ? x : y);
     }
     prev = curr;
   }

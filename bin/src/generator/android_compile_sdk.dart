@@ -26,7 +26,8 @@ Future<void> raiseAndroidCompileSdk(String projectPath) async {
   final buildGradleFile = File('$projectPath/android/app/build.gradle.kts');
   if (!await buildGradleFile.exists()) {
     logWarn(
-        'Warning: android/app/build.gradle.kts not found, skipping compileSdk floor.');
+      'Warning: android/app/build.gradle.kts not found, skipping compileSdk floor.',
+    );
     return;
   }
 
@@ -34,7 +35,8 @@ Future<void> raiseAndroidCompileSdk(String projectPath) async {
   const target = 'compileSdk = flutter.compileSdkVersion';
   if (!contents.contains(target)) {
     logWarn(
-        'Warning: expected "$target" not found in android/app/build.gradle.kts, skipping compileSdk floor.');
+      'Warning: expected "$target" not found in android/app/build.gradle.kts, skipping compileSdk floor.',
+    );
     return;
   }
 

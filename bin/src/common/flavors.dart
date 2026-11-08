@@ -26,9 +26,8 @@ List<String> discoverFlavors([String? projectDir]) {
     return i == -1 ? _flavorOrder.length : i;
   }
 
-  return found.toList()
-    ..sort((a, b) {
-      final byRank = rank(a).compareTo(rank(b));
-      return byRank != 0 ? byRank : a.compareTo(b);
-    });
+  return found.toList()..sort((a, b) {
+    final byRank = rank(a).compareTo(rank(b));
+    return byRank != 0 ? byRank : a.compareTo(b);
+  });
 }

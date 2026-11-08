@@ -49,12 +49,13 @@ Future<void> runGenerator() async {
   final appDisplayName = _promptAppDisplayName(projectName);
 
   logInfo(
-      'Initializing the setup for your Flutter project: "$projectName". Please hold on...');
+    'Initializing the setup for your Flutter project: "$projectName". Please hold on...',
+  );
   stdout.writeln('');
 
   // Everything below lives inside this one folder, start to finish — never
   // touches anything else in the current directory. A failure at any point
-  // is always safe to recover from the same way: remove "./<projectName>"
+  // is always safe to recover from the same way: remove `./<projectName>`
   // and try again.
   final projectDir = './$projectName';
 
@@ -69,33 +70,44 @@ Future<void> runGenerator() async {
   try {
     final source = await getSourceDir('moshaf_boilerplate');
 
-    await runStep('Creating Flutter project for project: $projectName',
-        () async {
-      await executeCommand('flutter create $projectName');
-      await raiseIosDeploymentTarget(projectDir);
-      await addMacosKeychainEntitlement(projectDir, projectName);
-      await raiseAndroidCompileSdk(projectDir);
-    });
+    await runStep(
+      'Creating Flutter project for project: $projectName',
+      () async {
+        await executeCommand('flutter create $projectName');
+        await raiseIosDeploymentTarget(projectDir);
+        await addMacosKeychainEntitlement(projectDir, projectName);
+        await raiseAndroidCompileSdk(projectDir);
+      },
+    );
 
-    await runStep('Merging template into project for project: $projectName',
-        () async {
-      final generatedPubspec = File('$projectDir/pubspec.yaml');
-      // Read before the template's own pubspec.yaml overwrites this one.
-      final overrides = await extractPubspecVersionOverrides(generatedPubspec);
+    await runStep(
+      'Merging template into project for project: $projectName',
+      () async {
+        final generatedPubspec = File('$projectDir/pubspec.yaml');
+        // Read before the template's own pubspec.yaml overwrites this one.
+        final overrides = await extractPubspecVersionOverrides(
+          generatedPubspec,
+        );
 
-      await copyFolder(source.path, projectDir);
-      await modifyFilesInFolder(projectDir, 'ProjectName', projectName);
-      await modifyFilesInFolder(projectDir, 'ProjectDisplayName', appDisplayName);
+        await copyFolder(source.path, projectDir);
+        await modifyFilesInFolder(projectDir, 'ProjectName', projectName);
+        await modifyFilesInFolder(
+          projectDir,
+          'ProjectDisplayName',
+          appDisplayName,
+        );
 
-      if (overrides != null) {
-        await applyPubspecVersionOverrides(generatedPubspec, overrides);
-      }
-    });
+        if (overrides != null) {
+          await applyPubspecVersionOverrides(generatedPubspec, overrides);
+        }
+      },
+    );
   } catch (e) {
     stdout.writeln('');
     logError('Generation aborted: $e');
     logHint(
-        'Partially generated files may remain in "$projectDir" — remove it before retrying.');
+      'Partially generated files may remain in "$projectDir" — remove it before retrying.',
+    );
     return;
   }
 
@@ -104,8 +116,10 @@ Future<void> runGenerator() async {
   // means assets.gen.dart is missing/stale, not that generation as a whole
   // needs to be aborted and retried from scratch.
   try {
-    await runStep('Generating asset constants for project: $projectName',
-        () => generateAssetsFile(projectDir));
+    await runStep(
+      'Generating asset constants for project: $projectName',
+      () => generateAssetsFile(projectDir),
+    );
   } catch (e) {
     stdout.writeln('');
     logWarn('Asset constants generation failed: $e');
@@ -116,16 +130,18 @@ Future<void> runGenerator() async {
   }
 
   try {
-    await runStep('Installing dependencies for project: $projectName',
-        () async {
-      dependencyFailures.addAll(
-        await installDependencies(
-          generatorDependencies,
-          isDev: false,
-          workingDirectory: projectDir,
-        ),
-      );
-    });
+    await runStep(
+      'Installing dependencies for project: $projectName',
+      () async {
+        dependencyFailures.addAll(
+          await installDependencies(
+            generatorDependencies,
+            isDev: false,
+            workingDirectory: projectDir,
+          ),
+        );
+      },
+    );
 
     // Flutter's Swift Package Manager plugin-symlink generation isn't
     // idempotent across repeated `flutter pub get`s in the same project —
@@ -134,21 +150,24 @@ Future<void> runGenerator() async {
     // the step above just created. See _resetSpmEphemeralPackages.
     await _resetSpmEphemeralPackages(projectDir);
 
-    await runStep('Installing dev dependencies for project: $projectName',
-        () async {
-      dependencyFailures.addAll(
-        await installDependencies(
-          generatorDevDependencies,
-          isDev: true,
-          workingDirectory: projectDir,
-        ),
-      );
-    });
+    await runStep(
+      'Installing dev dependencies for project: $projectName',
+      () async {
+        dependencyFailures.addAll(
+          await installDependencies(
+            generatorDevDependencies,
+            isDev: true,
+            workingDirectory: projectDir,
+          ),
+        );
+      },
+    );
   } catch (e) {
     stdout.writeln('');
     logError('Generation aborted: $e');
     logHint(
-        'Partially generated files may remain in "$projectDir" — remove it before retrying.');
+      'Partially generated files may remain in "$projectDir" — remove it before retrying.',
+    );
     return;
   }
 
@@ -164,23 +183,28 @@ Future<void> runGenerator() async {
   // broken — every other step already succeeded — so each gets its own
   // try/catch with advice to fix and retry that one step, instead of the
   // generic "remove and start over" abort message above.
-  final flavorizrDepFailed =
-      dependencyFailures.any((f) => f.package == 'flutter_flavorizr');
+  final flavorizrDepFailed = dependencyFailures.any(
+    (f) => f.package == 'flutter_flavorizr',
+  );
   if (flavorizrDepFailed) {
     logWarn(
-        'Skipping flavor configuration: flutter_flavorizr failed to install (see warning above).');
+      'Skipping flavor configuration: flutter_flavorizr failed to install (see warning above).',
+    );
     logHint(
-        'Fix that dependency, then run "dart run flutter_flavorizr -f" manually from inside "$projectDir".');
+      'Fix that dependency, then run "dart run flutter_flavorizr -f" manually from inside "$projectDir".',
+    );
   } else {
     try {
-      await runStep('Applying flavor configuration for project: $projectName',
-          () async {
-        await runFlavorizr(workingDirectory: projectDir);
-        // Re-asserted in case flavorizr's newly duplicated Debug-dev/
-        // Release-dev/etc. configs didn't fully inherit 15.0 from the base
-        // configs raised in the first step, above.
-        await raiseIosDeploymentTarget(projectDir);
-      });
+      await runStep(
+        'Applying flavor configuration for project: $projectName',
+        () async {
+          await runFlavorizr(workingDirectory: projectDir);
+          // Re-asserted in case flavorizr's newly duplicated Debug-dev/
+          // Release-dev/etc. configs didn't fully inherit 15.0 from the base
+          // configs raised in the first step, above.
+          await raiseIosDeploymentTarget(projectDir);
+        },
+      );
     } catch (e) {
       stdout.writeln('');
       logWarn('Flavor configuration failed: $e');
@@ -193,14 +217,16 @@ Future<void> runGenerator() async {
 
   var buildRunnerLog = '';
   try {
-    await runStep('Generating code (build_runner) for project: $projectName',
-        () async {
-      final result = await runBuildRunner(workingDirectory: projectDir);
-      buildRunnerLog = result.output;
-      if (!result.success) {
-        throw 'all build_runner strategies (fvm flutter / dart / flutter) failed';
-      }
-    });
+    await runStep(
+      'Generating code (build_runner) for project: $projectName',
+      () async {
+        final result = await runBuildRunner(workingDirectory: projectDir);
+        buildRunnerLog = result.output;
+        if (!result.success) {
+          throw 'all build_runner strategies (fvm flutter / dart / flutter) failed';
+        }
+      },
+    );
   } catch (e) {
     stdout.writeln('');
     logWarn('build_runner failed: $e');
@@ -220,7 +246,8 @@ Future<void> runGenerator() async {
   logInfo('Your Flutter project is now ready in "$projectDir"!');
   if (dependencyFailures.isNotEmpty) {
     logWarn(
-        'Remember to fix the dependency warnings above before your first run.');
+      'Remember to fix the dependency warnings above before your first run.',
+    );
   }
   logInfo('Thank you for using MOSHAF Boilerplate Generator.');
   logInfo('💻 Happy coding and good luck with your project! 🚀');
@@ -232,7 +259,8 @@ Future<void> runGenerator() async {
 void _warnAboutDependencyFailures(List<DependencyFailure> failures) {
   stdout.writeln('');
   logWarn(
-      '⚠ ${failures.length} dependenc${failures.length == 1 ? 'y' : 'ies'} could not be added automatically:');
+    '⚠ ${failures.length} dependenc${failures.length == 1 ? 'y' : 'ies'} could not be added automatically:',
+  );
   for (final failure in failures) {
     logWarn('  - ${failure.package}: ${failure.reason}');
   }
@@ -247,20 +275,24 @@ void _warnAboutDependencyFailures(List<DependencyFailure> failures) {
 Future<bool> _checkFlutterVersion() async {
   ProcessResult result;
   try {
-    result =
-        await Process.run('fvm', ['flutter', '--version'], runInShell: true);
+    result = await Process.run('fvm', [
+      'flutter',
+      '--version',
+    ], runInShell: true);
     if (result.exitCode != 0) {
       result = await Process.run('flutter', ['--version'], runInShell: true);
     }
   } catch (e) {
     logError(
-        'Failed to run "flutter --version". Make sure Flutter or FVM is installed and in your PATH.');
+      'Failed to run "flutter --version". Make sure Flutter or FVM is installed and in your PATH.',
+    );
     return false;
   }
 
   if (result.exitCode != 0) {
     logError(
-        'Failed to run "flutter --version". Make sure Flutter or FVM is installed and in your PATH.');
+      'Failed to run "flutter --version". Make sure Flutter or FVM is installed and in your PATH.',
+    );
     return false;
   }
 
@@ -273,9 +305,11 @@ Future<bool> _checkFlutterVersion() async {
   if (versionLessThan(flutterVersion, minFlutterVersion)) {
     logWarn('Flutter version detected: $flutterVersion');
     logError(
-        'Warning: recommended Flutter version is $minFlutterVersion or higher, but detected $flutterVersion.');
+      'Warning: recommended Flutter version is $minFlutterVersion or higher, but detected $flutterVersion.',
+    );
     logError(
-        'Please use Flutter $minFlutterVersion or newer for best compatibility with this boilerplate.');
+      'Please use Flutter $minFlutterVersion or newer for best compatibility with this boilerplate.',
+    );
   } else {
     logHint('Flutter version detected: $flutterVersion');
   }
@@ -300,7 +334,8 @@ Future<void> _resetSpmEphemeralPackages(String projectDir) async {
 /// `snake_case` format Flutter/Dart package names require.
 String? _promptProjectName() {
   stdout.write(
-      'Please enter the Flutter project name (e.g. moshaf_app or moshafapp): ');
+    'Please enter the Flutter project name (e.g. moshaf_app or moshafapp): ',
+  );
   final projectName = stdin.readLineSync();
 
   if (projectName == null || projectName.trim().isEmpty) {
@@ -311,7 +346,8 @@ String? _promptProjectName() {
   if (!RegExp(r'^[a-z0-9_]+$').hasMatch(projectName)) {
     logError('Error: invalid project name "$projectName".');
     stdout.writeln(
-        'The name should consist of lowercase letters, numbers, and underscores only.');
+      'The name should consist of lowercase letters, numbers, and underscores only.',
+    );
     logWarn('Example of a valid name: moshaf_app or moshafapp');
     stdout.writeln('');
     return null;
@@ -326,7 +362,8 @@ String? _promptProjectName() {
 String _promptAppDisplayName(String projectName) {
   final fallback = _titleCaseFromSnakeCase(projectName);
   stdout.write(
-      'Please enter the app display name (press Enter to use "$fallback"): ');
+    'Please enter the app display name (press Enter to use "$fallback"): ',
+  );
   final input = stdin.readLineSync();
 
   if (input == null || input.trim().isEmpty) {
@@ -344,7 +381,7 @@ String _titleCaseFromSnakeCase(String name) {
 }
 
 /// Guards the one way `create` can clobber existing work now that
-/// generation stays inside "./<projectName>" the whole time: that folder
+/// generation stays inside `./<projectName>` the whole time: that folder
 /// already existing (it would get merged into and dependency-installed
 /// over, potentially mixing with whatever was already there).
 bool _confirmSafeToGenerateInto(String projectName) {

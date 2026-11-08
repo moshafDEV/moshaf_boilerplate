@@ -22,8 +22,9 @@ Future<Directory> getSourceDir(
     );
   }
 
-  final packageRoot =
-      Directory.fromUri(libUri).parent; // .../package-<version>/
+  final packageRoot = Directory.fromUri(
+    libUri,
+  ).parent; // .../package-<version>/
   final sourceDir = Directory(
     p.join(packageRoot.path, customTargetDir ?? 'source'),
   );

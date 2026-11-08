@@ -23,7 +23,9 @@ String? _validateName(String name, Set<String> existing) {
 void printFlavorUsage() {
   stdout.writeln('Usage: moshaf_boilerplate flavor <command>\n');
   stdout.writeln('Commands:');
-  stdout.writeln('  add [name]   Scaffold a new build flavor (asks for a name if omitted)');
+  stdout.writeln(
+    '  add [name]   Scaffold a new build flavor (asks for a name if omitted)',
+  );
   stdout.writeln('  icons        Generate ribboned dev/staging app icons');
   stdout.writeln('  list         Show flavors defined in this project');
 }
@@ -31,7 +33,9 @@ void printFlavorUsage() {
 void _listFlavors() {
   final flavors = discoverFlavors();
   if (flavors.isEmpty) {
-    logError('No .env.<flavor> files found — run from a generated project root.');
+    logError(
+      'No .env.<flavor> files found — run from a generated project root.',
+    );
     exit(1);
   }
   for (final f in flavors) {
@@ -75,14 +79,15 @@ Future<void> mainFlavor(List<String> arguments) async {
 
   final existing = {'dev', 'prod', ...discoverFlavors()};
   final rest = arguments.length > 1 ? arguments.sublist(1) : <String>[];
-  final name = (rest.isNotEmpty
-          ? rest.first
-          : promptText(
-              'New flavor name (e.g. staging, qa):',
-              validator: (v) => _validateName(v, existing),
-            ) ??
-              '')
-      .toLowerCase();
+  final name =
+      (rest.isNotEmpty
+              ? rest.first
+              : promptText(
+                      'New flavor name (e.g. staging, qa):',
+                      validator: (v) => _validateName(v, existing),
+                    ) ??
+                    '')
+          .toLowerCase();
 
   if (name.isEmpty) {
     logError('Flavor name required.');
@@ -98,10 +103,7 @@ Future<void> mainFlavor(List<String> arguments) async {
   final projectDir = Directory.current.path;
 
   try {
-    await runStep(
-      'Adding flavor "$name"',
-      () => _addFlavor(projectDir, name),
-    );
+    await runStep('Adding flavor "$name"', () => _addFlavor(projectDir, name));
   } catch (e) {
     logError('Failed to add flavor "$name": $e');
     exit(1);
@@ -216,12 +218,14 @@ Future<void> _patchFlavorizr(String projectDir, String name) async {
     return;
   }
 
-  final appNameMatch =
-      RegExp(r'prod:\s*\n\s*app:\s*\n\s*name:\s*"([^"]+)"').firstMatch(content);
+  final appNameMatch = RegExp(
+    r'prod:\s*\n\s*app:\s*\n\s*name:\s*"([^"]+)"',
+  ).firstMatch(content);
   final appName = appNameMatch?.group(1) ?? name;
 
-  final basePackageMatch =
-      RegExp(r'prod:[\s\S]*?applicationId:\s*"([^"]+)"').firstMatch(content);
+  final basePackageMatch = RegExp(
+    r'prod:[\s\S]*?applicationId:\s*"([^"]+)"',
+  ).firstMatch(content);
   final basePackage = basePackageMatch?.group(1);
   if (basePackage == null) {
     throw StateError(
@@ -231,7 +235,8 @@ Future<void> _patchFlavorizr(String projectDir, String name) async {
   }
 
   final title = name[0].toUpperCase() + name.substring(1);
-  final block = '''
+  final block =
+      '''
   $name:
     app:
       name: "$appName $title"
@@ -253,8 +258,9 @@ Future<void> _patchFlavorizr(String projectDir, String name) async {
 
   final anchor = '# Deliberately excludes';
   final anchorIndex = content.indexOf(anchor);
-  final insertAt =
-      anchorIndex != -1 ? anchorIndex : content.indexOf('instructions:');
+  final insertAt = anchorIndex != -1
+      ? anchorIndex
+      : content.indexOf('instructions:');
   if (insertAt == -1) {
     throw StateError('Could not find where to insert the new flavor block.');
   }
@@ -276,9 +282,9 @@ Future<void> _writeEnvFile(String projectDir, String name) async {
   if (await envDartFile.exists()) {
     final envDartContent = await envDartFile.readAsString();
     varNames.addAll(
-      RegExp(r"varName:\s*'([^']+)'")
-          .allMatches(envDartContent)
-          .map((m) => m.group(1)!),
+      RegExp(
+        r"varName:\s*'([^']+)'",
+      ).allMatches(envDartContent).map((m) => m.group(1)!),
     );
   }
   if (varNames.isEmpty) {
@@ -328,8 +334,8 @@ Future<void> _addLaunchJsonConfigs(String projectDir, String name) async {
   }
 
   final json = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-  final configurations =
-      (json['configurations'] as List).cast<Map<String, dynamic>>();
+  final configurations = (json['configurations'] as List)
+      .cast<Map<String, dynamic>>();
 
   final title = name[0].toUpperCase() + name.substring(1);
   final projectLabel = _projectLabelFrom(configurations) ?? 'App';
@@ -354,13 +360,15 @@ Future<void> _addLaunchJsonConfigs(String projectDir, String name) async {
   await file.writeAsString('${encoder.convert(json)}\n');
 }
 
-/// Existing configs are named "<ProjectLabel> <Mode>: Run <Flavor> Flavor" —
+/// Existing configs are named `"<ProjectLabel> <Mode>: Run <Flavor> Flavor"` —
 /// reuse whatever prefix is already there instead of hardcoding one.
 String? _projectLabelFrom(List<Map<String, dynamic>> configurations) {
   for (final c in configurations) {
     final name = c['name'] as String?;
     if (name == null) continue;
-    final match = RegExp(r'^(.*) (Debug|Profile|Release): Run ').firstMatch(name);
+    final match = RegExp(
+      r'^(.*) (Debug|Profile|Release): Run ',
+    ).firstMatch(name);
     if (match != null) return match.group(1);
   }
   return null;

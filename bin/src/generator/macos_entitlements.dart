@@ -32,7 +32,8 @@ Future<void> addMacosKeychainEntitlement(
     final dict = document.rootElement.getElement('dict');
     if (dict == null) {
       logWarn(
-          'Warning: could not find <dict> in $relativePath, skipping keychain entitlement.');
+        'Warning: could not find <dict> in $relativePath, skipping keychain entitlement.',
+      );
       continue;
     }
 
@@ -43,14 +44,21 @@ Future<void> addMacosKeychainEntitlement(
 
     dict.children.addAll([
       XmlElement.tag('key', children: [XmlText('keychain-access-groups')]),
-      XmlElement.tag('array', children: [
-        XmlElement.tag('string', children: [
-          XmlText('\$(AppIdentifierPrefix)com.example.$projectName'),
-        ]),
-      ]),
+      XmlElement.tag(
+        'array',
+        children: [
+          XmlElement.tag(
+            'string',
+            children: [
+              XmlText('\$(AppIdentifierPrefix)com.example.$projectName'),
+            ],
+          ),
+        ],
+      ),
     ]);
 
-    await file
-        .writeAsString('${document.toXmlString(pretty: true, indent: '\t')}\n');
+    await file.writeAsString(
+      '${document.toXmlString(pretty: true, indent: '\t')}\n',
+    );
   }
 }

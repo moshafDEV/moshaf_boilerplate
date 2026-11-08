@@ -27,8 +27,9 @@ Future<void> mainEnv(List<String> arguments) async {
   final skipBuild = arguments.contains('--no-build');
   final autoYes = arguments.contains('--yes') || arguments.contains('-y');
   final positional = arguments.where((a) => !a.startsWith('-')).toList();
-  final unknownFlags = arguments.where((a) =>
-      a.startsWith('-') && !{'--yes', '-y', '--no-build'}.contains(a));
+  final unknownFlags = arguments.where(
+    (a) => a.startsWith('-') && !{'--yes', '-y', '--no-build'}.contains(a),
+  );
   if (unknownFlags.isNotEmpty) {
     logError('Unknown option: ${unknownFlags.first}');
     printEnvUsage();
@@ -76,7 +77,8 @@ Future<void> runCodegenForFlavor(String flavor) async {
 
   if (!result.success) {
     logError(
-        'All strategies failed. Please ensure SDK & dependencies are installed correctly.');
+      'All strategies failed. Please ensure SDK & dependencies are installed correctly.',
+    );
     if (result.output.trim().isNotEmpty) {
       stdout.writeln('');
       logHint('--- build_runner output (for debugging) ---');
@@ -99,9 +101,12 @@ Future<void> mainPLT(List<String> arguments) async {
 void printEnvUsage() {
   stdout.writeln('Usage: moshaf_boilerplate env [flavor] [options]\n');
   stdout.writeln(
-      'Copies .env.<flavor> to .env (and GoogleService-Info-<flavor>.plist),');
+    'Copies .env.<flavor> to .env (and GoogleService-Info-<flavor>.plist),',
+  );
   stdout.writeln('then optionally runs build_runner.\n');
-  stdout.writeln('Without [flavor], pick one of the .env.* files found here.\n');
+  stdout.writeln(
+    'Without [flavor], pick one of the .env.* files found here.\n',
+  );
   stdout.writeln('Options:');
   stdout.writeln('  -y, --yes     Run build_runner without asking');
   stdout.writeln('      --no-build  Skip build_runner');
@@ -187,7 +192,8 @@ void _copyGoogleServiceFile(String flavor) {
     return;
   }
 
-  File(googleServiceFilePath)
-      .copySync('$cwd/ios/Runner/GoogleService-Info.plist');
+  File(
+    googleServiceFilePath,
+  ).copySync('$cwd/ios/Runner/GoogleService-Info.plist');
   logInfo('Using $googleServiceFile for GoogleService-Info.plist');
 }

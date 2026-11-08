@@ -48,7 +48,9 @@ void printHelp() {
   stdout.writeln('  moshaf_boilerplate build apk staging');
   stdout.writeln('  moshaf_boilerplate flavor add staging');
   stdout.writeln('  moshaf_boilerplate assets');
-  stdout.writeln('\nDeprecated: "pre_launch_task <flavor>" → use "env <flavor>".');
+  stdout.writeln(
+    '\nDeprecated: "pre_launch_task <flavor>" → use "env <flavor>".',
+  );
 }
 
 /// Prints help for [command]; returns false when it isn't a known command.

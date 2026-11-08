@@ -8,13 +8,18 @@ import '../pre_launch/pre_launch_runner.dart';
 const _targets = {'apk': 'apk', 'aab': 'appbundle', 'ipa': 'ipa'};
 
 void printBuildUsage() {
-  stdout.writeln('Usage: moshaf_boilerplate build [apk|aab|ipa] [flavor] [options]\n');
   stdout.writeln(
-      'Switches to the flavor (env step: .env + Firebase files + build_runner),');
+    'Usage: moshaf_boilerplate build [apk|aab|ipa] [flavor] [options]\n',
+  );
   stdout.writeln(
-      'then runs "flutter build <target> --flavor <flavor> -t lib/main_<flavor>.dart".');
+    'Switches to the flavor (env step: .env + Firebase files + build_runner),',
+  );
   stdout.writeln(
-      'Missing target/flavor are picked interactively (plus version and, for ipa,');
+    'then runs "flutter build <target> --flavor <flavor> -t lib/main_<flavor>.dart".',
+  );
+  stdout.writeln(
+    'Missing target/flavor are picked interactively (plus version and, for ipa,',
+  );
   stdout.writeln('export method).\n');
   stdout.writeln('Options:');
   stdout.writeln('      --debug | --profile   Build mode (default: release)');
@@ -22,35 +27,50 @@ void printBuildUsage() {
   stdout.writeln('      --build-name <x.y.z>  Version name for this build');
   stdout.writeln('      --build-number <n>    Build number for this build');
   stdout.writeln(
-      '      --bump <kind>         major | minor | patch | build — raise the pubspec');
+    '      --bump <kind>         major | minor | patch | build — raise the pubspec',
+  );
   stdout.writeln(
-      '                            version (build number +1) and save it after success');
+    '                            version (build number +1) and save it after success',
+  );
   stdout.writeln(
-      '      --save                Write --build-name/--build-number to pubspec.yaml');
+    '      --save                Write --build-name/--build-number to pubspec.yaml',
+  );
   stdout.writeln('                            after a successful build');
   stdout.writeln(
-      '      --export-method <m>   ipa only: app-store (default) | ad-hoc | development |');
+    '      --export-method <m>   ipa only: app-store (default) | ad-hoc | development |',
+  );
   stdout.writeln('                            enterprise');
   stdout.writeln(
-      '      --no-codesign         ipa only: archive without signing');
+    '      --no-codesign         ipa only: archive without signing',
+  );
   stdout.writeln(
-      '      --obfuscate           Obfuscate Dart code (symbols → build/symbols/<flavor>)');
-  stdout.writeln('      --no-codegen          Skip build_runner in the env step');
+    '      --obfuscate           Obfuscate Dart code (symbols → build/symbols/<flavor>)',
+  );
+  stdout.writeln(
+    '      --no-codegen          Skip build_runner in the env step',
+  );
   stdout.writeln('      --no-env              Skip the env step entirely');
-  stdout.writeln('      --dry-run             Print the commands without running them');
-  stdout.writeln('  -h, --help                Show this help');
-  stdout.writeln('  -- <args>                 Pass everything after -- to flutter\n');
   stdout.writeln(
-      'Without --save/--bump, --build-name/--build-number only affect that build;');
+    '      --dry-run             Print the commands without running them',
+  );
+  stdout.writeln('  -h, --help                Show this help');
+  stdout.writeln(
+    '  -- <args>                 Pass everything after -- to flutter\n',
+  );
+  stdout.writeln(
+    'Without --save/--bump, --build-name/--build-number only affect that build;',
+  );
   stdout.writeln('pubspec.yaml is left untouched.\n');
   stdout.writeln('Examples:');
   stdout.writeln('  moshaf_boilerplate build');
   stdout.writeln('  moshaf_boilerplate build apk staging');
   stdout.writeln('  moshaf_boilerplate build ipa prod --bump patch');
   stdout.writeln(
-      '  moshaf_boilerplate build ipa staging --export-method ad-hoc');
+    '  moshaf_boilerplate build ipa staging --export-method ad-hoc',
+  );
   stdout.writeln(
-      '  moshaf_boilerplate build aab prod --build-name 1.4.0 --build-number 42 --save');
+    '  moshaf_boilerplate build aab prod --build-name 1.4.0 --build-number 42 --save',
+  );
 }
 
 class _Args {
@@ -99,11 +119,10 @@ _Args _parse(
 /// actually works for this project — otherwise plain `flutter`.
 Future<List<String>> _flutterCommand() async {
   if (await commandExists('fvm')) {
-    final probe = await Process.run(
-      'fvm',
-      ['flutter', '--version'],
-      runInShell: true,
-    );
+    final probe = await Process.run('fvm', [
+      'flutter',
+      '--version',
+    ], runInShell: true);
     if (probe.exitCode == 0) return ['fvm', 'flutter'];
     logWarn('fvm found but "fvm flutter" failed — falling back to flutter.');
   }
@@ -132,8 +151,10 @@ Future<void> _prepare(
 }) async {
   if (skipEnv) return;
   if (dryRun) {
-    logHint('(dry run) env: .env.$flavor → .env'
-        '${skipCodegen ? '' : ', then build_runner'}');
+    logHint(
+      '(dry run) env: .env.$flavor → .env'
+      '${skipCodegen ? '' : ', then build_runner'}',
+    );
     return;
   }
   copyFlavorFiles(flavor);
@@ -149,8 +170,10 @@ String _requireMainFile(String flavor) {
   return main;
 }
 
-final _versionLine =
-    RegExp(r'^version:\s*(\d+\.\d+\.\d+)(?:\+(\d+))?\s*$', multiLine: true);
+final _versionLine = RegExp(
+  r'^version:\s*(\d+\.\d+\.\d+)(?:\+(\d+))?\s*$',
+  multiLine: true,
+);
 final _versionNameRe = RegExp(r'^\d+\.\d+\.\d+$');
 const _exportMethods = ['app-store', 'ad-hoc', 'development', 'enterprise'];
 
@@ -189,8 +212,9 @@ String _bumpName(String name, String kind) {
   }
 }
 
-String? _validateBuildNumber(String v) =>
-    v.isEmpty || int.tryParse(v) != null ? null : 'Build number must be an integer.';
+String? _validateBuildNumber(String v) => v.isEmpty || int.tryParse(v) != null
+    ? null
+    : 'Build number must be an integer.';
 
 String? _validateVersionName(String v) =>
     v.isEmpty || _versionNameRe.hasMatch(v) ? null : 'Use x.y.z (e.g. 1.4.0).';
@@ -201,7 +225,12 @@ String? _validateVersionName(String v) =>
 Future<void> _checkSigningIdentity() async {
   if (!Platform.isMacOS) return;
   try {
-    final r = await Process.run('security', ['find-identity', '-v', '-p', 'codesigning']);
+    final r = await Process.run('security', [
+      'find-identity',
+      '-v',
+      '-p',
+      'codesigning',
+    ]);
     final out = r.stdout.toString();
     if (out.contains(' 0 valid identities found')) {
       logWarn(
@@ -222,10 +251,22 @@ Future<void> mainBuild(List<String> arguments) async {
   final parsed = _parse(
     arguments,
     boolFlags: {
-      '--debug', '--profile', '--split-per-abi', '--obfuscate',
-      '--no-codegen', '--no-env', '--dry-run', '--save', '--no-codesign',
+      '--debug',
+      '--profile',
+      '--split-per-abi',
+      '--obfuscate',
+      '--no-codegen',
+      '--no-env',
+      '--dry-run',
+      '--save',
+      '--no-codesign',
     },
-    valueOptions: {'--build-name', '--build-number', '--bump', '--export-method'},
+    valueOptions: {
+      '--build-name',
+      '--build-number',
+      '--bump',
+      '--export-method',
+    },
     usage: printBuildUsage,
   );
   if (parsed.flags.containsAll(['--debug', '--profile'])) {
@@ -276,8 +317,10 @@ Future<void> mainBuild(List<String> arguments) async {
   // ipa export method: validate, or ask when the command was incomplete.
   var exportMethod = parsed.values['--export-method'];
   if (exportMethod != null && !_exportMethods.contains(exportMethod)) {
-    logError('Unknown export method "$exportMethod". '
-        'Use: ${_exportMethods.join(' | ')}');
+    logError(
+      'Unknown export method "$exportMethod". '
+      'Use: ${_exportMethods.join(' | ')}',
+    );
     exit(1);
   }
   if (target == 'ipa' &&
@@ -350,8 +393,8 @@ Future<void> mainBuild(List<String> arguments) async {
   final mode = parsed.flags.contains('--debug')
       ? 'debug'
       : parsed.flags.contains('--profile')
-          ? 'profile'
-          : 'release';
+      ? 'profile'
+      : 'release';
   final command = [
     ...await _flutterCommand(),
     'build',
@@ -403,6 +446,8 @@ Future<void> mainBuild(List<String> arguments) async {
   };
   logHint('Output: $output');
   if (parsed.flags.contains('--obfuscate')) {
-    logHint('Keep build/symbols/$flavor — needed to symbolicate crash reports.');
+    logHint(
+      'Keep build/symbols/$flavor — needed to symbolicate crash reports.',
+    );
   }
 }

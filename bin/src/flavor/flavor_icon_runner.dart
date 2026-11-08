@@ -24,7 +24,9 @@ final _ribbonTextColor = img.ColorRgba8(0xFF, 0xFF, 0xFF, 255);
 Future<void> mainFlavorIcons(List<String> arguments) async {
   final projectDir = Directory.current.path;
 
-  final baseConfigFile = File(p.join(projectDir, 'flutter_launcher_icons.yaml'));
+  final baseConfigFile = File(
+    p.join(projectDir, 'flutter_launcher_icons.yaml'),
+  );
   if (!await baseConfigFile.exists()) {
     logError(
       'flutter_launcher_icons.yaml not found — run this from a generated '
@@ -34,8 +36,10 @@ Future<void> mainFlavorIcons(List<String> arguments) async {
   }
   final baseConfigContent = await baseConfigFile.readAsString();
 
-  final imagePathMatch =
-      RegExp(r'^\s*image_path:\s*"([^"]+)"', multiLine: true).firstMatch(baseConfigContent);
+  final imagePathMatch = RegExp(
+    r'^\s*image_path:\s*"([^"]+)"',
+    multiLine: true,
+  ).firstMatch(baseConfigContent);
   final basePath = imagePathMatch?.group(1);
   if (basePath == null) {
     logError('Could not find "image_path:" in flutter_launcher_icons.yaml.');
@@ -72,9 +76,13 @@ Future<void> mainFlavorIcons(List<String> arguments) async {
       // icon (android/ios/web/macos all share one file in this
       // boilerplate) — replacing that literal path swaps the ribboned
       // icon in everywhere the base config used it.
-      final flavorConfig = baseConfigContent.replaceAll(basePath, outRelativePath);
-      await File(p.join(projectDir, 'flutter_launcher_icons-$flavor.yaml'))
-          .writeAsString(flavorConfig);
+      final flavorConfig = baseConfigContent.replaceAll(
+        basePath,
+        outRelativePath,
+      );
+      await File(
+        p.join(projectDir, 'flutter_launcher_icons-$flavor.yaml'),
+      ).writeAsString(flavorConfig);
     });
   }
 
@@ -86,8 +94,9 @@ Future<void> mainFlavorIcons(List<String> arguments) async {
   // (re)generated the moment dev/staging configs exist. Verbatim copy of
   // the base config — prod stays plain, no ribbon.
   await runStep('Generating "prod" flavor config (plain, no ribbon)', () async {
-    await File(p.join(projectDir, 'flutter_launcher_icons-prod.yaml'))
-        .writeAsString(baseConfigContent);
+    await File(
+      p.join(projectDir, 'flutter_launcher_icons-prod.yaml'),
+    ).writeAsString(baseConfigContent);
   });
 
   stdout.writeln('');

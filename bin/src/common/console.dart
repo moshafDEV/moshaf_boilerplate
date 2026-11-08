@@ -20,10 +20,7 @@ void logHint(String message) => stdout.writeln('$cyan$message$reset');
 /// to the real async work: if [action] throws, the step is reported as
 /// failed and the error is rethrown so the caller can stop the pipeline
 /// instead of continuing on top of a broken step.
-Future<T> runStep<T>(
-  String label,
-  Future<T> Function() action,
-) async {
+Future<T> runStep<T>(String label, Future<T> Function() action) async {
   const frames = ['|', '/', '-', '\\'];
   var frame = 0;
 
@@ -57,8 +54,8 @@ Future<bool> promptYesNoAutoYes(String label, {int seconds = 5}) async {
       .transform(utf8.decoder)
       .transform(const LineSplitter())
       .listen((line) {
-    if (!completer.isCompleted) completer.complete(line.trim());
-  });
+        if (!completer.isCompleted) completer.complete(line.trim());
+      });
 
   var remaining = seconds;
   void render() => stdout.write('\r$label (y/n, auto "y" in $remaining s): ');

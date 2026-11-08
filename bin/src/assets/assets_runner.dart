@@ -5,10 +5,39 @@ import 'package:path/path.dart' as p;
 import '../common/console.dart';
 
 const _dartReservedWords = {
-  'assert', 'break', 'case', 'catch', 'class', 'const', 'continue', 'default',
-  'do', 'else', 'enum', 'extends', 'false', 'final', 'finally', 'for', 'if',
-  'in', 'is', 'new', 'null', 'rethrow', 'return', 'super', 'switch', 'this',
-  'throw', 'true', 'try', 'var', 'void', 'while', 'with',
+  'assert',
+  'break',
+  'case',
+  'catch',
+  'class',
+  'const',
+  'continue',
+  'default',
+  'do',
+  'else',
+  'enum',
+  'extends',
+  'false',
+  'final',
+  'finally',
+  'for',
+  'if',
+  'in',
+  'is',
+  'new',
+  'null',
+  'rethrow',
+  'return',
+  'super',
+  'switch',
+  'this',
+  'throw',
+  'true',
+  'try',
+  'var',
+  'void',
+  'while',
+  'with',
 };
 
 /// Splits [basenameWithoutExt] on `-`, `_`, whitespace, and any non
@@ -29,7 +58,9 @@ String _capitalize(String s) =>
 /// lowerCamelCase identifier for a generated field name, e.g.
 /// `img_landing` -> `imgLanding`, `Manrope-Bold` -> `manropeBold`.
 String _toCamelCase(String basenameWithoutExt) {
-  final tokens = _tokenize(basenameWithoutExt).map((t) => t.toLowerCase()).toList();
+  final tokens = _tokenize(
+    basenameWithoutExt,
+  ).map((t) => t.toLowerCase()).toList();
   if (tokens.isEmpty) return 'asset';
 
   final buffer = StringBuffer(tokens.first);
@@ -46,7 +77,9 @@ String _toCamelCase(String basenameWithoutExt) {
 /// PascalCase identifier for a generated class name, e.g. `images` ->
 /// `Images` (used as `$AssetsImagesGen`).
 String _toPascalCase(String basenameWithoutExt) {
-  final tokens = _tokenize(basenameWithoutExt).map((t) => t.toLowerCase()).toList();
+  final tokens = _tokenize(
+    basenameWithoutExt,
+  ).map((t) => t.toLowerCase()).toList();
   if (tokens.isEmpty) return 'Asset';
   return tokens.map(_capitalize).join();
 }
@@ -54,7 +87,9 @@ String _toPascalCase(String basenameWithoutExt) {
 /// snake_case for a generated per-folder file name, e.g. `images` ->
 /// `images`, `App Icons` -> `app_icons` (used as `assets_app_icons.gen.dart`).
 String _toSnakeCase(String basenameWithoutExt) {
-  final tokens = _tokenize(basenameWithoutExt).map((t) => t.toLowerCase()).toList();
+  final tokens = _tokenize(
+    basenameWithoutExt,
+  ).map((t) => t.toLowerCase()).toList();
   if (tokens.isEmpty) return 'asset';
   return tokens.join('_');
 }
@@ -80,7 +115,9 @@ List<_AssetFile> _assignFieldNames(List<String> relativePaths) {
       if (tier == 0) return naive;
       if (tier == 1) {
         final parent = segments.isNotEmpty ? segments.last : '';
-        return parent.isEmpty ? naive : '${_toCamelCase(parent)}${_capitalize(naive)}';
+        return parent.isEmpty
+            ? naive
+            : '${_toCamelCase(parent)}${_capitalize(naive)}';
       }
       if (tier == 2) {
         final chain = [...segments, p.basenameWithoutExtension(fileName)];
@@ -118,7 +155,8 @@ List<_AssetFile> _assignFieldNames(List<String> relativePaths) {
 
 bool _hasDuplicates(List<String> names) => names.toSet().length != names.length;
 
-const _genHeader = '// GENERATED CODE - DO NOT MODIFY BY HAND\n'
+const _genHeader =
+    '// GENERATED CODE - DO NOT MODIFY BY HAND\n'
     '// Regenerate with: moshaf_boilerplate assets\n';
 
 /// Scans [assetsDir] and returns every generated file's content, keyed by
@@ -128,28 +166,30 @@ const _genHeader = '// GENERATED CODE - DO NOT MODIFY BY HAND\n'
 /// defines the `Assets` root class. Pure: no I/O beyond reading the
 /// directory tree it's given, no side effects — fully testable in isolation.
 Map<String, String> generateAssetsFiles(Directory assetsDir) {
-  final topLevelDirs = assetsDir
-      .listSync()
-      .whereType<Directory>()
-      .where((d) => !p.basename(d.path).startsWith('.'))
-      .toList()
-    ..sort((a, b) => p.basename(a.path).compareTo(p.basename(b.path)));
+  final topLevelDirs =
+      assetsDir
+          .listSync()
+          .whereType<Directory>()
+          .where((d) => !p.basename(d.path).startsWith('.'))
+          .toList()
+        ..sort((a, b) => p.basename(a.path).compareTo(p.basename(b.path)));
 
   final classes = <String, List<_AssetFile>>{};
 
   for (final dir in topLevelDirs) {
     final folderName = p.basename(dir.path);
-    final relativePaths = dir
-        .listSync(recursive: true)
-        .whereType<File>()
-        .map((f) => p.relative(f.path, from: dir.path))
-        .where((rel) {
-          final segments = p.split(rel);
-          return !segments.any((s) => s.startsWith('.'));
-        })
-        .map((rel) => p.posix.joinAll(p.split(rel)))
-        .toList()
-      ..sort();
+    final relativePaths =
+        dir
+            .listSync(recursive: true)
+            .whereType<File>()
+            .map((f) => p.relative(f.path, from: dir.path))
+            .where((rel) {
+              final segments = p.split(rel);
+              return !segments.any((s) => s.startsWith('.'));
+            })
+            .map((rel) => p.posix.joinAll(p.split(rel)))
+            .toList()
+          ..sort();
 
     if (relativePaths.isEmpty) continue;
     classes[folderName] = _assignFieldNames(relativePaths);
@@ -169,7 +209,8 @@ Map<String, String> generateAssetsFiles(Directory assetsDir) {
       ..writeln();
     for (final file in entry.value) {
       buffer.writeln(
-          "  String get ${file.fieldName} => 'assets/$folderName/${file.relativePath}';");
+        "  String get ${file.fieldName} => 'assets/$folderName/${file.relativePath}';",
+      );
     }
     buffer.writeln('}');
 
@@ -179,12 +220,14 @@ Map<String, String> generateAssetsFiles(Directory assetsDir) {
   final barrel = StringBuffer(_genHeader)..writeln();
   for (final folderName in classes.keys) {
     barrel.writeln(
-        "export 'assets_gen/assets_${_toSnakeCase(folderName)}.gen.dart';");
+      "export 'assets_gen/assets_${_toSnakeCase(folderName)}.gen.dart';",
+    );
   }
   barrel.writeln();
   for (final folderName in classes.keys) {
     barrel.writeln(
-        "import 'assets_gen/assets_${_toSnakeCase(folderName)}.gen.dart';");
+      "import 'assets_gen/assets_${_toSnakeCase(folderName)}.gen.dart';",
+    );
   }
   barrel
     ..writeln()
@@ -193,7 +236,8 @@ Map<String, String> generateAssetsFiles(Directory assetsDir) {
     ..writeln();
   for (final folderName in classes.keys) {
     barrel.writeln(
-        '  static const $folderName = \$Assets${_toPascalCase(folderName)}Gen();');
+      '  static const $folderName = \$Assets${_toPascalCase(folderName)}Gen();',
+    );
   }
   barrel.writeln('}');
 
@@ -237,15 +281,11 @@ Future<void> mainAssets(List<String> arguments) async {
   final cwd = Directory.current.path;
 
   try {
-    await runStep(
-      'Generating assets.gen.dart',
-      () => generateAssetsFile(cwd),
-    );
+    await runStep('Generating assets.gen.dart', () => generateAssetsFile(cwd));
   } catch (e) {
     logError('Failed to generate assets: $e');
     exit(1);
   }
 
-  logInfo(
-      'lib/core/constants/assets.gen.dart and assets_gen/ are up to date.');
+  logInfo('lib/core/constants/assets.gen.dart and assets_gen/ are up to date.');
 }

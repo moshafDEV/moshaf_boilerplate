@@ -23,7 +23,8 @@ Future<void> raiseIosDeploymentTarget(String projectPath) async {
   final xcodeprojPath = '$projectPath/ios/Runner.xcodeproj';
   if (!Directory(xcodeprojPath).existsSync()) {
     logWarn(
-        'Warning: Runner.xcodeproj not found, skipping iOS deployment target bump.');
+      'Warning: Runner.xcodeproj not found, skipping iOS deployment target bump.',
+    );
     return;
   }
 

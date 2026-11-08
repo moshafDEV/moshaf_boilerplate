@@ -52,8 +52,9 @@ Future<List<DependencyFailure>> installDependencies(
 
 /// Reduces a (possibly long, multi-line) pub error down to one readable line.
 String _shortReason(Object error) {
-  final text =
-      error is CommandFailedException ? error.stderr : error.toString();
+  final text = error is CommandFailedException
+      ? error.stderr
+      : error.toString();
   final firstLine = text
       .split('\n')
       .map((line) => line.trim())
