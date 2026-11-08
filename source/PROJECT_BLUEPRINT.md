@@ -388,6 +388,17 @@ Future<void> configureDependencies() async => await $initGetIt(getIt);
 
 ## 6. ROUTING (go_router)
 
+```mermaid
+flowchart TD
+  S["Splash (always allowed)"] -->|"timer: go to Welcome"| R{"redirect:<br/>token in secure storage?"}
+  R -->|"no token"| W["Welcome / Login / Register<br/>(public routes)"]
+  R -->|"token + public route"| H["Home"]
+  W -->|"login succeeds, token stored"| R
+  H -->|"signed out"| W
+  AB["About (always allowed,<br/>signed in or out)"]
+```
+
+
 ### `app_path.dart` — path constants
 
 ```dart
@@ -597,7 +608,7 @@ An Android-Developer-Options-style debug layer, invisible to normal users until 
 - **Unlock gesture**: `DeveloperUnlockService.registerTap()` counts taps on the app version text on that page — 7 within a 3s window flips `DeveloperModeNotifier.isEnabled`. `dev` calls `.enable()` unconditionally at startup instead (`main.dart`); `staging` and `prod` additionally require a PIN (`developer_pin_gate.dart`, `DEVELOPER_PIN` in `.env` — empty means no PIN is enforced). The whole flow (tap count → PIN → enable → snackbar) lives in the reusable `DeveloperModeUnlockTrigger` widget; `AboutPage` just wraps the version text in it. The menu's "Disable Developer Mode" action calls `DeveloperModeNotifier.disable()` (`dev` re-enables at next startup).
 - **`DeveloperOverlay`** wraps `MaterialApp.router`'s `builder` — renders `DraggableDebugButton` only while `isEnabled` AND no developer-tools screen is currently open (`isDeveloperPageVisible`, a `ValueNotifier` toggled by `pushDeveloperPage()` in `developer_navigation.dart`).
 - Developer-tools screens (menu, API logs, feature flags) are **pushed directly onto the root `Navigator`** (`appRouter.routerDelegate.navigatorKey.currentState`), not registered as `go_router` routes — keeps them unreachable by path/deep-link.
-- **`ApiLoggerInterceptor`** (`core/http_client/interceptors/`) is constructor-injected with `DeveloperModeNotifier`/`ApiLogStore` (not read off `getIt` internally, for testability) and wired into `MainClient` unconditionally — it self-gates on `isEnabled` at request time, capped at 100 entries, masking `Authorization`/`Cookie` headers and `password`/`token`/`otp`/`id_token`-style body fields before they're ever stored (`maskHeaders`/`maskBody` in `api_log_model.dart`, covered by `api_log_model_test.dart`; `ResponseType.bytes` JSON bodies are decoded and masked, other bytes shown as `(binary, N bytes)`).
+- **`ApiLoggerInterceptor`** (`core/http_client/interceptors/`) is constructor-injected with `DeveloperModeNotifier`/`ApiLogStore` (not read off `getIt` internally, for testability) and wired into `MainClient` unconditionally — it self-gates on `isEnabled` at request time, capped at 100 entries; failure toasts go through `ErrorToastThrottle` (max one per 4 s, "+N more", replaces the one on screen) and can be muted via `ApiLogStore.errorToastsEnabled` (Developer Menu → API Error Toasts), masking `Authorization`/`Cookie` headers and `password`/`token`/`otp`/`id_token`-style body fields before they're ever stored (`maskHeaders`/`maskBody` in `api_log_model.dart`, covered by `api_log_model_test.dart`; `ResponseType.bytes` JSON bodies are decoded and masked, other bytes shown as `(binary, N bytes)`).
 
 If you add a new developer-tools screen, follow the same `pushDeveloperPage()` pattern — don't add it to `app_routes.dart`.
 

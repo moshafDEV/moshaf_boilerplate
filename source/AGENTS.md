@@ -68,6 +68,7 @@ flutter test                              # must pass
 - Don't add `.md` files for plans, notes, or checklists — put the plan in chat or the PR description.
 - Kept docs: `README.md`, `PROJECT_BLUEPRINT.md`, `AGENTS.md`, `ci/docs/`, `docs/release/`.
 - Changing a pattern or standard means updating `PROJECT_BLUEPRINT.md` in the same change.
+- The Mermaid diagrams in `README.md` (quick start, request flow) and `PROJECT_BLUEPRINT.md` (§6 routing) mirror real code. If you change that flow, update its diagram in the same change.
 
 ## 6. Project tooling (don't reinvent)
 

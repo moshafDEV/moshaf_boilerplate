@@ -1,138 +1,86 @@
 # ProjectDisplayName
 
-![Logo](https://avatars.githubusercontent.com/u/153476629?v=4&size=120)
+A Flutter app generated from [`moshaf_boilerplate`](https://pub.dev/packages/moshaf_boilerplate): Clean Architecture, BLoC, `go_router`, and dev / staging / prod flavors. How the code is organised is in [`PROJECT_BLUEPRINT.md`](./PROJECT_BLUEPRINT.md); rules for AI agents are in [`AGENTS.md`](./AGENTS.md).
 
-**ProjectDisplayName** is a Flutter app generated from the [`moshaf_boilerplate`](https://pub.dev/packages/moshaf_boilerplate) template — Clean Architecture, BLoC state management, `go_router` navigation, and dev/staging/prod flavors set up out of the box.
+## Quick Start
 
-### Developer Notes
-
-**FVM Configuration:**
-
-If you're using Flutter Version Manager (fvm), ensure you have set the correct Flutter version for this project. Run the following command in the project root:
-
-```bash
-fvm use $version
+```mermaid
+flowchart LR
+  A["git clone"] --> B["fvm use"]
+  B --> C["moshaf_boilerplate env FLAVOR<br/>copies .env + Firebase files,<br/>runs build_runner"]
+  C --> D["flutter run --flavor FLAVOR<br/>-t lib/main_FLAVOR.dart"]
 ```
 
-**Prettier:**
+Generated files (`*.g.dart`, `*.freezed.dart`, `*.config.dart`) and `.env` are git-ignored, so a fresh clone **does not compile until step 3** has run. Run `moshaf_boilerplate env` with no flavor to pick one from a list.
 
-Maintaining consistent code style by applying the standard Dart formatting rules, such as indentation, spacing, and line breaks, without the need for manual adjustments. The dot (.) signifies the current directory.
+Needs the [`moshaf_boilerplate`](https://pub.dev/packages/moshaf_boilerplate) CLI (`dart pub global activate moshaf_boilerplate`), FVM or a matching Flutter, and Android SDK Platform 37 (`sdkmanager "platforms;android-37"`; required by `flutter_secure_storage`).
 
-   ```bash
-    dart format .
-   ```
+## Commands
 
-### ⚠️ Ensure These Steps Are Completed
+Run from this project's root. Missing arguments are asked for interactively (not in CI: pass them explicitly).
 
-After completing all the configurations above, you are ready to run the application on an emulator or physical device.
-
-[Go to Flavor Setup](https://pub.dev/packages/moshaf_boilerplate#flavors-android--ios)
-
-**Android SDK requirement:** `android/app/build.gradle.kts` sets `compileSdk = maxOf(flutter.compileSdkVersion, 37)` — a floor required by `flutter_secure_storage`, independent of which Flutter version you use. Building against it needs Android SDK Platform 37 installed (Android Studio's SDK Manager auto-downloads it on first sync, or run `sdkmanager "platforms;android-37"`).
-
-**CLI cheat sheet** (run from this project's root; `moshaf_boilerplate help` lists everything):
-
-| Command | Purpose |
-| --- | --- |
-| `moshaf_boilerplate env [flavor]` | Switch `.env`/Firebase files to a flavor, optionally run `build_runner` — asks which flavor if omitted |
-| `moshaf_boilerplate build [apk\|aab\|ipa] [flavor]` | `env` + `flutter build` with the right flavor and entry point |
-| `moshaf_boilerplate assets` | Regenerate typed asset constants |
-| `moshaf_boilerplate flavor add\|icons\|list` | Add a flavor, ribboned icons, list flavors |
-
-Missing arguments are asked for interactively (not in CI/piped input — pass them explicitly there). `pre_launch_task` is the deprecated old name of `env`.
-
-**Shortcut (env + build in one command):**
+| Command | What it does |
+|---|---|
+| `moshaf_boilerplate env [flavor]` | Switch `.env` and Firebase files to a flavor, then run `build_runner` |
+| `moshaf_boilerplate build [apk\|aab\|ipa] [flavor]` | `env` + `flutter build` with the right `--flavor` and entry point |
+| `moshaf_boilerplate assets` | Regenerate typed `Assets.*` constants after adding or removing files in `assets/` |
+| `moshaf_boilerplate flavor add\|icons\|list` | Add a flavor, draw ribboned icons, list flavors |
 
 ```bash
-moshaf_boilerplate build                       # interactive: target, flavor, version
 moshaf_boilerplate build apk staging
-moshaf_boilerplate build ipa prod --bump patch # raises pubspec version, saved after success
+moshaf_boilerplate build ipa prod --bump patch    # raises pubspec version, saved after a successful build
 moshaf_boilerplate build ipa staging --export-method ad-hoc
 ```
 
-Add `--dry-run` to print the commands first. Full options: `moshaf_boilerplate build --help`. The manual steps below do the same thing.
+`--dry-run` prints the commands first; `moshaf_boilerplate build --help` lists every option. `--build-name`/`--build-number` change that build only, while `--bump` and `--save` also write `version:` in `pubspec.yaml`. `build ipa` needs macOS with Xcode signed in to your Apple ID/team; if signing fails on provisioning, open `ios/Runner.xcworkspace` in Xcode once. (`pre_launch_task` is the deprecated old name of `env`.)
 
-- `build` runs `fvm flutter` when FVM works for this project, otherwise `flutter`, and runs `build_runner` as part of the env step (`--no-codegen` skips it).
-- `--build-name`/`--build-number` change that build only; `--bump patch|minor|major|build` or `--save` also write the new `version:` into `pubspec.yaml` after a successful build.
-- `build ipa` needs macOS with Xcode signed in to your Apple ID/team (automatic signing). Pick `--export-method app-store|ad-hoc|development|enterprise` (default `app-store`), or `--no-codesign` to archive unsigned. If signing fails on provisioning, open `ios/Runner.xcworkspace` in Xcode once.
+## Flavors
 
-**Building APK:**
+| | `dev` | `staging` | `prod` |
+|---|---|---|---|
+| Entry point | `lib/main_dev.dart` | `lib/main_staging.dart` | `lib/main_prod.dart` |
+| Env file | `.env.dev` | `.env.staging` | `.env.prod` |
+| App name | `ProjectDisplayName [DEV]` | `ProjectDisplayName [STAGING]` | `ProjectDisplayName` |
+| applicationId / bundleId | `com.example.ProjectName.staging` | `com.example.ProjectName.staging` | `com.example.ProjectName` |
+| Developer Tools | on at startup | 7 taps + PIN | 7 taps + PIN |
 
-1. Set the environment variables for the desired flavor (dev, staging, or prod):
+`dev` and `staging` share one id on purpose: a device holds one of them at a time. `envied` bakes `.env` into `env.g.dart` at build time, so switching flavor means re-running `env`. Changed `flavorizr.yaml`? Run `dart run flutter_flavorizr -f`.
 
-   ```bash
-    moshaf_boilerplate env [dev/staging/prod]  (root directory)
-   ```
+## How a Request Flows
 
-2. Build the APK for the selected flavor:
-   
-   ```bash
-   flutter build apk --split-per-abi --flavor [dev/staging/prod] --target=lib/main_[dev/staging/prod].dart
-   ```
+The login feature is the reference. A layer never skips another layer.
 
-**Building IPA (iOS):**
-
-1. Set the environment variables for the desired flavor (dev, staging, or prod):
-
-   ```bash
-   moshaf_boilerplate env [dev/staging/prod]  (root directory)
-   ```
-
-2. Install the necessary CocoaPods dependencies:
-
-   ```bash
-   pod install (in ios directory project)
-   ```
-
-3. Open the project in Xcode, select the appropriate scheme (dev, staging, or prod), and build the archive:
-
-   ```bash
-   open Xcode > Select scheme [dev/staging/prod] > Product > Archive
-   ```
-
-
-### Type-Safe Assets
-
-`Assets.images.xxx`/`Assets.svg.xxx`/`Assets.fonts.xxx` constants in `lib/core/constants/assets.gen.dart` are generated from whatever's under `assets/`. Added or removed a file there? Regenerate with:
-
-```bash
-moshaf_boilerplate assets
+```mermaid
+sequenceDiagram
+  participant P as LoginPage
+  participant B as LoginBloc
+  participant U as LoginUsecase
+  participant R as AuthRepository impl
+  participant D as AuthRemoteDatasource
+  participant C as MainClient (Dio)
+  participant A as API
+  P->>B: add(onSubmit)
+  B->>U: execute(params)
+  U->>R: login(entity)
+  R->>D: login(request model)
+  D->>C: POST /auth/login
+  Note over C: CustomInterceptor, ApiLoggerInterceptor
+  C->>A: request
+  A-->>C: response or error
+  C-->>D: Response or DioException
+  D-->>R: Either Failure, Model (toDomain)
+  R-->>U: Either Failure, Entity
+  U-->>B: Either Failure, Entity
+  B-->>P: state (isLoading, successLogin or errorResponseMessage)
+  Note over P: router redirect decides where to go next
 ```
 
-(also available as the "Regenerate Assets" VS Code task).
+A new feature is this chain written bottom-up: `ApiPath` → model → datasource → repository → entity → usecase → bloc → page (`PROJECT_BLUEPRINT.md` §4).
 
-### App Icon & Splash Screen
+## Good to Know
 
-`flutter_launcher_icons.yaml` and `flutter_native_splash.yaml` at the project root point at placeholder images — replace them with your own app icon/splash, then run:
-
-```bash
-dart run flutter_launcher_icons
-dart run flutter_native_splash:create
-```
-
-### Feature Flags
-
-A remote-config-backed feature flag system (`lib/core/feature_flags/`, `lib/domain/entities/feature_flags/`) — fetched once at startup from `GET <API_URL>/v1/config/feature-flags`, grouped per module (`auth`, `profile` out of the box) so each module only ever reads its own flags. Any failure falls back to every flag off, silently. See `password_input_field.dart`'s "Forgot Password" button for a working example of gating UI on a flag.
-
-To add a new flag: create a `<Module>FeatureFlags` entity under `domain/entities/feature_flags/` (give it a `toJson()` mirroring its `fromJson()`), add a field for it on `FeatureFlagState` (and to its own `toJson()`) — the Developer Tools Feature Flags screen picks it up automatically, nothing else to touch.
-
-### Developer Tools
-
-An Android-Developer-Options-style debug layer, invisible to normal users. Tap the logo on the Welcome or Login page (no visible button — that's deliberate) to open the About page, no login required:
-
-- **dev**: developer mode is already on — the tap just gets you to About.
-- **staging** and **prod**: tap the app version 7 times, then a PIN dialog (`DEVELOPER_PIN` in `.env` — unset means no PIN is enforced, so the tap alone unlocks).
-
-Once unlocked, a draggable floating button appears on every page except the developer-tools screens themselves. Tapping it opens a menu: a masked API log viewer (up to 100 requests; `Authorization`/`Cookie` headers and `password`/`token`/`otp`-style body fields redacted before storage), a Feature Flags inspector with a "copy expected response" button, a remote-config refresh action, a cache-clear action, app info, and a "Disable Developer Mode" action (on `dev` it re-enables at the next app start).
-
-### Continuous Integration (Jenkins)
-
-A ready-to-adapt Jenkins pipeline ships in `Jenkinsfile` + `ci/` — builds/signs/ships Android and iOS for `staging` and `production` branches, with optional TestFlight/Play Store/OTA distribution. Every project-specific value (credential IDs, agent labels, bundle IDs) lives in one file: `ci/config.groovy` — that's the only thing to edit, `Jenkinsfile` and `ci/scripts/*.sh` stay untouched. Start with `ci/docs/CREDENTIALS_GUIDE.md`, then `ci/docs/RUN-PIPELINE.md` to test locally before wiring it into Jenkins. Not using Jenkins, or don't need CI right now? Delete `Jenkinsfile` and `ci/` — nothing else in the project depends on them.
-
-### Store Launch Checklist
-
-`docs/release/store-launch-checklist.html` is a single offline HTML file (no build step, no server) with a fixed 60-point App Store/Google Play release checklist plus a copyable privacy policy template. Its Audit and Reference tabs start empty; the prompt in `docs/release/README.md` has Claude Code inspect this repository and fill them in. Toggle English/Indonesian from the top bar. Don't need it? Delete `docs/release/`.
-
-## Authors
-
-- [@moshaf](https://github.com/moshafDEV)
+- **Developer Tools** (hidden debug menu: masked API logs, feature flags, app info). Tap the logo on Welcome/Login to reach About, then the version 7 times (plus `DEVELOPER_PIN` on staging/prod; `dev` is always on). Details: blueprint §11.
+- **Feature flags** are fetched from `GET <API_URL>/v1/config/feature-flags`, grouped per module, and fall back to off on any failure. Adding one: blueprint §12.
+- **App icon and splash:** replace the placeholder images referenced by `flutter_launcher_icons.yaml` / `flutter_native_splash.yaml`, then `dart run flutter_launcher_icons` and `dart run flutter_native_splash:create`.
+- **CI:** `Jenkinsfile` + `ci/` build and ship Android/iOS; every project value lives in `ci/config.groovy`. Start with `ci/docs/CREDENTIALS_GUIDE.md`. Not using Jenkins? Delete both.
+- **Store launch checklist:** open `docs/release/store-launch-checklist.html` (offline, no build step). Not needed? Delete `docs/release/`.
