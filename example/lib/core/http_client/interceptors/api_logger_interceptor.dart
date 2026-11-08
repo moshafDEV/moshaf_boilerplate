@@ -4,6 +4,7 @@ import 'package:example/core/constants/colors.dart';
 import 'package:example/core/developer_tools/api_logs/api_log_detail_page.dart';
 import 'package:example/core/developer_tools/api_logs/api_log_model.dart';
 import 'package:example/core/developer_tools/api_logs/api_log_store.dart';
+import 'package:example/core/developer_tools/api_logs/error_toast_throttle.dart';
 import 'package:example/core/developer_tools/developer_mode_notifier.dart';
 import 'package:example/core/developer_tools/developer_navigation.dart';
 
@@ -17,6 +18,8 @@ class ApiLoggerInterceptor extends Interceptor {
   final ApiLogStore logStore;
 
   ApiLoggerInterceptor(this.developerMode, this.logStore);
+
+  final _toastThrottle = ErrorToastThrottle();
 
   static const _startedAtKey = 'apiLoggerStartedAt';
 
@@ -73,25 +76,37 @@ class ApiLoggerInterceptor extends Interceptor {
   }
 
   /// Success needs no popup — only surfaces >=400 responses and network
-  /// errors, tappable straight into the offending log entry.
+  /// errors, tappable straight into the offending log entry. At most one
+  /// toast per cooldown (the rest are summarised as "+N more"), it replaces
+  /// the one on screen instead of queueing, and it can be muted from the
+  /// Developer Menu. Every failure is still logged either way.
   void _notifyError(ApiLogEntry entry) {
+    if (!logStore.errorToastsEnabled) return;
+    if (!_toastThrottle.allow(DateTime.now())) return;
+
     final context = rootDeveloperContext();
     if (context == null || !context.mounted) return;
 
-    final message =
-        entry.statusCode != null ? 'API Error ${entry.statusCode}' : 'Network error';
+    final more = _toastThrottle.takeSuppressed();
+    final base = entry.statusCode != null
+        ? 'API Error ${entry.statusCode}'
+        : 'Network error';
+    final message = more > 0 ? '$base (+$more more)' : base;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: kMainDanger,
-        behavior: SnackBarBehavior.floating,
-        action: SnackBarAction(
-          label: 'View',
-          textColor: kMainWhite,
-          onPressed: () => pushDeveloperPage(ApiLogDetailPage(log: entry)),
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(seconds: 3),
+          backgroundColor: kMainDanger,
+          behavior: SnackBarBehavior.floating,
+          action: SnackBarAction(
+            label: 'View',
+            textColor: kMainWhite,
+            onPressed: () => pushDeveloperPage(ApiLogDetailPage(log: entry)),
+          ),
         ),
-      ),
-    );
+      );
   }
 }

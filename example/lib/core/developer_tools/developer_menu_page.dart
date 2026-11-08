@@ -65,6 +65,20 @@ class DeveloperMenuPage extends StatelessWidget {
                 subtitle: 'Re-fetch feature flags from the API',
                 onTap: () => _refreshRemoteConfig(context),
               ),
+              ListenableBuilder(
+                listenable: logs,
+                builder: (context, _) => DeveloperMenuTile(
+                  icon: logs.errorToastsEnabled
+                      ? Icons.notifications_active_rounded
+                      : Icons.notifications_off_rounded,
+                  iconColor: kMainGrey,
+                  title: 'API Error Toasts',
+                  subtitle: logs.errorToastsEnabled
+                      ? 'On — at most one per 4 s, tap to mute'
+                      : 'Muted — errors are still logged, tap to enable',
+                  onTap: logs.toggleErrorToasts,
+                ),
+              ),
               DeveloperMenuTile(
                 icon: Icons.delete_sweep_rounded,
                 iconColor: kMainWarning,

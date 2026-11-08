@@ -10,6 +10,17 @@ class ApiLogStore extends ChangeNotifier {
 
   final List<ApiLogEntry> _logs = [];
 
+  bool _errorToastsEnabled = true;
+
+  /// Whether failed calls raise a snackbar. Failed calls are always logged;
+  /// this only mutes the popup (Developer Menu → Error Toasts).
+  bool get errorToastsEnabled => _errorToastsEnabled;
+
+  void toggleErrorToasts() {
+    _errorToastsEnabled = !_errorToastsEnabled;
+    notifyListeners();
+  }
+
   List<ApiLogEntry> getLogs() => List.unmodifiable(_logs);
 
   void add(ApiLogEntry entry) {
