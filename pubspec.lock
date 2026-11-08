@@ -45,10 +45,10 @@ packages:
     dependency: "direct main"
     description:
       name: dart_xcodeproj
-      sha256: bf7c7f4830adef81367222bbb299c1856c50a8487ff72a74635f37af255188bb
+      sha256: "538d0e6e94df351a5fa6cec8e8979374023066d782a16058b6889b4a7c6d96c4"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
+    version: "0.1.1"
   ffi:
     dependency: transitive
     description:
@@ -101,10 +101,10 @@ packages:
     dependency: transitive
     description:
       name: petitparser
-      sha256: "2f1564aadb14215e478563b5406cb80729d022158c01dc50c96013c2f7eb4790"
+      sha256: "91bd59303e9f769f108f8df05e371341b15d59e995e6806aefab827b58336675"
       url: "https://pub.dev"
     source: hosted
-    version: "7.1.0"
+    version: "7.0.2"
   posix:
     dependency: transitive
     description:
@@ -117,10 +117,10 @@ packages:
     dependency: transitive
     description:
       name: propertylistserialization
-      sha256: "8ebe5e73b912c080916895bff96af9dd026cf87c1867447894f84e4c9e51b4b8"
+      sha256: "645aaac37e73735286087fc81b27c7eabaa81b6146881bdf84090ba56f4e15ad"
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.0"
+    version: "1.4.1"
   source_span:
     dependency: transitive
     description:
@@ -165,10 +165,10 @@ packages:
     dependency: "direct main"
     description:
       name: xml
-      sha256: "0fe8cc98946def31cbcbc8734aa4067031e6f65ea3a78a508060bfed2200bfeb"
+      sha256: "971043b3a0d3da28727e40ed3e0b5d18b742fa5a68665cca88e74b7876d5e025"
       url: "https://pub.dev"
     source: hosted
-    version: "7.1.0"
+    version: "6.6.1"
   yaml_writer:
     dependency: transitive
     description:
@@ -178,4 +178,4 @@ packages:
     source: hosted
     version: "2.1.0"
 sdks:
-  dart: ">=3.13.0 <4.0.0"
+  dart: ">=3.9.0 <4.0.0"

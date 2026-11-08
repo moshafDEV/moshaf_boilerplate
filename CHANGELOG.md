@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.0.2
+- Fixed README images not showing on pub.dev: images now use absolute `raw.githubusercontent.com` URLs (pub.dev did not resolve the relative `assets/readme/...` paths), the CHANGELOG link is absolute, and `repository:` in `pubspec.yaml` no longer ends in `.git`.
+
 ## 3.0.1
 - pub.dev score fixes (locally 160/160, was 140/160): widened `xml` to `>=6.6.1 <8.0.0` and `dart_xcodeproj` to `>=0.1.1 <0.4.0` so the latest versions count as supported while Dart 3.9+ still resolves the older ones (`xml` 7.1 alone needs Dart 3.13; `dart_xcodeproj` 0.2+ needs `xml` 7, so pinning either to ^7 would have broken `dart pub global activate` on Dart 3.9–3.12). The iOS deployment-target bump and macOS keychain entitlement were checked against both the lowest and the highest versions, escaped angle brackets in doc comments, braced a multi-line `if` in the interactive picker, and formatted `bin/` with `dart format`.
 - Root README opens with a "what is this for" infographic (`flutter create` vs `moshaf_boilerplate create`, good fit / probably not) and a collapsible detailed comparison with measured numbers (119 vs 1 Dart files in `lib/`, 11 vs 1 tests, 39 vs 1 packages, 3 vs 0 flavors, 15 shared components), including the trade-offs.

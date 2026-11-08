@@ -4,12 +4,12 @@
 
 This repository provides a boilerplate source code to streamline the initial setup of new Flutter projects. Developed by moshafDEV, it ensures consistency, scalability, and adherence to best practices through Clean Architecture principles.
 
-![What moshaf_boilerplate is for: flutter create gives an empty counter app and open questions; moshaf_boilerplate create gives a working app with the decisions made](assets/readme/img_what_is_it.png)
+![What moshaf_boilerplate is for: flutter create gives an empty counter app and open questions; moshaf_boilerplate create gives a working app with the decisions made](https://raw.githubusercontent.com/moshafDEV/moshaf_boilerplate/main/assets/readme/img_what_is_it.png)
 
 <details>
 <summary>Detailed comparison with a plain <code>flutter create</code></summary>
 
-![flutter create vs moshaf_boilerplate, side by side](assets/readme/img_comparison.png)
+![flutter create vs moshaf_boilerplate, side by side](https://raw.githubusercontent.com/moshafDEV/moshaf_boilerplate/main/assets/readme/img_comparison.png)
 
 </details>
 
@@ -87,14 +87,14 @@ Once installation is complete, follow these steps to initialize your Flutter pro
    ```
    You'll be prompted for a project name (a valid Dart package identifier — lowercase, `snake_case`) and then an app display name (press Enter to derive one from the project name, e.g. `moshaf_app` → `Moshaf App`). A new folder named after the project name is created right there with the full Clean Architecture structure and templates inside it — nothing outside that new folder is touched.
 
-> **Updates are not automatic.** `create` is a one-time copy: a new boilerplate release does not change projects you already generated. Read the [CHANGELOG](CHANGELOG.md) and port what you want.
+> **Updates are not automatic.** `create` is a one-time copy: a new boilerplate release does not change projects you already generated. Read the [CHANGELOG](https://github.com/moshafDEV/moshaf_boilerplate/blob/main/CHANGELOG.md) and port what you want.
 
 > **Note:**  
 > After generating your project, it is highly recommended to review and customize your `.gitignore` file to ensure that unnecessary files and directories are excluded from version control. This helps maintain a clean repository and prevents accidental commits of sensitive or build-related files.
 
 ## CLI Commands
 
-![Command map: create, env, build, assets, flavor, version](assets/readme/flow_commands.png)
+![Command map: create, env, build, assets, flavor, version](https://raw.githubusercontent.com/moshafDEV/moshaf_boilerplate/main/assets/readme/flow_commands.png)
 
 Run `moshaf_boilerplate help` for the list, or `moshaf_boilerplate help <command>` (or `<command> --help`) for details.
 
@@ -247,7 +247,7 @@ To add a new flag: create a `<Module>FeatureFlags` entity under `domain/entities
 
 An Android-Developer-Options-style debug layer, invisible to normal users — no visible button anywhere until it's unlocked.
 
-![Developer Tools: About page with the floating debug button, Developer Menu, API log detail, Feature Flags](assets/readme/img_developer_tools.png)
+![Developer Tools: About page with the floating debug button, Developer Menu, API log detail, Feature Flags](https://raw.githubusercontent.com/moshafDEV/moshaf_boilerplate/main/assets/readme/img_developer_tools.png)
 
 **Unlocking it**: tap the logo on the Welcome or Login page (it looks like a plain logo, not a button — that's the point) to open the About page, no login required. From there:
 
