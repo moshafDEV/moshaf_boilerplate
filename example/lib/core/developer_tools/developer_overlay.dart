@@ -23,10 +23,7 @@ class DeveloperOverlay extends StatelessWidget {
       builder: (context, onDeveloperPage, _) {
         final showButton = isEnabled && !onDeveloperPage;
         return Stack(
-          children: [
-            child,
-            if (showButton) const DraggableDebugButton(),
-          ],
+          children: [child, if (showButton) const DraggableDebugButton()],
         );
       },
     );

@@ -16,7 +16,7 @@ Future<void> showDeveloperInfoDialog(
     context: context,
     builder: (_) => Dialog(
       backgroundColor: kMainWhite,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420, maxHeight: 480),
@@ -33,7 +33,7 @@ Future<void> showDeveloperInfoDialog(
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: iconColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(icon, color: iconColor, size: 18),
                   ),
@@ -51,7 +51,10 @@ Future<void> showDeveloperInfoDialog(
             Flexible(
               child: ListView.separated(
                 shrinkWrap: true,
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 4,
+                  horizontal: 20,
+                ),
                 itemCount: rows.length,
                 separatorBuilder: (_, __) =>
                     const Divider(height: 1, color: kMainGreySoft),

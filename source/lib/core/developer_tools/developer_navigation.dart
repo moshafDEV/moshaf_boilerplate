@@ -30,10 +30,15 @@ void pushDeveloperPage(Widget page) {
   final navigator = appRouter.routerDelegate.navigatorKey.currentState;
   if (navigator == null) return;
 
+  // dev page pushed over a dev page (e.g. snackbar "View" action): only
+  // the outermost route resets the flag
+  final outermost = !isDeveloperPageVisible.value;
   isDeveloperPageVisible.value = true;
-  navigator
-      .push(MaterialPageRoute(builder: (_) => page))
-      .whenComplete(() => isDeveloperPageVisible.value = false);
+  navigator.push(MaterialPageRoute<void>(builder: (_) => page)).whenComplete(
+    () {
+      if (outermost) isDeveloperPageVisible.value = false;
+    },
+  );
 }
 
 /// Null if called before the app's root Navigator has mounted.

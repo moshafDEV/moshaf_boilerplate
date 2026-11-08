@@ -55,7 +55,11 @@ class _DraggableDebugButtonState extends State<DraggableDebugButton> {
             color: kMainDanger,
             shape: BoxShape.circle,
             boxShadow: [
-              BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2)),
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 6,
+                offset: Offset(0, 2),
+              ),
             ],
           ),
           child: const Icon(Icons.bug_report, color: kMainWhite),

@@ -29,7 +29,9 @@ Future<void> showFeatureFlagsDialog(
 
 /// Reshapes the raw `{"features": {"auth": {...}, ...}}` JSON into
 /// readable labels for display — see [_prettify].
-Map<String, Map<String, bool>> _sectionsFrom(Map<String, dynamic> expectedResponse) {
+Map<String, Map<String, bool>> _sectionsFrom(
+  Map<String, dynamic> expectedResponse,
+) {
   final features = expectedResponse['features'] as Map<String, dynamic>;
   return features.map((module, flags) {
     final prettyFlags = (flags as Map<String, dynamic>).map(
@@ -55,7 +57,10 @@ class _FeatureFlagsDialog extends StatelessWidget {
   final Map<String, Map<String, bool>> sections;
   final Map<String, dynamic> expectedResponse;
 
-  const _FeatureFlagsDialog({required this.sections, required this.expectedResponse});
+  const _FeatureFlagsDialog({
+    required this.sections,
+    required this.expectedResponse,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +68,7 @@ class _FeatureFlagsDialog extends StatelessWidget {
 
     return Dialog(
       backgroundColor: kMainWhite,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420, maxHeight: 520),
@@ -99,7 +104,8 @@ class _Header extends StatelessWidget {
   const _Header({required this.totalFlags, required this.expectedResponse});
 
   void _copyExpectedResponse(BuildContext context) {
-    final text = 'GET ${ApiPath.UFeatureFlags}\n\n'
+    final text =
+        'GET ${ApiPath.UFeatureFlags}\n\n'
         '${_jsonEncoder.convert(expectedResponse)}';
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -122,7 +128,7 @@ class _Header extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: kMainInfo.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.flag_rounded, color: kMainInfo, size: 18),
           ),
@@ -133,7 +139,10 @@ class _Header extends StatelessWidget {
               children: [
                 Text('Feature Flags', style: genStyle16Bold),
                 const SizedBox(height: 2),
-                Text('$totalFlags flags', style: genStyle12Regular.copyWith(color: kMainGrey)),
+                Text(
+                  '$totalFlags flags',
+                  style: genStyle12Regular.copyWith(color: kMainGrey),
+                ),
               ],
             ),
           ),
@@ -175,7 +184,9 @@ class _ModuleSection extends StatelessWidget {
           '$onCount/${flags.length} on',
           style: genStyle12Regular.copyWith(color: kMainGrey),
         ),
-        children: flags.entries.map((e) => _FlagRow(label: e.key, value: e.value)).toList(),
+        children: flags.entries
+            .map((e) => _FlagRow(label: e.key, value: e.value))
+            .toList(),
       ),
     );
   }

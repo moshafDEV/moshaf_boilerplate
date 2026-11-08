@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
 const _sensitiveHeaderKeys = {'authorization', 'cookie', 'set-cookie'};
@@ -7,6 +9,12 @@ const _sensitiveBodyKeys = {
   'access_token',
   'refresh_token',
   'secret',
+  'id_token',
+  'otp',
+  'current_password',
+  'new_password',
+  'password_confirmation',
+  'resend_token',
 };
 
 /// Masks known-sensitive header values. Keeps a scheme prefix like "Bearer"
@@ -27,6 +35,14 @@ Map<String, dynamic> maskHeaders(Map<String, dynamic> headers) {
 /// FormData, bytes) pass through unmasked, since there's no safe way to
 /// find a "password" field inside them.
 dynamic maskBody(dynamic body) {
+  // ResponseType.bytes (e.g. PDF): keep the decoded JSON, not the raw bytes
+  if (body is List<int>) {
+    try {
+      return maskBody(jsonDecode(utf8.decode(body)));
+    } catch (_) {
+      return '(binary, ${body.length} bytes)';
+    }
+  }
   if (body is Map) {
     return body.map((key, value) {
       if (_sensitiveBodyKeys.contains(key.toString().toLowerCase())) {
@@ -74,6 +90,7 @@ class ApiLogEntry {
     int? statusCode,
     dynamic responseBody,
     String? errorMessage,
+    DateTime? now,
   }) {
     return ApiLogEntry(
       method: options.method,
@@ -83,7 +100,7 @@ class ApiLogEntry {
       statusCode: statusCode,
       responseBody: maskBody(responseBody),
       errorMessage: errorMessage,
-      duration: DateTime.now().difference(startedAt),
+      duration: (now ?? DateTime.now()).difference(startedAt),
       timestamp: startedAt,
     );
   }

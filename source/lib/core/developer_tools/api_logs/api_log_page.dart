@@ -4,6 +4,7 @@ import 'package:ProjectName/core/constants/colors.dart';
 import 'package:ProjectName/core/constants/textstyle.dart';
 import 'package:ProjectName/core/developer_tools/api_logs/api_log_detail_page.dart';
 import 'package:ProjectName/core/developer_tools/api_logs/api_log_model.dart';
+import 'package:ProjectName/core/developer_tools/api_logs/api_log_status_badge.dart';
 import 'package:ProjectName/core/developer_tools/api_logs/api_log_store.dart';
 
 class ApiLogPage extends StatelessWidget {
@@ -43,8 +44,10 @@ class _EmptyState extends StatelessWidget {
         children: [
           const Icon(Icons.inbox_rounded, size: 48, color: kMainGreyLight),
           const SizedBox(height: 12),
-          Text('No API calls recorded yet',
-              style: genStyle14Medium.copyWith(color: kMainGrey)),
+          Text(
+            'No API calls recorded yet',
+            style: genStyle14Medium.copyWith(color: kMainGrey),
+          ),
         ],
       ),
     );
@@ -66,22 +69,6 @@ class _LogList extends StatelessWidget {
   }
 }
 
-Color _methodColor(String method) {
-  switch (method.toUpperCase()) {
-    case 'GET':
-      return kMainBlue;
-    case 'POST':
-      return kMainSuccess;
-    case 'PUT':
-    case 'PATCH':
-      return kMainWarning;
-    case 'DELETE':
-      return kMainDanger;
-    default:
-      return kMainGrey;
-  }
-}
-
 String _timeOfDay(DateTime t) =>
     '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}:${t.second.toString().padLeft(2, '0')}';
 
@@ -91,39 +78,26 @@ class _ApiLogTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = log.isError ? kMainDanger : kMainSuccess;
-    final statusText = log.statusCode?.toString() ?? 'ERR';
-
     return Material(
       color: kMainWhite,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(8),
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => ApiLogDetailPage(log: log)),
-        ),
+        borderRadius: BorderRadius.circular(8),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => ApiLogDetailPage(log: log))),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _methodColor(log.method).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  log.method,
-                  style: genStyle12Bold.copyWith(color: _methodColor(log.method)),
-                ),
-              ),
+              ApiMethodBadge(method: log.method),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      log.url,
+                      Uri.tryParse(log.url)?.path ?? log.url,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: genStyle14Medium,
@@ -137,17 +111,7 @@ class _ApiLogTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusColor,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  statusText,
-                  style: genStyle12Bold.copyWith(color: kMainWhite),
-                ),
-              ),
+              ApiStatusBadge(log: log),
             ],
           ),
         ),
