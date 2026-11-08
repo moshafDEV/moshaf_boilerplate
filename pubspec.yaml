@@ -14,7 +14,7 @@ topics:
   - cli
 
 environment:
-  sdk: ">=3.9.0 <4.0.0"   # Floor set by dart_xcodeproj/xml — keep in sync if either is bumped
+  sdk: ">=3.9.0 <4.0.0"   # Floor set by the oldest allowed dart_xcodeproj/xml (0.1.1 / 6.6.1) — keep in sync if the ranges move
 
 # Register CLI executable
 executables:
@@ -22,10 +22,10 @@ executables:
 
 # Optional: Add dependencies as needed
 dependencies:
-  dart_xcodeproj: ^0.3.0
+  dart_xcodeproj: ">=0.1.1 <0.4.0"   # 0.2+ needs xml 7 (Dart 3.11+); the range keeps Dart 3.9 working
   image: ^4.9.0
   path: ^1.9.1
-  xml: ^7.1.0
+  xml: ">=6.6.1 <8.0.0"   # 7.x needs Dart 3.11+; older SDKs resolve 6.x
 
 # Optional: Add development dependencies for linting and code quality
 # dev_dependencies:
