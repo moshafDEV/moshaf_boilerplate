@@ -6,7 +6,7 @@
       "type": "shell",
       "command": "moshaf_boilerplate",
       "args": [
-        "pre_launch_task",
+        "env",
         "dev"
       ],
       "group": {
@@ -19,7 +19,7 @@
       "type": "shell",
       "command": "moshaf_boilerplate",
       "args": [
-        "pre_launch_task",
+        "env",
         "staging"
       ],
       "group": {
@@ -32,7 +32,7 @@
       "type": "shell",
       "command": "moshaf_boilerplate",
       "args": [
-        "pre_launch_task",
+        "env",
         "prod"
       ],
       "group": {

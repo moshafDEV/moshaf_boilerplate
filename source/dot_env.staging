@@ -1,4 +1,4 @@
-# Copied to .env by `moshaf_boilerplate pre_launch_task staging` — see
+# Copied to .env by `moshaf_boilerplate env staging` — see
 # env.dart for what each key does. Placeholder values only — replace with
 # your real staging API URL, and consider moving real values to your team's
 # secret store instead of committing them if this stops being a placeholder.

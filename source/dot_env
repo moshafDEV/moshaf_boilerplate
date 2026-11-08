@@ -1,4 +1,4 @@
-# Copied to .env by `moshaf_boilerplate pre_launch_task dev` — see env.dart
+# Copied to .env by `moshaf_boilerplate env dev` — see env.dart
 # for what each key does. Safe to commit: placeholder values only, no real
 # secrets. Fill in your actual dev API URL below.
 APP_NAME=ProjectDisplayName Dev

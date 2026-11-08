@@ -4,39 +4,94 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 import '../common/console.dart';
+import '../common/flavors.dart';
+import '../common/prompt.dart';
 import 'flavor_icon_runner.dart';
 
 final _nameRegExp = RegExp(r'^[a-z][a-z0-9]*$');
 
+String? _validateName(String name, Set<String> existing) {
+  final lower = name.toLowerCase();
+  if (!_nameRegExp.hasMatch(lower)) {
+    return 'Flavor name must be lowercase letters/digits, starting with a '
+        'letter (e.g. "staging", "qa").';
+  }
+  if (existing.contains(lower)) return 'Flavor "$lower" already exists.';
+  return null;
+}
+
+void printFlavorUsage() {
+  stdout.writeln('Usage: moshaf_boilerplate flavor <command>\n');
+  stdout.writeln('Commands:');
+  stdout.writeln('  add [name]   Scaffold a new build flavor (asks for a name if omitted)');
+  stdout.writeln('  icons        Generate ribboned dev/staging app icons');
+  stdout.writeln('  list         Show flavors defined in this project');
+}
+
+void _listFlavors() {
+  final flavors = discoverFlavors();
+  if (flavors.isEmpty) {
+    logError('No .env.<flavor> files found — run from a generated project root.');
+    exit(1);
+  }
+  for (final f in flavors) {
+    stdout.writeln('  $f');
+  }
+}
+
 /// Adds a new build flavor to an already-generated project (run with cwd
-/// inside that project, same convention as `assets`/`pre_launch_task`):
+/// inside that project, same convention as `assets`/`env`):
 /// registers it in the `Flavor` enum, scaffolds `main_<name>.dart`, appends
 /// a block to `flavorizr.yaml`, creates a starter `.env.<name>`, and adds a
 /// matching VS Code task. Native Android/iOS wiring itself is NOT run here —
 /// see the printed next steps.
 Future<void> mainFlavor(List<String> arguments) async {
-  if (arguments.isNotEmpty && arguments[0] == 'icons') {
-    return mainFlavorIcons(arguments.sublist(1));
+  if (arguments.contains('--help') || arguments.contains('-h')) {
+    printFlavorUsage();
+    return;
   }
 
-  if (arguments.isEmpty || arguments[0] != 'add' || arguments.length < 2) {
-    logError(
-      'Usage: moshaf_boilerplate flavor add <name>\n'
-      '       moshaf_boilerplate flavor icons',
-    );
-    exit(1);
+  var sub = arguments.isEmpty ? null : arguments[0];
+  if (sub == null) {
+    sub = promptSelect('What do you want to do?', ['add', 'icons', 'list']);
+    if (sub == null) {
+      printFlavorUsage();
+      exit(1);
+    }
   }
 
-  final name = arguments[1].toLowerCase();
-  if (!_nameRegExp.hasMatch(name)) {
-    logError(
-      'Flavor name must be lowercase letters/digits, starting with a letter '
-      '(e.g. "staging", "qa").',
-    );
+  switch (sub) {
+    case 'icons':
+      return mainFlavorIcons(arguments.skip(1).toList());
+    case 'list':
+      return _listFlavors();
+    case 'add':
+      break;
+    default:
+      logError('Unknown flavor command "$sub".');
+      printFlavorUsage();
+      exit(1);
+  }
+
+  final existing = {'dev', 'prod', ...discoverFlavors()};
+  final rest = arguments.length > 1 ? arguments.sublist(1) : <String>[];
+  final name = (rest.isNotEmpty
+          ? rest.first
+          : promptText(
+              'New flavor name (e.g. staging, qa):',
+              validator: (v) => _validateName(v, existing),
+            ) ??
+              '')
+      .toLowerCase();
+
+  if (name.isEmpty) {
+    logError('Flavor name required.');
+    printFlavorUsage();
     exit(1);
   }
-  if (name == 'dev' || name == 'prod') {
-    logError('Flavor "$name" already exists.');
+  final nameError = _validateName(name, existing);
+  if (nameError != null) {
+    logError(nameError);
     exit(1);
   }
 
@@ -254,7 +309,7 @@ Future<void> _addVsCodeTask(String projectDir, String name) async {
     'label': label,
     'type': 'shell',
     'command': 'moshaf_boilerplate',
-    'args': ['pre_launch_task', name],
+    'args': ['env', name],
     'group': {'kind': 'build', 'isDefault': false},
   });
   json['tasks'] = tasks;
@@ -329,7 +384,7 @@ void _printNextSteps(String name) {
     'and a GoogleService-Info-$name.plist, then uncomment the firebase: '
     'block for "$name" in flavorizr.yaml before step 3.',
   );
-  logHint('  5. Run: moshaf_boilerplate pre_launch_task $name');
+  logHint('  5. Run: moshaf_boilerplate env $name');
   logHint('  6. Run: flutter run --flavor $name -t lib/main_$name.dart');
   logHint(
     '  CI (Jenkinsfile / ci/config.groovy) is NOT updated automatically — '
