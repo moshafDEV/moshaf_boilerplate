@@ -40,7 +40,7 @@ lib/
 │   │   └── loggers/       ← crashlytic_logger.dart
 │   ├── constants/         ← api_path_constant.dart, colors.dart, textstyle.dart,
 │   │                        assets.gen.dart (generated, see §9), assets_gen/ (per-folder generated files)
-│   ├── developer_tools/   ← hidden debug menu (see §11); api_logs/, dialogs/ subfolders
+│   ├── developer_tools/   ← hidden debug menu (see §11); api_logs/, components/, dialogs/ subfolders
 │   ├── env/               ← env.dart (envied), secure_storage_key.dart
 │   ├── error/              ← failure.dart, exception.dart
 │   ├── feature_flags/     ← FeatureFlagApi, FeatureFlagNotifier (see §12)
@@ -579,9 +579,11 @@ Three flavors — `dev`, `staging`, `prod` — each with its own entry point (`m
 
 ⚠️ `dev` and `staging` share one `applicationId`/`bundleId` on purpose (`flavorizr.yaml`) — a device can only have one of the two installed at a time; they're not meant to coexist side by side. `prod` has its own, separate one. The display name (`app.name` per flavor) still differs, so the two remain visually distinguishable even sharing a package id.
 
-Env vars via `envied` (`core/env/env.dart`); tokens/session via `flutter_secure_storage` (`core/utils/storage_data.dart`). `.env.dev`/`.env.staging`/`.env.prod` ship as starter files (placeholder values) at the project root — `moshaf_boilerplate pre_launch_task <flavor>` copies the matching one to `.env`.
+Env vars via `envied` (`core/env/env.dart`); tokens/session via `flutter_secure_storage` (`core/utils/storage_data.dart`). `.env.dev`/`.env.staging`/`.env.prod` ship as starter files (placeholder values) at the project root — `moshaf_boilerplate env <flavor>` (formerly `pre_launch_task`, still accepted but deprecated) copies the matching one to `.env`; run without a flavor it offers the `.env.*` files it finds as a picker.
 
 ⚠️ `android/app/build.gradle.kts` sets `compileSdk = maxOf(flutter.compileSdkVersion, 37)`, not Flutter's plain default — `flutter_secure_storage` v11+ requires compileSdk 37 (permanently, per its own changelog) and Flutter's own default hasn't caught up regardless of Flutter version. Building against it needs Android SDK Platform 37 installed on every machine that builds this project, including CI agents (`sdkmanager "platforms;android-37"` — Android Studio auto-downloads it interactively, a headless agent won't). Bump the `37` in that line (generator source: `bin/src/generator/android_compile_sdk.dart`) if a future dependency needs higher.
+
+**Building**: `moshaf_boilerplate build [apk|aab|ipa] [flavor]` runs the `env` step, then `flutter build` with the matching `--flavor`/`-t lib/main_<flavor>.dart` (FVM first when available). `--bump`/`--save` write the `version:` line in `pubspec.yaml` after a successful build; `--build-name`/`--build-number` alone don't touch it. See the root README's CLI section for all flags.
 
 **Adding a new flavor**: `moshaf_boilerplate flavor add <name>` scaffolds the entry point, `flavorizr.yaml` block, starter `.env.<name>`, and a VS Code task — it does not run `flutter_flavorizr` for you (native regen touches every flavor at once, worth reviewing first). `moshaf_boilerplate flavor icons` additionally draws a "DEV"/"STAGING"-style ribbon on the app icon for non-prod flavors.
 
@@ -592,10 +594,10 @@ Env vars via `envied` (`core/env/env.dart`); tokens/session via `flutter_secure_
 An Android-Developer-Options-style debug layer, invisible to normal users until unlocked:
 
 - **Unlock entry point**: tapping the logo on the Welcome/Login page (`GestureDetector`, no visible button) opens `presentation/pages/settings/about_page.dart` — deliberately not gated by auth (`Paths.about` is in `app_router.dart`'s `alwaysAllowedRoutes`, not `publicRoutes` — it's reachable whether signed in or out, never redirected either way).
-- **Unlock gesture**: `DeveloperUnlockService.registerTap()` counts taps on the app version text on that page — 7 within a 3s window flips `DeveloperModeNotifier.isEnabled`. `dev` calls `.enable()` unconditionally at startup instead (`main.dart`); `prod` additionally requires a PIN (`developer_pin_gate.dart`, `DEVELOPER_PIN` in `.env` — empty means no PIN is enforced).
+- **Unlock gesture**: `DeveloperUnlockService.registerTap()` counts taps on the app version text on that page — 7 within a 3s window flips `DeveloperModeNotifier.isEnabled`. `dev` calls `.enable()` unconditionally at startup instead (`main.dart`); `staging` and `prod` additionally require a PIN (`developer_pin_gate.dart`, `DEVELOPER_PIN` in `.env` — empty means no PIN is enforced). The whole flow (tap count → PIN → enable → snackbar) lives in the reusable `DeveloperModeUnlockTrigger` widget; `AboutPage` just wraps the version text in it. The menu's "Disable Developer Mode" action calls `DeveloperModeNotifier.disable()` (`dev` re-enables at next startup).
 - **`DeveloperOverlay`** wraps `MaterialApp.router`'s `builder` — renders `DraggableDebugButton` only while `isEnabled` AND no developer-tools screen is currently open (`isDeveloperPageVisible`, a `ValueNotifier` toggled by `pushDeveloperPage()` in `developer_navigation.dart`).
 - Developer-tools screens (menu, API logs, feature flags) are **pushed directly onto the root `Navigator`** (`appRouter.routerDelegate.navigatorKey.currentState`), not registered as `go_router` routes — keeps them unreachable by path/deep-link.
-- **`ApiLoggerInterceptor`** (`core/http_client/interceptors/`) is constructor-injected with `DeveloperModeNotifier`/`ApiLogStore` (not read off `getIt` internally, for testability) and wired into `MainClient` unconditionally — it self-gates on `isEnabled` at request time, capped at 100 entries, masking `Authorization`/`password`/`token` fields before they're ever stored.
+- **`ApiLoggerInterceptor`** (`core/http_client/interceptors/`) is constructor-injected with `DeveloperModeNotifier`/`ApiLogStore` (not read off `getIt` internally, for testability) and wired into `MainClient` unconditionally — it self-gates on `isEnabled` at request time, capped at 100 entries, masking `Authorization`/`Cookie` headers and `password`/`token`/`otp`/`id_token`-style body fields before they're ever stored (`maskHeaders`/`maskBody` in `api_log_model.dart`, covered by `api_log_model_test.dart`; `ResponseType.bytes` JSON bodies are decoded and masked, other bytes shown as `(binary, N bytes)`).
 
 If you add a new developer-tools screen, follow the same `pushDeveloperPage()` pattern — don't add it to `app_routes.dart`.
 
@@ -628,6 +630,27 @@ This section is documented honestly because this project is still an early-stage
 
 ---
 
+## 14. UI & PERFORMANCE RULES
+
+1. `setState` is fine for cheap, local UI state (toggle, tab index, expand, a field in a small sheet, animation).
+2. `setState` is not for server/async data, for duplicating bloc state, or for frequent triggers that rebuild a large tree — use a bloc, `ValueListenableBuilder`, or a small `StatefulWidget`.
+3. Fields that change often are read with `BlocSelector`/`context.select((XBloc b) => b.state.field)` in the smallest widget possible, not `context.watch<XBloc>()`. Other `BlocBuilder`/`BlocConsumer`s get `buildWhen`/`listenWhen`.
+4. One-shot effects (navigate, snackbar) use a `success*` flag that the next handler resets.
+5. One public widget per file (small widgets that are always used together may share one), aim for ≤ ~300 lines, no `*_widgets.dart` grab-bags, no new `Widget _buildX()` methods. Non-widget logic stays out of `pages/`.
+
+---
+
+## 15. WORKING WITH AI AGENTS
+
+If this project is worked on by an AI agent (Claude Code, Cursor, Codex, ...), [`AGENTS.md`](./AGENTS.md) is its rulebook; `CLAUDE.md` just points to it. The split:
+
+- **This blueprint** = what the code should look like (standards, patterns, deviations).
+- **`AGENTS.md`** = how an agent should work: read this blueprint first, build bottom-up through the layers, run the verification checklist (`build_runner`, `dart format`, `flutter analyze`, `flutter test`) before reporting done, ask before adding a dependency, don't create plan/notes `.md` files, and avoid the known traps.
+
+Changing a standard means updating this blueprint in the same change; if an agent-specific rule changes, update `AGENTS.md`. Keep the two consistent — an agent follows whichever it read last.
+
+---
+
 ## IMPLICIT RULES SUMMARY
 
 | Rule | Detail |
@@ -646,3 +669,5 @@ This section is documented honestly because this project is still an early-stage
 | Colors/text via `kMain*`/`genStyle()` | Not a literal hex/`TextStyle` directly in a widget |
 | Developer-tools screens use `pushDeveloperPage()` | Not a `go_router` route — see §11 |
 | Feature flags: add once to `toJson()`/`fromJson()` | UI and the "copy expected response" button both derive from it — see §12 |
+| `setState` only for cheap local UI state | Data from a server/async source goes through a bloc — see §14 |
+| Agent rules live in `AGENTS.md` | Read it before editing; update this blueprint with any pattern change — see §15 |

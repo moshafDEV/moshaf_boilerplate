@@ -30,12 +30,38 @@ After completing all the configurations above, you are ready to run the applicat
 
 **Android SDK requirement:** `android/app/build.gradle.kts` sets `compileSdk = maxOf(flutter.compileSdkVersion, 37)` — a floor required by `flutter_secure_storage`, independent of which Flutter version you use. Building against it needs Android SDK Platform 37 installed (Android Studio's SDK Manager auto-downloads it on first sync, or run `sdkmanager "platforms;android-37"`).
 
+**CLI cheat sheet** (run from this project's root; `moshaf_boilerplate help` lists everything):
+
+| Command | Purpose |
+| --- | --- |
+| `moshaf_boilerplate env [flavor]` | Switch `.env`/Firebase files to a flavor, optionally run `build_runner` — asks which flavor if omitted |
+| `moshaf_boilerplate build [apk\|aab\|ipa] [flavor]` | `env` + `flutter build` with the right flavor and entry point |
+| `moshaf_boilerplate assets` | Regenerate typed asset constants |
+| `moshaf_boilerplate flavor add\|icons\|list` | Add a flavor, ribboned icons, list flavors |
+
+Missing arguments are asked for interactively (not in CI/piped input — pass them explicitly there). `pre_launch_task` is the deprecated old name of `env`.
+
+**Shortcut (env + build in one command):**
+
+```bash
+moshaf_boilerplate build                       # interactive: target, flavor, version
+moshaf_boilerplate build apk staging
+moshaf_boilerplate build ipa prod --bump patch # raises pubspec version, saved after success
+moshaf_boilerplate build ipa staging --export-method ad-hoc
+```
+
+Add `--dry-run` to print the commands first. Full options: `moshaf_boilerplate build --help`. The manual steps below do the same thing.
+
+- `build` runs `fvm flutter` when FVM works for this project, otherwise `flutter`, and runs `build_runner` as part of the env step (`--no-codegen` skips it).
+- `--build-name`/`--build-number` change that build only; `--bump patch|minor|major|build` or `--save` also write the new `version:` into `pubspec.yaml` after a successful build.
+- `build ipa` needs macOS with Xcode signed in to your Apple ID/team (automatic signing). Pick `--export-method app-store|ad-hoc|development|enterprise` (default `app-store`), or `--no-codesign` to archive unsigned. If signing fails on provisioning, open `ios/Runner.xcworkspace` in Xcode once.
+
 **Building APK:**
 
 1. Set the environment variables for the desired flavor (dev, staging, or prod):
 
    ```bash
-    moshaf_boilerplate pre_launch_task [dev/staging/prod]  (root directory)
+    moshaf_boilerplate env [dev/staging/prod]  (root directory)
    ```
 
 2. Build the APK for the selected flavor:
@@ -49,7 +75,7 @@ After completing all the configurations above, you are ready to run the applicat
 1. Set the environment variables for the desired flavor (dev, staging, or prod):
 
    ```bash
-   moshaf_boilerplate pre_launch_task [dev/staging/prod]  (root directory)
+   moshaf_boilerplate env [dev/staging/prod]  (root directory)
    ```
 
 2. Install the necessary CocoaPods dependencies:
@@ -95,10 +121,9 @@ To add a new flag: create a `<Module>FeatureFlags` entity under `domain/entities
 An Android-Developer-Options-style debug layer, invisible to normal users. Tap the logo on the Welcome or Login page (no visible button — that's deliberate) to open the About page, no login required:
 
 - **dev**: developer mode is already on — the tap just gets you to About.
-- **staging**: tap the app version 7 times to unlock.
-- **prod**: same 7-tap gesture, then a PIN dialog (`DEVELOPER_PIN` in `.env` — unset means no PIN is enforced).
+- **staging** and **prod**: tap the app version 7 times, then a PIN dialog (`DEVELOPER_PIN` in `.env` — unset means no PIN is enforced, so the tap alone unlocks).
 
-Once unlocked, a draggable floating button appears on every page except the developer-tools screens themselves. Tapping it opens a menu: a masked API log viewer (up to 100 requests, `Authorization`/`password`/`token` redacted before storage), a Feature Flags inspector with a "copy expected response" button, a remote-config refresh action, a cache-clear action, and app info.
+Once unlocked, a draggable floating button appears on every page except the developer-tools screens themselves. Tapping it opens a menu: a masked API log viewer (up to 100 requests; `Authorization`/`Cookie` headers and `password`/`token`/`otp`-style body fields redacted before storage), a Feature Flags inspector with a "copy expected response" button, a remote-config refresh action, a cache-clear action, app info, and a "Disable Developer Mode" action (on `dev` it re-enables at the next app start).
 
 ### Continuous Integration (Jenkins)
 

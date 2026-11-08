@@ -10,6 +10,7 @@ This repository provides a boilerplate source code to streamline the initial set
 - Modular codebase for rapid development
 - Pre-configured assets and essential directories
 - Ready-to-use templates for common features
+- One CLI for day-to-day work — `env` (switch flavor config), `build` (apk/aab/ipa with versioning), `assets`, `flavor`; interactive when arguments are missing, see [CLI Commands](#cli-commands)
 - Integrated support for multiple environments using [`flutter_flavor`](https://pub.dev/packages/flutter_flavor) — `dev`/`staging`/`prod` out of the box, `moshaf_boilerplate flavor add <name>` scaffolds new ones (e.g. qa)
 - State management with [`flutter_bloc`](https://pub.dev/packages/flutter_bloc)
 - Dependency injection via [`get_it`](https://pub.dev/packages/get_it) + [`injectable`](https://pub.dev/packages/injectable)
@@ -25,6 +26,7 @@ This repository provides a boilerplate source code to streamline the initial set
 - Example implementation for authentication (login/profile)
 - Separation of data, domain, and presentation layers
 - Configurable environment variables and DI modules
+- AI-agent ready — `AGENTS.md` (+ `CLAUDE.md`) gives Claude Code/Cursor/Codex the project's working rules, backed by `PROJECT_BLUEPRINT.md`
 - Ready-to-adapt Jenkins CI pipeline (`Jenkinsfile` + `ci/`) for Android + iOS staging/production builds
 - Internal developer tools, hidden from normal users — tap the Welcome/Login logo to reach a hidden About page, tap the app version 7 times to unlock (auto-on in `dev`) a draggable floating debug button opening a menu with a masked API log viewer, feature flag inspector, and app info; see [Developer Tools](#developer-tools)
 
@@ -78,6 +80,51 @@ Once installation is complete, follow these steps to initialize your Flutter pro
 
 > **Note:**  
 > After generating your project, it is highly recommended to review and customize your `.gitignore` file to ensure that unnecessary files and directories are excluded from version control. This helps maintain a clean repository and prevents accidental commits of sensitive or build-related files.
+
+## CLI Commands
+
+Run `moshaf_boilerplate help` for the list, or `moshaf_boilerplate help <command>` (or `<command> --help`) for details.
+
+| Command | What it does |
+| --- | --- |
+| `create` | Generate a new project (run from your workspace folder) |
+| `env [flavor]` | Copy `.env.<flavor>` → `.env` (+ the flavor's `GoogleService-Info` plist), then optionally run `build_runner` |
+| `build [apk\|aab\|ipa] [flavor]` | `env` step, then `flutter build` with the right `--flavor` / `-t lib/main_<flavor>.dart` |
+| `assets` | Regenerate typed asset constants |
+| `flavor add\|icons\|list` | Scaffold a flavor, draw ribboned icons, list flavors |
+| `version` | Show the generator version |
+
+Run project commands (`env`, `build`, `assets`, `flavor`) from the **generated project's root**, not from where you ran `create`.
+
+**Missing arguments are asked for, not rejected.** `moshaf_boilerplate env` lists the flavors it finds as `.env.*` files and lets you pick with ↑/↓ and Enter; `build` asks for target, flavor, version, and (ipa) export method. A mistyped flavor gets a "did you mean" hint. Without a terminal (CI, piped input) nothing is asked — pass every argument explicitly, or the command exits with an error.
+
+### `env`
+
+```bash
+moshaf_boilerplate env                 # pick a flavor
+moshaf_boilerplate env staging --yes   # run build_runner without asking
+moshaf_boilerplate env prod --no-build # only copy files, skip build_runner
+```
+
+### `build`
+
+```bash
+moshaf_boilerplate build                              # interactive
+moshaf_boilerplate build apk staging
+moshaf_boilerplate build aab prod --bump patch        # 1.2.3+4 → 1.2.4+5, saved to pubspec after success
+moshaf_boilerplate build aab prod --build-name 1.4.0 --build-number 42 --save
+moshaf_boilerplate build ipa staging --export-method ad-hoc
+moshaf_boilerplate build apk dev --dry-run -- --verbose
+```
+
+- Uses `fvm flutter` when FVM works for the project, otherwise plain `flutter`.
+- The env step also runs `build_runner` (slow, but it regenerates `envied` output for the selected flavor); `--no-codegen` skips it, `--no-env` skips the whole step.
+- **Versioning:** `--build-name`/`--build-number` affect that build only and leave `pubspec.yaml` untouched. `--bump major|minor|patch|build` (build number always +1) and `--save` write the new `version:` to `pubspec.yaml`, only after the build succeeds.
+- **ipa** needs macOS and an Xcode with your Apple ID/team already signed in (automatic signing). `--export-method app-store|ad-hoc|development|enterprise` (default `app-store`); `--no-codesign` archives without signing. A warning is shown if no signing identity is in the keychain — that's normal when Xcode manages signing for you. If automatic signing fails on provisioning, open the project in Xcode once.
+- `--obfuscate` stores symbols in `build/symbols/<flavor>` — keep them, they're needed to symbolicate crash reports.
+- `--debug`/`--profile`, `--split-per-abi` (apk), `--dry-run`, and `-- <flutter args>` passthrough are supported too.
+
+> **Deprecated:** `moshaf_boilerplate pre_launch_task <flavor>` still works but prints a warning — use `env`. Projects generated by an older version keep `pre_launch_task` in `.vscode/tasks.json`; both work, switch whenever convenient. Newly generated projects use `env`, which needs this CLI version or newer installed (`dart pub global activate moshaf_boilerplate`).
 
 ## Running on macOS
 
@@ -190,16 +237,19 @@ An Android-Developer-Options-style debug layer, invisible to normal users — no
 **Unlocking it**: tap the logo on the Welcome or Login page (it looks like a plain logo, not a button — that's the point) to open the About page, no login required. From there:
 
 - **`dev`**: already on automatically — the tap just gets you to About, nothing to unlock.
-- **`staging`**: tap the app version 7 times to unlock; shows "Developer mode enabled".
-- **`prod`**: same 7-tap gesture, then a PIN dialog (`DEVELOPER_PIN` in `.env` — unset means no PIN is enforced, so the tap alone unlocks; see `developer_pin_gate.dart`).
+- **`staging`**: tap the app version 7 times, then the same PIN dialog as prod (`DEVELOPER_PIN`; unset means no PIN is enforced, so the tap alone unlocks); shows "Developer mode enabled".
+- **`prod`**: same as staging — 7 taps, then a PIN dialog (`DEVELOPER_PIN` in `.env` — unset means no PIN is enforced, so the tap alone unlocks; see `developer_pin_gate.dart`).
 
 Once unlocked, a draggable floating button (`lib/core/developer_tools/`) appears on every page except the developer-tools screens themselves — drag it anywhere, it stays within screen bounds and keeps its position for the rest of the app session (not persisted across restarts). Tapping it opens the Developer Menu:
 
-- **API Logs** — every request/response Dio makes, while developer mode is on only, capped at 100 (newest first). Sensitive values (`Authorization` header, `password`/`token` body fields) are masked before they're ever stored. Tap an entry for full request/response detail, with a copy-response button; a failed call (>=400 or network error) also raises a snackbar with a direct link to its log.
+- **API Logs** — every request/response Dio makes, while developer mode is on only, capped at 100 (newest first). Sensitive values (`Authorization`/`Cookie` headers; `password`, `token`, `otp`, `id_token` and similar body fields) are masked before they're ever stored; `ResponseType.bytes` bodies that hold JSON are decoded and masked too, other binary bodies show as `(binary, N bytes)`. Tap an entry for full request/response detail, with a copy-response button; a failed call (>=400 or network error) also raises a snackbar with a direct link to its log.
 - **Feature Flags** — current state of the [feature flag system](#feature-flags) below, grouped per module in a scrollable accordion; a "copy expected response" button copies the exact JSON (and endpoint) a working backend should return for the current flag set.
 - **Refresh Remote Config** — re-fetches feature flags from the API.
 - **Clear Cache** — clears the in-memory API log store.
 - **App Information** — app name, version/build number, flavor, API base URL.
+- **Disable Developer Mode** — hides the floating button until unlocked again (on `dev` it comes back after the next app restart, since `dev` enables itself at startup).
+
+To expose the unlock gesture somewhere else, wrap any widget in `DeveloperModeUnlockTrigger` (`core/developer_tools/`) — it holds the whole tap-count → PIN → enable flow, so `AboutPage` is just one user of it.
 
 `ApiLoggerInterceptor` is wired into `MainClient` alongside the existing `PrettyDioLogger`/`CustomInterceptor` — it self-gates on `DeveloperModeNotifier.isEnabled` at request time, so nothing is recorded while developer mode is off, no matter how the interceptor got attached.
 
@@ -224,6 +274,8 @@ nothing else in the project depends on them.
 > **Note:** The following diagram illustrates the recommended folder structure, demonstrating clear separation of concerns in accordance with Clean Architecture.
 
 ```
+├── AGENTS.md                     # working rules for AI agents (CLAUDE.md points to it)
+├── PROJECT_BLUEPRINT.md          # code standard — read before adding a feature
 ├── ci                            # Jenkins pipeline scripts/docs (optional, deletable)
 ├── docs
 │   └── release                   # store-launch-checklist.html — offline release checklist (optional, deletable)
@@ -250,6 +302,7 @@ nothing else in the project depends on them.
 │   │   ├── constants                # colors.dart, textstyle.dart, generated assets.gen.dart
 │   │   ├── developer_tools          # hidden debug menu — see Developer Tools below
 │   │   │   ├── api_logs
+│   │   │   ├── components           # shared menu section/tile widgets
 │   │   │   └── dialogs
 │   │   ├── env
 │   │   ├── error
